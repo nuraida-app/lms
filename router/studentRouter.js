@@ -105,8 +105,7 @@ router.get(
   async (req, res) => {
     try {
       const data = await client.query(
-        "SELECT students.id, students.name, homebase.name AS homebase, students.nis FROM students " +
-          "INNER JOIN homebase ON homebase.id = students.homebase_id " +
+        "SELECT students.id, students.name, students.nis FROM students " +
           "ORDER BY students.name ASC"
       );
 
