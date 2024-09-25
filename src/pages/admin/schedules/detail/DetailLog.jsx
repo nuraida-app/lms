@@ -15,7 +15,10 @@ import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import LockResetIcon from "@mui/icons-material/LockReset";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useResetLogMutation } from "../../../../state-control/api/logApi";
+import {
+  useClearLogAnswersMutation,
+  useResetLogMutation,
+} from "../../../../state-control/api/logApi";
 import { toast } from "react-toastify";
 
 const columns = [
@@ -34,15 +37,34 @@ const DetailLog = ({ data, logs }) => {
   const params = useParams();
   const [resetLog, { data: message, isSuccess, isLoading, error }] =
     useResetLogMutation();
+  const [
+    clearLogAnswer,
+    {
+      data: clearMsg,
+      isSuccess: isClear,
+      error: clearError,
+      isLoading: clearLoading,
+    },
+  ] = useClearLogAnswersMutation();
 
   const resetHandler = (nis, logId) => {
     const data = {
-      nis,
-      logId,
-      quizId: params.quizId,
+      nis: parseInt(nis),
+      logId: parseInt(logId),
+      quizId: parseInt(params.quizId),
     };
 
     resetLog(data);
+  };
+
+  const rejoin = (nis, logId) => {
+    const data = {
+      nis: parseInt(nis),
+      logId: parseInt(logId),
+      quizId: parseInt(params.quizId),
+    };
+
+    clearLogAnswer(data);
   };
 
   useEffect(() => {
@@ -54,6 +76,16 @@ const DetailLog = ({ data, logs }) => {
       toast.error(error.data.message);
     }
   }, [message, isSuccess, error]);
+
+  useEffect(() => {
+    if (isClear) {
+      toast.success(clearMsg.message);
+    }
+
+    if (clearError) {
+      toast.error(clearError.data.message);
+    }
+  }, [clearMsg, isClear, clearError]);
   return (
     <Paper sx={{ overflow: "auto" }}>
       <TableContainer sx={{ maxHeight: { md: 530, xl: 570 }, width: "100%" }}>
@@ -97,13 +129,17 @@ const DetailLog = ({ data, logs }) => {
                       <Typography sx={{ color: "orange", fontWeight: "bold" }}>
                         Unjoin
                       </Typography>
+                    ) : log?.isDone ? (
+                      <Typography sx={{ color: "red", fontWeight: "bold" }}>
+                        Finished
+                      </Typography>
                     ) : log?.isActive ? (
                       <Typography sx={{ color: "green", fontWeight: "bold" }}>
                         Ongoing
                       </Typography>
                     ) : (
-                      <Typography sx={{ color: "red", fontWeight: "bold" }}>
-                        Finished
+                      <Typography sx={{ color: "orange", fontWeight: "bold" }}>
+                        Unjoin
                       </Typography>
                     )}
                   </TableCell>
@@ -113,7 +149,7 @@ const DetailLog = ({ data, logs }) => {
                         <IconButton
                           color="info"
                           onClick={() => resetHandler(student.nis, log?.id)}
-                          disabled={!log ? true : false}
+                          disabled={!log ? true : log?.isActive ? false : true}
                         >
                           {isLoading ? (
                             <CircularProgress size={20} color="inherit" />
@@ -129,8 +165,13 @@ const DetailLog = ({ data, logs }) => {
                         <IconButton
                           color="error"
                           disabled={!log ? true : log.isDone ? false : true}
+                          onClick={() => rejoin(student.nis, log?.id)}
                         >
-                          <LockResetIcon />
+                          {clearLoading ? (
+                            <CircularProgress size={20} color="inherit" />
+                          ) : (
+                            <LockResetIcon />
+                          )}
                         </IconButton>
                       </span>
                     </Tooltip>

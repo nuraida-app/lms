@@ -6,11 +6,13 @@ export const logApi = createApi({
     baseUrl: `${import.meta.env.VITE_BASE}/log`,
     credentials: "include",
   }),
+  tagTypes: ["logs", "log"],
   endpoints: (builder) => ({
     getLogs: builder.query({
       query: (id) => ({
         url: `/get/${id}`,
       }),
+      providesTags: ["logs"],
     }),
     createLog: builder.mutation({
       query: (body) => ({
@@ -18,24 +20,19 @@ export const logApi = createApi({
         method: "POST",
         body,
       }),
+      invalidatesTags: ["logs"],
     }),
     getMyLogs: builder.query({
       query: (nis) => `/detail/${nis}`,
+      providesTags: ["log"],
     }),
-
     resetLog: builder.mutation({
       query: (body) => ({
         url: "/change-status-log",
         method: "PUT",
         body,
       }),
-      async onQueryStarted({ quizId }, { queryFulfilled, dispatch }) {
-        await queryFulfilled;
-
-        dispatch(
-          logApi.endpoints.getLogs.initiate(quizId, { forceRefetch: true })
-        );
-      },
+      invalidatesTags: ["logs"],
     }),
     clearLogAnswers: builder.mutation({
       query: (body) => ({
@@ -43,6 +40,7 @@ export const logApi = createApi({
         method: "DELETE",
         body,
       }),
+      invalidatesTags: ["logs"],
     }),
     finishedQuiz: builder.mutation({
       query: (quizId) => ({

@@ -124,6 +124,7 @@ const Question = ({ setOpen, question, note, number, refresh, answers }) => {
   useEffect(() => {
     if (isSuccess) {
       toast.success(data.message);
+      setValue("");
       reset();
     }
 
