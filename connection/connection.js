@@ -3,10 +3,10 @@ import pkg from "pg";
 const { Client } = pkg;
 
 const config = {
-  user: process.env.USER,
-  password: process.env.PASS,
-  host: process.env.LOCATION,
-  database: process.env.DATABASE,
+  user: "postgres",
+  password: "nibs2024*",
+  host: "103.245.38.61",
+  database: "nibs_lms",
   port: 5432,
 };
 

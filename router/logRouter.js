@@ -144,10 +144,12 @@ router.put(
       const { nis, quizId, logId } = req.body;
 
       const isActive = false;
+      const isDone = false;
 
       const result = await client.query(
-        `UPDATE log SET "isActive" = $1 WHERE id = $2 AND nis = $3 AND quiz_id = $4`,
-        [isActive, logId, nis, quizId]
+        `UPDATE log SET "isActive" = $1, "isDone" = $2 
+        WHERE id = $3 AND nis = $4 AND quiz_id = $5`,
+        [isActive, isDone, logId, nis, quizId]
       );
 
       if (result.rowCount === 0) {
@@ -171,15 +173,15 @@ router.delete(
   authorizeRoles("admin", "teacher"),
   async (req, res) => {
     try {
-      const { nis, quizId, logid } = req.body;
+      const { nis, quizId, logId } = req.body;
 
       await client.query(
         "DELETE FROM log WHERE id = $1 AND nis = $2 AND quiz_id = $3",
-        [logid, nis, quizId]
+        [logId, nis, quizId]
       );
 
       await client.query(
-        "DELETE FROM jawaban WHERE nis = $1 AND quiz_id = $2",
+        "DELETE FROM answers WHERE nis = $1 AND quiz_id = $2",
         [nis, quizId]
       );
 
