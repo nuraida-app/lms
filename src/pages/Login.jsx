@@ -73,6 +73,8 @@ const Login = () => {
         window.location.href = "/student/dashboard";
       } else if (user.role === "teacher") {
         window.location.href = "/teacher/dashboard";
+      } else if (user.role === "super-admin") {
+        window.location.href = "/admin-center";
       }
     }
 
