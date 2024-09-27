@@ -1,0 +1,1 @@
+import{b6 as n,j as o,bg as r,e as u,b3 as b,b4 as f}from"./index-DjgEXlBM.js";function m({styles:e,themeId:t,defaultTheme:a={}}){const s=n(a),l=typeof e=="function"?e(t&&s[t]||s):e;return o.jsx(r,{styles:l})}function x(e){return o.jsx(m,u({},e,{defaultTheme:b,themeId:f}))}export{x as G};

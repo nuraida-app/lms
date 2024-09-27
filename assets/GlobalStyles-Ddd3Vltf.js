@@ -1,1 +1,0 @@
-import{b7 as n,j as o,bh as r,e as u,b4 as b,b5 as f}from"./index-B4oIbNwU.js";function m({styles:e,themeId:t,defaultTheme:a={}}){const s=n(a),l=typeof e=="function"?e(t&&s[t]||s):e;return o.jsx(r,{styles:l})}function x(e){return o.jsx(m,u({},e,{defaultTheme:b,themeId:f}))}export{x as G};
