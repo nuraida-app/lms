@@ -15,12 +15,8 @@ import {
 } from "@mui/material";
 import React, { Fragment, useEffect, useState } from "react";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import StudentFunc from "./StudentFunc";
 import StudentEdit from "./StudentEdit";
-import {
-  useDeleteStudentMutation,
-  useGetStudentMutation,
-} from "../../../state-control/api/studentApi";
+import { useGetStudentMutation } from "../../../state-control/api/studentApi";
 import { toast } from "react-toastify";
 
 const columns = [
@@ -32,9 +28,7 @@ const columns = [
 ];
 
 const StudentsTable = ({ students, loading }) => {
-  const [deleteStudent, { data, isLoading, isSuccess, error }] =
-    useDeleteStudentMutation();
-  const [getStudent, { data: student }] = useGetStudentMutation();
+  const [getStudent, { data: student, isLoading }] = useGetStudentMutation();
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [edit, setEdit] = useState(false);
@@ -49,13 +43,6 @@ const StudentsTable = ({ students, loading }) => {
     setAnchorEl(null);
   };
 
-  const deleteHandler = () => {
-    if (studentId) {
-      handleClose();
-      deleteStudent(studentId);
-    }
-  };
-
   const editHandler = () => {
     if (studentId) {
       setEdit(true);
@@ -63,16 +50,6 @@ const StudentsTable = ({ students, loading }) => {
       handleClose();
     }
   };
-
-  useEffect(() => {
-    if (isSuccess) {
-      toast.success(data.message);
-    }
-
-    if (error) {
-      toast.error(error.data.message);
-    }
-  }, [data, isSuccess, error]);
 
   // search function
   const [searchTerm, setSearchTerm] = useState("");
@@ -105,8 +82,6 @@ const StudentsTable = ({ students, loading }) => {
           value={searchTerm}
           onChange={serachFunction}
         />
-
-        {/* <StudentFunc /> */}
       </Box>
 
       <Paper>
@@ -167,7 +142,6 @@ const StudentsTable = ({ students, loading }) => {
         }}
       >
         <MenuItem onClick={editHandler}>Edit</MenuItem>
-        <MenuItem onClick={deleteHandler}>Delete</MenuItem>
       </Menu>
 
       <StudentEdit open={edit} close={() => setEdit(false)} student={student} />

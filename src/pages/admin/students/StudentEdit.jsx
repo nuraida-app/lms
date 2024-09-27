@@ -4,11 +4,7 @@ import {
   Button,
   CircularProgress,
   Fade,
-  FormControl,
-  InputLabel,
-  MenuItem,
   Modal,
-  Select,
   TextField,
 } from "@mui/material";
 import "./styles.css";
