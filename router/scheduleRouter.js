@@ -53,9 +53,20 @@ router.post(
         return res.status(500).json({ message: "Schedule has been used" });
       } else {
         await client.query(
-          `INSERT INTO schedules(name, description, token, teacher_id, quiz_id, start, "end", grade_id) 
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
-          [name, desc, code, teacherId, quizId, start, end, gradeId]
+          `INSERT INTO schedules(name, description, token, teacher_id,
+            quiz_id, start, "end", grade_id, homebase_id)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
+          [
+            name,
+            desc,
+            code,
+            teacherId,
+            quizId,
+            start,
+            end,
+            gradeId,
+            req.user.homebase_id,
+          ]
         );
 
         res.status(200).json({ message: "Schedule is successfully added" });
@@ -84,7 +95,8 @@ router.get(
             "INNER JOIN teachers ON schedules.teacher_id = teachers.id " +
             "INNER JOIN quizzes ON schedules.quiz_id = quizzes.id " +
             "INNER JOIN grades ON schedules.grade_id = grades.id " +
-            "ORDER BY teachers.name ASC"
+            "WHERE schedules.homebase_id = $1 ORDER BY teachers.name ASC",
+          [req.user.homebase_id]
         );
 
         const rooms = data.rows;

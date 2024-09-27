@@ -29,9 +29,17 @@ router.post(
         return res.status(500).json({ message: "Quiz Name has been used" });
       } else {
         const data = await client.query(
-          "INSERT INTO quizzes (teacher_id, grade_id, quiz_name, shuffle, mc_weight, essay_weight) " +
-            "VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
-          [teacherId, gradeId, quizName, shuffle, mc, essay]
+          "INSERT INTO quizzes (teacher_id, grade_id, quiz_name, shuffle, mc_weight, essay_weight, homebase_id) " +
+            "VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
+          [
+            teacherId,
+            gradeId,
+            quizName,
+            shuffle,
+            mc,
+            essay,
+            req.user.homebase_id,
+          ]
         );
 
         const exam = data.rows[0];
@@ -84,6 +92,9 @@ router.get(
   authorizeRoles("admin", "teacher"),
   async (req, res) => {
     try {
+      const teacher = req.user.role === "teacher";
+      const admin = req.user.role === "admin";
+
       let query =
         "SELECT quizzes.id, quizzes.quiz_name, quizzes.teacher_id, teachers.name AS teacher, " +
         "grades.grade, " +
@@ -95,9 +106,14 @@ router.get(
 
       let queryParams = [];
 
-      if (req.user.role !== "admin") {
+      if (teacher) {
         query += "WHERE quizzes.teacher_id = $1 ";
         queryParams.push(req.user.id);
+      }
+
+      if (admin) {
+        query += "WHERE quizzes.homebase_id = $1 ";
+        queryParams.push(req.user.homebase_id);
       }
 
       query += "ORDER BY CAST(quizzes.grade_id AS INTEGER) ASC";
