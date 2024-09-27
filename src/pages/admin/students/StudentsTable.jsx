@@ -106,7 +106,7 @@ const StudentsTable = ({ students, loading }) => {
           onChange={serachFunction}
         />
 
-        <StudentFunc />
+        {/* <StudentFunc /> */}
       </Box>
 
       <Paper>
