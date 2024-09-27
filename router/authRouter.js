@@ -186,6 +186,14 @@ router.get("/load", authenticatedUser, async (req, res) => {
       const teacher = data.rows[0];
 
       res.status(200).json(teacher);
+    } else {
+      const data = await client.query(
+        `SELECT * FROM admin WHERE admin.id = $1`,
+        [user.id]
+      );
+      const adminData = data.rows[0];
+
+      res.status(200).json(adminData);
     }
   } catch (error) {
     console.log(error);

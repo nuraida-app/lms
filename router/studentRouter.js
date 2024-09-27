@@ -13,11 +13,10 @@ const router = express.Router();
 router.post(
   "/create",
   authenticatedUser,
-  authorizeRoles("admin"),
+  authorizeRoles("admin", "super-admin"),
   async (req, res) => {
     try {
-      const homebase = req.user.homebase_id;
-      const { nis, name } = req.body;
+      const { nis, name, homebase } = req.body;
 
       const password = "12345678";
       const role = "student";
@@ -101,7 +100,7 @@ router.post(
 router.get(
   "/get",
   authenticatedUser,
-  authorizeRoles("admin", "super-admin"),
+  authorizeRoles("super-admin"),
   async (req, res) => {
     try {
       const data = await client.query(
@@ -152,7 +151,7 @@ router.get(
 router.get(
   "/detail/:id",
   authenticatedUser,
-  authorizeRoles("admin", "siswa", "guru"),
+  authorizeRoles("admin", "siswa", "guru", "super-admin"),
   async (req, res) => {
     try {
       const { id } = req.params;
@@ -198,7 +197,7 @@ router.get(
 router.put(
   "/update/:id",
   authenticatedUser,
-  authorizeRoles("admin", "student", "teacher"),
+  authorizeRoles("admin", "student", "teacher", "super-admin"),
   async (req, res) => {
     try {
       const { id } = req.params;
