@@ -1,0 +1,1 @@
+import{g as t}from"./getThemeProps-DErmPepc.js";import{aX as p}from"./index-CFLTN1m7.js";function g({props:o,name:s,defaultTheme:m,themeId:r}){let e=p(m);return r&&(e=e[r]||e),t({theme:e,name:s,props:o})}export{g as u};

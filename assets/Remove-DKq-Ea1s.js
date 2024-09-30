@@ -1,0 +1,1 @@
+import{i as r,j as t}from"./index-CFLTN1m7.js";import{r as a}from"./createSvgIcon-T2x4Gml6.js";var e={},o=r;Object.defineProperty(e,"__esModule",{value:!0});var u=e.default=void 0,i=o(a()),v=t;u=e.default=(0,i.default)((0,v.jsx)("path",{d:"M19 13H5v-2h14z"}),"Remove");export{u as d};

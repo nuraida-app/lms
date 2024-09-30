@@ -1,1 +1,0 @@
-import{g as t}from"./ChevronRight-JRIqjZRu.js";import{b6 as p}from"./index-DjgEXlBM.js";function i({props:o,name:s,defaultTheme:m,themeId:r}){let e=p(m);return r&&(e=e[r]||e),t({theme:e,name:s,props:o})}export{i as u};
