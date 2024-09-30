@@ -12,17 +12,17 @@ import {
   Input,
 } from "@mui/material";
 
-const DataTable = ({ type }) => {
+const Data = ({ type }) => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(50);
   const [filteredData, setFilteredData] = useState([]);
 
   useEffect(() => {
     const filtered = type?.filter((item) =>
       item.name.toLowerCase().includes(search.toLowerCase())
     );
-    setFilteredData(filtered);
+    setFilteredData(filtered || []);
   }, [search, type]);
 
   const handleSearchChange = (e) => {
@@ -39,17 +39,17 @@ const DataTable = ({ type }) => {
   };
 
   return (
-    <Paper>
+    <Paper sx={{ width: "100%" }}>
       <Input
         placeholder="Search"
         variant="outlined"
         value={search}
         onChange={handleSearchChange}
-        margin="normal"
+        margin="dense"
         sx={{ m: 1 }}
       />
-      <TableContainer>
-        <Table>
+      <TableContainer sx={{ height: 550 }}>
+        <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
               <TableCell align="center">Name</TableCell>
@@ -69,7 +69,7 @@ const DataTable = ({ type }) => {
         </Table>
       </TableContainer>
       <TablePagination
-        rowsPerPageOptions={[5, 10, 25, 50, 100]}
+        rowsPerPageOptions={[50, 100]}
         component="div"
         count={filteredData?.length}
         rowsPerPage={rowsPerPage}
@@ -81,4 +81,4 @@ const DataTable = ({ type }) => {
   );
 };
 
-export default DataTable;
+export default Data;

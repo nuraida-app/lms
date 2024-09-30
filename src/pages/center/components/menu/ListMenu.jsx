@@ -8,6 +8,9 @@ import {
   ListSubheader,
 } from "@mui/material";
 import React from "react";
+import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { logoutUser } from "../../../../state-control/api/authApi";
 
 // Icons
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
@@ -16,7 +19,7 @@ import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import DonutLargeIcon from "@mui/icons-material/DonutLarge";
 import SettingsIcon from "@mui/icons-material/Settings";
 import HomeIcon from "@mui/icons-material/Home";
-import { Link } from "react-router-dom";
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 
 const Menus = [
   {
@@ -52,18 +55,29 @@ const Menus = [
 ];
 
 const ListMenu = () => {
+  const dispatch = useDispatch();
+
+  const logout = () => dispatch(logoutUser());
   return (
     <Box sx={{ height: "100vh", overflow: "auto", bgcolor: "white" }}>
       <List>
         <ListSubheader>Admin Center</ListSubheader>
         {Menus.map((item) => (
-          <ListItem>
+          <ListItem key={item.label}>
             <ListItemButton key={item.label} component={Link} to={item.link}>
               <ListItemAvatar>{item.icon}</ListItemAvatar>
               <ListItemText primary={item.label} />
             </ListItemButton>
           </ListItem>
         ))}
+        <ListItem>
+          <ListItemButton onClick={logout}>
+            <ListItemAvatar>
+              <ExitToAppIcon color="error" />
+            </ListItemAvatar>
+            <ListItemText primary="Logout" />
+          </ListItemButton>
+        </ListItem>
       </List>
     </Box>
   );

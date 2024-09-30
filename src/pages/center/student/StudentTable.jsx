@@ -16,6 +16,7 @@ import {
 import React, { Fragment, useEffect, useState } from "react";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import StudentEdit from "./StudentEdit";
+import StudentFunc from "./StudentFunc";
 import {
   useDeleteStudentMutation,
   useGetStudentMutation,
@@ -104,7 +105,7 @@ const StudentTable = ({ students, loading }) => {
           onChange={serachFunction}
         />
 
-        {/* <StudentFunc /> */}
+        <StudentFunc />
       </Box>
 
       {loading ? (

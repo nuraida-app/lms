@@ -11,6 +11,8 @@ import { scheduleApi } from "./api/scheduleApi";
 import { answerApi } from "./api/answerApi";
 import { logApi } from "./api/logApi";
 import { dbApi } from "./api/dbApi";
+import { adminApi } from "./api/adminApi";
+import { mediaApi } from "./api/mediaApi";
 
 const store = configureStore({
   reducer: {
@@ -26,6 +28,8 @@ const store = configureStore({
     [answerApi.reducerPath]: answerApi.reducer,
     [logApi.reducerPath]: logApi.reducer,
     [dbApi.reducerPath]: dbApi.reducer,
+    [adminApi.reducerPath]: adminApi.reducer,
+    [mediaApi.reducerPath]: mediaApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat([
@@ -40,6 +44,8 @@ const store = configureStore({
       answerApi.middleware,
       logApi.middleware,
       dbApi.middleware,
+      adminApi.middleware,
+      mediaApi.middleware,
     ]),
 });
 

@@ -11,11 +11,6 @@ import TeachersUpload from "./TeachersUpload";
 const TeachersFunc = () => {
   const [confirm, setConfirm] = useState(false);
   const [openAdd, setOpenAdd] = useState(false);
-  const [upload, setUpload] = useState(false);
-
-  const download = () => {
-    window, open("/guru_template.xlsx", "_blank");
-  };
 
   return (
     <Box
@@ -37,26 +32,6 @@ const TeachersFunc = () => {
       </Button>
 
       <Button
-        startIcon={<UploadFileIcon />}
-        variant="contained"
-        color="secondary"
-        onClick={() => setUpload(true)}
-        sx={{ width: 120 }}
-      >
-        Upload
-      </Button>
-
-      <Button
-        startIcon={<InsertDriveFileOutlinedIcon />}
-        variant="contained"
-        color="warning"
-        onClick={download}
-        sx={{ width: 120 }}
-      >
-        Template
-      </Button>
-
-      <Button
         startIcon={<FolderDeleteIcon />}
         variant="contained"
         color="error"
@@ -67,8 +42,6 @@ const TeachersFunc = () => {
       </Button>
 
       <TeacherAdd open={openAdd} close={() => setOpenAdd(false)} />
-
-      <TeachersUpload open={upload} close={() => setUpload(false)} />
 
       <TeachersConfirm open={confirm} close={() => setConfirm(false)} />
     </Box>
