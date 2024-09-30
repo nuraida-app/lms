@@ -301,7 +301,7 @@ router.put(
 router.delete(
   "/delete/:id",
   authenticatedUser,
-  authorizeRoles("admin"),
+  authorizeRoles("admin", "super-admin"),
   async (req, res) => {
     try {
       const id = req.params.id;

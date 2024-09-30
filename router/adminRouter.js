@@ -47,12 +47,12 @@ router.post(
 router.get(
   "/profile",
   authenticatedUser,
-  authorizeRoles("admin"),
+  authorizeRoles("admin", "super-admin"),
   async (req, res) => {
     try {
       const user = req.user;
 
-      if (user && user.role === "admin") {
+      if (user.role === "admin") {
         const data = await client.query(
           "SELECT admin.name, admin.role, homebase.name FROM admin " +
             "INNER JOIN homebase ON homebase.id = admin.homebase_id " +
@@ -63,8 +63,40 @@ router.get(
 
         res.status(200).json(adminData);
       } else {
-        return null;
+        const data = await client.query(
+          "SELECT admin.name, admin.role, admin.email FROM admin " +
+            "WHERE admin.id = $1",
+          [user.id]
+        );
+        const adminData = data.rows[0];
+
+        res.status(200).json(adminData);
       }
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
+    }
+  }
+);
+
+// Admin Center data
+// Dashboard
+router.get(
+  "/data-users",
+  authenticatedUser,
+  authorizeRoles("super-admin"),
+  async (req, res) => {
+    try {
+      const homebase = await client.query(`SELECT * FROM homebase`);
+      const classes = await client.query(`SELECT * FROM classes`);
+      const teachers = await client.query(`SELECT * FROM Teachers`);
+      const students = await client.query(`SELECT * FROM Students`);
+
+      res.status(200).json({
+        homebase: homebase.rowCount,
+        classes: classes.rowCount,
+        teachers: teachers.rowCount,
+        students: students.rowCount,
+      });
     } catch (error) {
       return res.status(500).json({ error: error.message });
     }
