@@ -108,7 +108,7 @@ const CenterTeacherPage = () => {
           }}
         >
           <Input
-            placeholder="Search Subject"
+            placeholder="Search Teacher"
             value={searchTerm}
             onChange={serachFunction}
           />
@@ -117,7 +117,7 @@ const CenterTeacherPage = () => {
         {isLoading ? (
           <Box
             sx={{
-              height: { xs: 500, md: 530, lg: 650, xl: 638 },
+              height: { xs: 500, md: 530, lg: 650, xl: 790 },
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -128,7 +128,7 @@ const CenterTeacherPage = () => {
         ) : (
           <TableContainer
             sx={{
-              height: { xs: 500, md: 530, lg: 650, xl: 638 },
+              height: { xs: 500, md: 530, lg: 650, xl: 790 },
               overflow: "auto",
             }}
           >

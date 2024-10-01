@@ -13,10 +13,12 @@ import { logApi } from "./api/logApi";
 import { dbApi } from "./api/dbApi";
 import { adminApi } from "./api/adminApi";
 import { mediaApi } from "./api/mediaApi";
+import { homebaseApi } from "./api/homebaseApi";
 
 const store = configureStore({
   reducer: {
     authentication: authSlice,
+    [homebaseApi.reducerPath]: homebaseApi.reducer,
     [gradeApi.reducerPath]: gradeApi.reducer,
     [classApi.reducerPath]: classApi.reducer,
     [subjectApi.reducerPath]: subjectApi.reducer,
@@ -46,6 +48,7 @@ const store = configureStore({
       dbApi.middleware,
       adminApi.middleware,
       mediaApi.middleware,
+      homebaseApi.middleware,
     ]),
 });
 

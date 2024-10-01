@@ -23,9 +23,7 @@ const Center = () => {
         <DataOne data={data} />
       </Paper>
 
-      <Paper sx={{ p: 1 }}>
-        <DataTwo />
-      </Paper>
+      <DataTwo />
     </Layout>
   );
 };

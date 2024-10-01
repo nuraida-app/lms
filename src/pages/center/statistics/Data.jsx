@@ -48,7 +48,7 @@ const Data = ({ type }) => {
         margin="dense"
         sx={{ m: 1 }}
       />
-      <TableContainer sx={{ height: 550 }}>
+      <TableContainer sx={{ height: { xs: 500, md: 550, lg: 680 } }}>
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>

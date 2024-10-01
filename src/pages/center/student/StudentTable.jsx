@@ -121,7 +121,10 @@ const StudentTable = ({ students, loading }) => {
         </Box>
       ) : (
         <TableContainer
-          sx={{ height: { xs: 500, md: 530, lg: 630 }, overflow: "auto" }}
+          sx={{
+            height: { xs: 500, md: 530, lg: 630, xl: 780 },
+            overflow: "auto",
+          }}
         >
           <Table stickyHeader aria-label="sticky table">
             <TableHead>

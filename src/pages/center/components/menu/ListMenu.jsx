@@ -59,7 +59,14 @@ const ListMenu = () => {
 
   const logout = () => dispatch(logoutUser());
   return (
-    <Box sx={{ height: "100vh", overflow: "auto", bgcolor: "white" }}>
+    <Box
+      sx={{
+        height: "100vh",
+        overflow: "auto",
+        bgcolor: "white",
+        position: "fixed",
+      }}
+    >
       <List>
         <ListSubheader>Admin Center</ListSubheader>
         {Menus.map((item) => (

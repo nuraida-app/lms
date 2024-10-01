@@ -92,6 +92,9 @@ const CenterStudentPage = lazy(() =>
 const CenterStatistic = lazy(() =>
   import("./pages/center/statistics/CenterStatistic")
 );
+const CenterAdminPage = lazy(() =>
+  import("./pages/center/admin/CenterAdminPage")
+);
 
 function App() {
   const dispatch = useDispatch();
@@ -214,6 +217,8 @@ function App() {
           {/* Admin Center */}
 
           <Route path="/admin-center" element={<Center />} />
+
+          <Route path="/admin-center/admin" element={<CenterAdminPage />} />
 
           <Route
             path="/admin-center/teachers"

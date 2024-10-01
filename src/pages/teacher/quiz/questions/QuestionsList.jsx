@@ -18,6 +18,7 @@ import EditNoteIcon from "@mui/icons-material/EditNote";
 import PlaylistRemoveIcon from "@mui/icons-material/PlaylistRemove";
 import { toast } from "react-toastify";
 import ReactAudioPlayer from "react-audio-player";
+import "./styles.css";
 
 const createMarkup = (html) => {
   return { __html: html };

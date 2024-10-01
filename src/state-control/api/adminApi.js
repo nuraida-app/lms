@@ -6,6 +6,7 @@ export const adminApi = createApi({
     baseUrl: `${import.meta.env.VITE_BASE}/admin`,
     credentials: "include",
   }),
+  tagTypes: ["Admins", "Admin"],
   endpoints: (builder) => ({
     getUserData: builder.query({
       query: () => ({
@@ -16,8 +17,24 @@ export const adminApi = createApi({
       query: () => ({
         url: "/profile",
       }),
+      providesTags: ["admin"],
+    }),
+    getAdmins: builder.query({
+      query: () => `/get-admins`,
+      providesTags: ["Admins"],
+    }),
+    getDetailAdmin: builder.query({
+      query: (id) => ({
+        url: `/admin/${id}`,
+      }),
+      providesTags: ["Admin"],
     }),
   }),
 });
 
-export const { useGetUserDataQuery, useGetAdminQuery } = adminApi;
+export const {
+  useGetUserDataQuery,
+  useGetAdminQuery,
+  useGetAdminsQuery,
+  useGetDetailAdminQuery,
+} = adminApi;
