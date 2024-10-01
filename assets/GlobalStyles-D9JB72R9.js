@@ -1,0 +1,1 @@
+import{aX as n,j as a,b5 as r,ap as u,aU as p,aV as f}from"./index-DVVZMFAy.js";function m({styles:e,themeId:t,defaultTheme:o={}}){const s=n(o),l=typeof e=="function"?e(t&&s[t]||s):e;return a.jsx(r,{styles:l})}function b(e){return a.jsx(m,u({},e,{defaultTheme:p,themeId:f}))}export{b as G};
