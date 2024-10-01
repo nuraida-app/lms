@@ -502,25 +502,25 @@ router.get(
 
         if (nisList.length > 0) {
           const queryProvince = `
-              SELECT province_id, province_name AS name, COUNT(*) AS total 
+              SELECT province_id AS id, TRIM(province_name) AS name, COUNT(*)::INTEGER AS total 
               FROM db_students 
               WHERE nis = ANY($1)
               GROUP BY province_id, province_name
           `;
           const queryRegency = `
-              SELECT regency_id, regency_name AS name, COUNT(*) AS total 
+              SELECT regency_id AS id, TRIM(regency_name) AS name, COUNT(*)::INTEGER AS total 
               FROM db_students 
               WHERE nis = ANY($1)
               GROUP BY regency_id, regency_name
           `;
           const queryDistrict = `
-              SELECT district_id, district_name AS name, COUNT(*) AS total 
+              SELECT district_id AS id, TRIM(district_name) AS name, COUNT(*)::INTEGER AS total 
               FROM db_students 
               WHERE nis = ANY($1)
               GROUP BY district_id, district_name
           `;
           const queryVillage = `
-              SELECT village_id, village_name AS name, COUNT(*) AS total 
+              SELECT village_id AS id, TRIM(village_name) AS name, COUNT(*)::INTEGER AS total 
               FROM db_students 
               WHERE nis = ANY($1)
               GROUP BY village_id, village_name
@@ -554,22 +554,22 @@ router.get(
         }
       } else {
         const queryProvince = `
-            SELECT province_id, province_name AS name, COUNT(*) AS total 
+            SELECT province_id AS id, TRIM(province_name) AS name, COUNT(*)::INTEGER AS total 
             FROM db_students 
             GROUP BY province_id, province_name
         `;
         const queryRegency = `
-            SELECT regency_id, regency_name AS name, COUNT(*) AS total 
+            SELECT regency_id AS id, TRIM(regency_name) AS name, COUNT(*)::INTEGER AS total 
             FROM db_students 
             GROUP BY regency_id, regency_name
         `;
         const queryDistrict = `
-            SELECT district_id, district_name AS name, COUNT(*) AS total 
+            SELECT district_id AS id, TRIM(district_name) AS name, COUNT(*)::INTEGER AS total 
             FROM db_students 
             GROUP BY district_id, district_name
         `;
         const queryVillage = `
-            SELECT village_id, village_name AS name, COUNT(*) AS total 
+            SELECT village_id AS id, TRIM(village_name) AS name, COUNT(*)::INTEGER AS total 
             FROM db_students 
             GROUP BY village_id, village_name
         `;

@@ -43,8 +43,8 @@ router.post(
 // Menampilkan satuan
 router.get(
   "/get",
-  authenticatedUser,
-  authorizeRoles("admin", "super-admin"),
+  // authenticatedUser,
+  // authorizeRoles("super-admin", "admin"),
   async (req, res) => {
     try {
       const data = await client.query("SELECT * FROM homebase ORDER BY id ASC");
