@@ -1,0 +1,1 @@
+import{g as t}from"./getThemeProps-BoIgSFff.js";import{aY as p}from"./index-G82UTrCn.js";function g({props:o,name:s,defaultTheme:m,themeId:r}){let e=p(m);return r&&(e=e[r]||e),t({theme:e,name:s,props:o})}export{g as u};
