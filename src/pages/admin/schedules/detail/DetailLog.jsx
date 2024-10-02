@@ -88,7 +88,9 @@ const DetailLog = ({ data, logs }) => {
   }, [clearMsg, isClear, clearError]);
   return (
     <Paper sx={{ overflow: "auto" }}>
-      <TableContainer sx={{ maxHeight: { md: 530, xl: 570 }, width: "100%" }}>
+      <TableContainer
+        sx={{ maxHeight: { md: 530, lg: 550, xl: 700 }, width: "100%" }}
+      >
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>

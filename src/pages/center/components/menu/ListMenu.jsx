@@ -20,6 +20,7 @@ import DonutLargeIcon from "@mui/icons-material/DonutLarge";
 import SettingsIcon from "@mui/icons-material/Settings";
 import HomeIcon from "@mui/icons-material/Home";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
+import SchoolIcon from "@mui/icons-material/School";
 
 const Menus = [
   {
@@ -31,6 +32,11 @@ const Menus = [
     label: "Admin",
     icon: <AdminPanelSettingsIcon color="success" />,
     link: "/admin-center/admin",
+  },
+  {
+    label: "Homebase",
+    icon: <SchoolIcon color="success" />,
+    link: "/admin-center/homebase",
   },
   {
     label: "Teachers",

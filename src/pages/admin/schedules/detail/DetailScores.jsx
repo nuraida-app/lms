@@ -96,7 +96,7 @@ const DetailScores = ({ data, quizname }) => {
         </Button>
       </Paper>
       <Paper sx={{ overflow: "auto" }}>
-        <TableContainer sx={{ maxHeight: { md: 480, xl: 570 }, width: "100%" }}>
+        <TableContainer sx={{ maxHeight: { md: 530, lg: 550, xl: 640 } }}>
           <Table stickyHeader aria-label="sticky table" ref={tableRef}>
             <TableHead>
               <TableRow>

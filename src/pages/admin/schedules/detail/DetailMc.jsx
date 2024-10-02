@@ -96,16 +96,10 @@ const DetailMc = ({ data, questions, quizname }) => {
         sx={{
           overflowX: "auto",
           overflowY: "auto",
-          width: { md: 900, lg: 1220, xl: 1400 },
         }}
       >
-        <TableContainer sx={{ maxHeight: { md: 480, xl: 570 }, width: "100%" }}>
-          <Table
-            stickyHeader
-            aria-label="sticky table"
-            sx={{ minWidth: 650 }}
-            ref={tableRef}
-          >
+        <TableContainer sx={{ maxHeight: { md: 480, xl: 570 } }}>
+          <Table stickyHeader aria-label="sticky table" ref={tableRef}>
             <TableHead>
               <TableRow>
                 {columns.map((item, index) => (

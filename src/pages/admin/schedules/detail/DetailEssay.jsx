@@ -129,7 +129,7 @@ const DetailEssay = ({ data, questions }) => {
       </Paper>
 
       <Paper sx={{ overflow: "auto" }}>
-        <TableContainer sx={{ maxHeight: { md: 480, xl: 570 }, width: "100%" }}>
+        <TableContainer sx={{ maxHeight: { md: 530, lg: 550, xl: 630 } }}>
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>

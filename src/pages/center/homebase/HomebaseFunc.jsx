@@ -1,26 +1,68 @@
-import { Box, Button, Fade, Input, Modal, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Fade,
+  Input,
+  Modal,
+  Paper,
+  Typography,
+} from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import FolderDeleteIcon from "@mui/icons-material/FolderDelete";
 import "./styles.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAddHomebaseMutation } from "../../../state-control/api/homebaseApi";
+import { toast } from "react-toastify";
 
 const HomebaseFunc = () => {
   const [open, setOpen] = useState(false);
+  const [homebase, setHomebase] = useState("");
+
+  const [addHomebase, { data, isSuccess, isLoading, error, reset }] =
+    useAddHomebaseMutation();
+
+  const addHandler = (e) => {
+    e.preventDefault();
+
+    const data = { homebase };
+    addHomebase(data);
+  };
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success(data.message);
+      setHomebase("");
+      reset();
+    }
+
+    if (error) {
+      toast.error(error.data.message);
+      reset();
+    }
+  }, [data, isSuccess, error]);
   return (
-    <Box
+    <Paper
       sx={{
         display: "flex",
         justifyContent: "end",
         gap: 2,
         flexDirection: { xs: "column", md: "row" },
+        p: 1,
       }}
     >
-      <form className="form-add">
-        <Input placeholder="Add Homebase" />
+      <form className="form-add" onSubmit={addHandler}>
+        <Input
+          placeholder="Add Homebase"
+          value={homebase || ""}
+          onChange={(e) => setHomebase(e.target.value)}
+        />
+
         <Button
           variant="contained"
           color="success"
-          startIcon={<AddCircleIcon />}
+          startIcon={isLoading ? <CircularProgress /> : <AddCircleIcon />}
+          type="submit"
         >
           Add
         </Button>
@@ -68,7 +110,7 @@ const HomebaseFunc = () => {
           </Box>
         </Fade>
       </Modal>
-    </Box>
+    </Paper>
   );
 };
 

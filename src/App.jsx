@@ -11,7 +11,7 @@ const Login = lazy(() => import("./pages/Login"));
 const DashboardPage = lazy(() =>
   import("./pages/admin/dashboard/DashboardPage")
 );
-const HomebasePage = lazy(() => import("./pages/admin/homebase/HomebasePage"));
+const HomebasePage = lazy(() => import("./pages/center/homebase/HomebasePage"));
 const SubjectsPage = lazy(() => import("./pages/admin/subjects/SubjectsPage"));
 const TeachersPage = lazy(() => import("./pages/admin/teachers/TeachersPage"));
 const GradesPage = lazy(() => import("./pages/admin/grades/GradesPage"));
@@ -118,8 +118,6 @@ function App() {
           <Route path="/" element={<Login />} />
 
           <Route path="/admin/dashboard" element={<DashboardPage />} />
-
-          <Route path="/admin/homebase" element={<HomebasePage />} />
 
           <Route path="/admin/subjects" element={<SubjectsPage />} />
 
@@ -231,6 +229,8 @@ function App() {
           />
 
           <Route path="/admin-center/statistic" element={<CenterStatistic />} />
+
+          <Route path="/admin-center/homebase" element={<HomebasePage />} />
         </Routes>
       </Suspense>
     </BrowserRouter>

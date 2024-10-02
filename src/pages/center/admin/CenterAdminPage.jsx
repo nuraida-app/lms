@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import Layout from "../components/layout/Layout";
 import {
   Box,
+  Button,
+  CircularProgress,
   IconButton,
   Input,
   Menu,
@@ -15,11 +17,14 @@ import {
   TableRow,
 } from "@mui/material";
 import {
+  useDeleteAdminMutation,
   useGetAdminsQuery,
   useGetDetailAdminQuery,
 } from "../../../state-control/api/adminApi";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import AdminEdit from "./AdminEdit";
+import AddIcon from "@mui/icons-material/Add";
+import Admin from "./Admin";
+import { toast } from "react-toastify";
 
 const CenterAdminPage = () => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -30,6 +35,8 @@ const CenterAdminPage = () => {
 
   const { data } = useGetAdminsQuery();
   const { data: admin } = useGetDetailAdminQuery(id, { skip: !id });
+  const [deleteAdmin, { data: msg, isSuccess, isLoading, error, reset }] =
+    useDeleteAdminMutation();
 
   const handleClick = (event, id) => {
     setAnchorEl(event.currentTarget);
@@ -41,13 +48,41 @@ const CenterAdminPage = () => {
 
   const editHandler = () => {
     setEdit(true);
+    handleClose();
   };
+
+  const removeHandler = () => {
+    handleClose();
+    deleteAdmin(id);
+  };
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success(msg.message);
+      reset();
+    }
+
+    if (error) {
+      toast.error(error.data.message);
+      reset();
+      console.log(error);
+    }
+  }, [msg, isSuccess, error]);
 
   return (
     <Layout>
       <Paper sx={{ p: 1 }}>
-        <Box>
+        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
           <Input placeholder="Search Admin" />
+
+          <Button
+            variant="contained"
+            color="success"
+            startIcon={<AddIcon />}
+            onClick={() => setEdit(true)}
+          >
+            Add
+          </Button>
         </Box>
 
         <TableContainer>
@@ -76,7 +111,11 @@ const CenterAdminPage = () => {
                       aria-expanded={open ? "true" : undefined}
                       onClick={(e) => handleClick(e, admin.id)}
                     >
-                      <MoreHorizIcon />
+                      {isLoading ? (
+                        <CircularProgress size={24} />
+                      ) : (
+                        <MoreHorizIcon />
+                      )}
                     </IconButton>
                   </TableCell>
                 </TableRow>
@@ -94,10 +133,10 @@ const CenterAdminPage = () => {
           }}
         >
           <MenuItem onClick={editHandler}>Edit</MenuItem>
-          <MenuItem>Delete</MenuItem>
+          <MenuItem onClick={removeHandler}>Delete</MenuItem>
         </Menu>
 
-        <AdminEdit open={edit} close={() => setEdit(false)} admin={admin} />
+        <Admin open={edit} close={() => setEdit(false)} admin={admin} />
       </Paper>
     </Layout>
   );
