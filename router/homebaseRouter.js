@@ -11,8 +11,8 @@ const router = express.Router();
 // super-admin
 router.post(
   "/create",
-  authenticatedUser,
-  authorizeRoles("super-admin"),
+  // authenticatedUser,
+  // authorizeRoles("super-admin"),
   async (req, res) => {
     try {
       const checking = await client.query(
@@ -62,8 +62,8 @@ router.get(
 // super-admin
 router.delete(
   "/delete/:id",
-  authenticatedUser,
-  authorizeRoles("super-admin"),
+  // authenticatedUser,
+  // authorizeRoles("super-admin"),
   async (req, res) => {
     try {
       await client.query("DELETE FROM homebase WHERE id = $1", [req.params.id]);

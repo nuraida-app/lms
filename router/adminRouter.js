@@ -16,13 +16,12 @@ router.post(
   authorizeRoles("super-admin"),
   async (req, res) => {
     try {
-      const { name, email, password, homebase_id } = req.body;
+      const { name, email, password, homebase_id, role } = req.body;
 
       bcrypt.hash(password, 10, async (err, hash) => {
         if (err) {
           return res.status(500).json({ error: err.message });
         } else {
-          const role = "admin";
           const data = await client.query(
             "INSERT INTO admin (name, email, password, role, homebase_id) VALUES($1, $2, $3, $4, $5) RETURNING *",
             [name, email, hash, role, homebase_id]
@@ -30,9 +29,7 @@ router.post(
           const admin = data.rows[0];
 
           if (admin) {
-            return res
-              .status(200)
-              .json({ message: "admin successfully added", admin });
+            return res.status(200).json({ message: "Added", admin });
           } else {
             return res.status(500).json({ message: "admin failed to add" });
           }
@@ -79,13 +76,28 @@ router.get(
   }
 );
 
-router.put(
-  "/update/:id",
+router.delete(
+  "/delete/:id",
   authenticatedUser,
   authorizeRoles("super-admin"),
   async (req, res) => {
     try {
-      const { name, email, role, homebase_id, password } = req.body;
+      await client.query(`DELETE FROM admin WHERE id = $1`, [req.params.id]);
+
+      res.status(200).json({ message: "Deleted" });
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
+    }
+  }
+);
+
+router.put(
+  "/update",
+  authenticatedUser,
+  authorizeRoles("super-admin"),
+  async (req, res) => {
+    try {
+      const { name, email, role, homebase_id, password, id } = req.body;
 
       if (password) {
         bcrypt.hash(password, 10, async (err, hash) => {
@@ -95,7 +107,7 @@ router.put(
             await client.query(
               `UPDATE admin SET name = $1, email = $2, password = $3,
               role = $4, homebase_id = $5 WHERE id = $6`,
-              [name, email, hash, role, homebase_id, req.params.id]
+              [name, email, hash, role, homebase_id, id]
             );
 
             res.status(200).json({ message: "Updated successfully" });
@@ -105,7 +117,7 @@ router.put(
         await client.query(
           `UPDATE admin SET name = $1, email = $2,
               role = $3, homebase_id = $4 WHERE id = $5`,
-          [name, email, role, homebase_id, req.params.id]
+          [name, email, role, homebase_id, id]
         );
 
         res.status(200).json({ message: "Updated successfully" });
