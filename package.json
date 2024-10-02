@@ -17,6 +17,7 @@
     "@mui/x-charts": "^6.19.8",
     "@mui/x-date-pickers": "^6.20.2",
     "@reduxjs/toolkit": "^2.2.6",
+    "@tinymce/tinymce-react": "^5.1.1",
     "axios": "^1.6.7",
     "chart.js": "^4.4.2",
     "date-fns": "^3.3.1",

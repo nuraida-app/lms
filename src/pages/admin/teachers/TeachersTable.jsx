@@ -112,7 +112,7 @@ const TeachersTable = () => {
         }}
       >
         <Input
-          placeholder="Search Subject"
+          placeholder="Search Teacher"
           value={searchTerm}
           onChange={serachFunction}
         />

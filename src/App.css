@@ -62,3 +62,8 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #555; /* Warna pegangan scrollbar saat hover */
 }
+
+* {
+  scrollbar-width: thin; /* Mengubah lebar scrollbar */
+  scrollbar-color: #888 #f1f1f1; /* thumb color track color */
+}

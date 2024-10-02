@@ -175,7 +175,7 @@ const DetailEssay = ({ data, questions }) => {
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
-              width: { xs: 350, md: 800 },
+              width: { xs: 350, md: 600 },
               maxHeight: 600,
               overflow: "auto",
               bgcolor: "#ffff",

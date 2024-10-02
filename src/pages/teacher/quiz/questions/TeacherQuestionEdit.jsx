@@ -20,6 +20,7 @@ import {
 } from "../../../../state-control/api/questionApi";
 import { toast } from "react-toastify";
 import ReactAudioPlayer from "react-audio-player";
+import CustomEditor from "./CustomEditor";
 
 const TeacherQuestionEdit = () => {
   const navigate = useNavigate();
@@ -158,7 +159,13 @@ const TeacherQuestionEdit = () => {
             </Select>
           </FormControl>
 
-          <Editor
+          {/* <Editor
+            placeholder="Write your question here"
+            value={value}
+            onChange={(html) => setValue(html)}
+          /> */}
+
+          <CustomEditor
             placeholder="Write your question here"
             value={value}
             onChange={(html) => setValue(html)}
@@ -188,7 +195,14 @@ const TeacherQuestionEdit = () => {
 
           {type === 1 &&
             Object.keys(choices).map((choice, index) => (
-              <Editor
+              // <Editor
+              //   key={index}
+              //   placeholder={`Choice ${choice.charAt(choice.length - 1)}`}
+              //   value={choices[choice]}
+              //   onChange={handleChoiceChange(choice)}
+              // />
+
+              <CustomEditor
                 key={index}
                 placeholder={`Choice ${choice.charAt(choice.length - 1)}`}
                 value={choices[choice]}

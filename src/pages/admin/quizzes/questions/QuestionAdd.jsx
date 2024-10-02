@@ -18,6 +18,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useCreateQuestionMutation } from "../../../../state-control/api/questionApi";
 import { toast } from "react-toastify";
 import Editor from "./Editor";
+import CustomEditor from "./CustomEditor";
 
 const QuestionAdd = () => {
   const [createQuestion, { data, isSuccess, isLoading, error, reset }] =
@@ -147,7 +148,13 @@ const QuestionAdd = () => {
             </Select>
           </FormControl>
 
-          <Editor
+          {/* <Editor
+            placeholder="Write your question here"
+            value={value}
+            onChange={(html) => setValue(html)}
+          /> */}
+
+          <CustomEditor
             placeholder="Write your question here"
             value={value}
             onChange={(html) => setValue(html)}
@@ -177,7 +184,14 @@ const QuestionAdd = () => {
 
           {type === 1 &&
             Object.keys(choices).map((choice, index) => (
-              <Editor
+              // <Editor
+              //   key={index}
+              //   placeholder={`Choice ${choice.charAt(choice.length - 1)}`}
+              //   value={choices[choice]}
+              //   onChange={handleChoiceChange(choice)}
+              // />
+
+              <CustomEditor
                 key={index}
                 placeholder={`Choice ${choice.charAt(choice.length - 1)}`}
                 value={choices[choice]}
