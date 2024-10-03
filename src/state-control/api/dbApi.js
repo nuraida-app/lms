@@ -111,6 +111,11 @@ export const dbApi = createApi({
         url: `/get-demographic`,
       }),
     }),
+    getTargeted: builder.query({
+      query: () => ({
+        url: `/get-targeted`,
+      }),
+    }),
   }),
 });
 
@@ -128,4 +133,5 @@ export const {
   useAddHealthDataMutation,
   useDeleteHealthDataMutation,
   useGetDemographicQuery,
+  useGetTargetedQuery,
 } = dbApi;

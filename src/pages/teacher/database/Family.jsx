@@ -29,6 +29,20 @@ import {
 } from "../../../state-control/api/dbApi";
 import { toast } from "react-toastify";
 
+function calculateAge(birthDate) {
+  const today = new Date();
+  const birthDateObj = new Date(birthDate);
+  let age = today.getFullYear() - birthDateObj.getFullYear();
+  const monthDiff = today.getMonth() - birthDateObj.getMonth();
+  if (
+    monthDiff < 0 ||
+    (monthDiff === 0 && today.getDate() < birthDateObj.getDate())
+  ) {
+    age--;
+  }
+  return age;
+}
+
 const Family = ({ info }) => {
   const [addFamilyData, { isSuccess, data, isLoading, error, reset }] =
     useAddFamilyDataMutation();
@@ -148,7 +162,7 @@ const Family = ({ info }) => {
             <Table>
               <TableHead>
                 <TableRow>
-                  {["No", "Name", "Gender", "Birth Date", "Action"].map(
+                  {["No", "Name", "Gender", "Birth Date", "Age", "Action"].map(
                     (item) => (
                       <TableCell key={item}>{item}</TableCell>
                     )
@@ -163,6 +177,9 @@ const Family = ({ info }) => {
                     <TableCell>{item.family_gender}</TableCell>
                     <TableCell>
                       {dayjs(item.family_birth_date).format("DD/MM/YYYY")}
+                    </TableCell>
+                    <TableCell>
+                      {calculateAge(item.family_birth_date)}
                     </TableCell>
                     <TableCell>
                       <IconButton
@@ -209,7 +226,7 @@ const Family = ({ info }) => {
                 value={formData.family_gender}
                 onChange={handleChange}
               >
-                <MenuItem value={"Male "}>Male</MenuItem>
+                <MenuItem value={"Male"}>Male</MenuItem>
                 <MenuItem value={"Female"}>Female</MenuItem>
               </Select>
             </FormControl>
