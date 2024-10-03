@@ -10,12 +10,6 @@ const CustomEditor = ({ placeholder, value, onChange }) => {
     onChange(content);
   };
 
-  useEffect(() => {
-    if (editorRef.current) {
-      editorRef.current.setContent(value || "");
-    }
-  }, [value]);
-
   return (
     <Box sx={{ height: 450, bgcolor: "white" }}>
       <Editor
