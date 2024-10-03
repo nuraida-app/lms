@@ -596,10 +596,66 @@ router.get(
 
       res.status(200).json(data);
     } catch (error) {
-      console.error("Error fetching demographic data:", error);
-      res.status(500).json({ message: "Internal Server Error" });
+      return res.status(500).json({ message: error.message });
     }
   }
 );
+
+function calculateAge(birthDate) {
+  const today = new Date();
+  const birthDateObj = new Date(birthDate);
+  let age = today.getFullYear() - birthDateObj.getFullYear();
+  const monthDiff = today.getMonth() - birthDateObj.getMonth();
+  if (
+    monthDiff < 0 ||
+    (monthDiff === 0 && today.getDate() < birthDateObj.getDate())
+  ) {
+    age--;
+  }
+  return age;
+}
+
+router.get("/get-targeted", async (req, res) => {
+  try {
+    const data = await client.query(`SELECT name AS student_name,
+    family_info, father_phone, mother_phone FROM db_students
+    WHERE family_info IS NOT NULL`);
+
+    if (data.rowCount === 0) {
+      return res.status(404).json({ message: "There is no data provided" });
+    }
+
+    const studentsData = data.rows;
+    const response = studentsData.map((student) => {
+      const familyInfo = student.family_info;
+      const familyDetails = [];
+
+      // Loop through each family member and calculate age
+      familyInfo.forEach((member) => {
+        const age = calculateAge(member.family_birth_date);
+        if (member.family_gender === "Female" && age >= 10 && age <= 15) {
+          familyDetails.push({
+            target_name: member.family_name,
+            gender: member.family_gender,
+            age: age,
+          });
+        }
+      });
+
+      return {
+        student_name: student.student_name,
+        phone: {
+          father_phone: student.father_phone,
+          mother_phone: student.mother_phone,
+        },
+        family: familyDetails,
+      };
+    });
+
+    res.status(200).json(response);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+});
 
 export default router;
