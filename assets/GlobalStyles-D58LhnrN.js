@@ -1,1 +1,0 @@
-import{aY as n,j as a,b6 as r,aq as u,aV as f,aW as m}from"./index-G82UTrCn.js";function p({styles:e,themeId:t,defaultTheme:o={}}){const s=n(o),l=typeof e=="function"?e(t&&s[t]||s):e;return a.jsx(r,{styles:l})}function b(e){return a.jsx(p,u({},e,{defaultTheme:f,themeId:m}))}export{b as G};
