@@ -4,6 +4,7 @@ import { Button, ButtonGroup, Grid, Paper } from "@mui/material";
 import Media from "./Media";
 import { useGetDemographicQuery } from "../../../state-control/api/dbApi";
 import Data from "./Data";
+import Targted from "./Targted";
 
 const CenterStatistic = () => {
   const [activeTab, setActiveTab] = useState("Province");
@@ -14,6 +15,7 @@ const CenterStatistic = () => {
     { name: "City", component: <Data type={data?.regencies} /> },
     { name: "District", component: <Data type={data?.districts} /> },
     { name: "Village", component: <Data type={data?.villages} /> },
+    { name: "Targeted", component: <Targted /> },
   ];
 
   const currentTab = tabs.find((tab) => tab.name === activeTab)?.component;

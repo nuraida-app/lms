@@ -44,11 +44,11 @@ const Admin = ({ open, close, admin }) => {
     e.preventDefault();
 
     if (id) {
-      const data = { name, email, password, role, homebase_id, password, id };
+      const data = { name, email, password, role, homebase_id, id };
 
       editAdmin(data);
     } else {
-      const data = { name, email, password, role, homebase_id, password };
+      const data = { name, email, password, role, homebase_id };
 
       addAdmin(data);
     }
