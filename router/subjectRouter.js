@@ -11,22 +11,42 @@ const router = express.Router();
 router.get(
   "/get",
   authenticatedUser,
-  authorizeRoles("admin", "guru"),
+  authorizeRoles("admin", "teacher"),
   async (req, res) => {
     try {
-      const homebase = req.user.homebase_id;
+      const role = req.user.role;
 
-      const data = await client.query(
-        "SELECT subjects.id, subjects.name, homebase.name AS homebase, subjects.code FROM subjects " +
-          "INNER JOIN homebase ON subjects.homebase_id = homebase.id " +
-          "WHERE subjects.homebase_id = $1 " +
-          "ORDER BY subjects.name ASC",
-        [homebase]
-      );
+      if (role === "admin") {
+        const homebase = req.user.homebase_id;
 
-      const subejcts = data.rows;
+        const data = await client.query(
+          "SELECT subjects.id, subjects.name, homebase.name AS homebase, subjects.code FROM subjects " +
+            "INNER JOIN homebase ON subjects.homebase_id = homebase.id " +
+            "WHERE subjects.homebase_id = $1 " +
+            "ORDER BY subjects.name ASC",
+          [homebase]
+        );
 
-      res.status(200).json(subejcts);
+        const subejcts = data.rows;
+
+        res.status(200).json(subejcts);
+      } else {
+        const data = await client.query(
+          `SELECT * FROM teachers WHERE id = $1`,
+          [req.user.id]
+        );
+
+        const teacher = data.rows[0];
+        const subjectCodes = teacher.subject_code;
+
+        // Query to fetch subjects based on the subject_code array
+        const subjectData = await client.query(
+          `SELECT code, name FROM subjects WHERE code = ANY($1::int[])`,
+          [subjectCodes]
+        );
+
+        res.status(200).json(subjectData.rows);
+      }
     } catch (error) {
       return res.status(500).json({ error: error.message });
     }

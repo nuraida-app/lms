@@ -23,6 +23,7 @@ import uploadRouter from "./router/uploadRouter.js";
 import answerRouter from "./router/answerRouter.js";
 import logRouter from "./router/logRouter.js";
 import dbRouter from "./router/dbRouter.js";
+import lmsRouter from "./router/lmsRouter.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -62,5 +63,6 @@ app.use("/upload", uploadRouter);
 app.use("/answer", answerRouter);
 app.use("/log", logRouter);
 app.use("/database", dbRouter);
+app.use("/lms", lmsRouter);
 
 export default app;
