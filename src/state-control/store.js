@@ -14,6 +14,7 @@ import { dbApi } from "./api/dbApi";
 import { adminApi } from "./api/adminApi";
 import { mediaApi } from "./api/mediaApi";
 import { homebaseApi } from "./api/homebaseApi";
+import { lmsApi } from "./api/lmsApi";
 
 const store = configureStore({
   reducer: {
@@ -32,6 +33,7 @@ const store = configureStore({
     [dbApi.reducerPath]: dbApi.reducer,
     [adminApi.reducerPath]: adminApi.reducer,
     [mediaApi.reducerPath]: mediaApi.reducer,
+    [lmsApi.reducerPath]: lmsApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat([
@@ -49,6 +51,7 @@ const store = configureStore({
       adminApi.middleware,
       mediaApi.middleware,
       homebaseApi.middleware,
+      lmsApi.middleware,
     ]),
 });
 

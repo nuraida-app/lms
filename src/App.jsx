@@ -79,6 +79,11 @@ const DbStudent = lazy(() => import("./pages/teacher/database/DbStudent"));
 const StudentProfile = lazy(() =>
   import("./pages/student/profile/StudentProfile")
 );
+
+const LmsPage = lazy(() => import("./pages/teacher/lms/LmsPage"));
+
+const Subject = lazy(() => import("./pages/teacher/lms/Subject"));
+
 const NoFound = lazy(() => import("./pages/NoFound"));
 
 // Admin Center
@@ -188,6 +193,10 @@ function App() {
             path="/teacher/schedules/:quizname/:quizId/:gradeId"
             element={<TeacherDetailPage />}
           />
+
+          <Route path="/teacher/subjects" element={<LmsPage />} />
+
+          <Route path="/teacher/subjects/:code/:name" element={<Subject />} />
 
           {/* Student */}
           <Route path="/student/dashboard" element={<StudentDashboard />} />
