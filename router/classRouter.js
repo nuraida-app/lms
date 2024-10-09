@@ -40,7 +40,7 @@ router.post(
 router.get(
   "/get",
   authenticatedUser,
-  authorizeRoles("admin"),
+  authorizeRoles("admin", "teacher"),
   async (req, res) => {
     try {
       const homebase = req.user.homebase_id;

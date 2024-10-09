@@ -132,7 +132,8 @@ router.get("/load", authenticatedUser, async (req, res) => {
       const data1 = data.rows[0];
 
       const detail = await client.query(
-        `SELECT students_class.grade_id, grades.grade, classes.name AS class, homebase.name AS homebase
+        `SELECT students_class.grade_id, grades.grade, classes.name AS class,
+        students_class.class_code, homebase.name AS homebase
         FROM students_class 
         INNER JOIN grades ON students_class.grade_id = grades.id
         INNER JOIN classes ON students_class.class_code = classes.code
@@ -150,6 +151,7 @@ router.get("/load", authenticatedUser, async (req, res) => {
         grade_id: data2.grade_id,
         grade: data2.grade,
         class: data2.class,
+        class_code: data2.class_code,
         role: data1.role,
       };
 
@@ -166,7 +168,8 @@ router.get("/load", authenticatedUser, async (req, res) => {
           homebase.name AS homebase, 
           teachers.homeroom, 
           classes.name AS class, 
-          teachers.class_code, 
+          teachers.class_code,
+          teachers.subject_classes,
           array_agg(subjects.name) AS subjects
         FROM 
           teachers 

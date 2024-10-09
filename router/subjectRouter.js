@@ -45,7 +45,32 @@ router.get(
           [subjectCodes]
         );
 
-        res.status(200).json(subjectData.rows);
+        const subjects = subjectData.rows;
+
+        // Count chapters and topics for each subject for teacher
+        const subjectsWithCounts = await Promise.all(
+          subjects.map(async (subject) => {
+            // Count chapters for each subject
+            const { rows: chapterCount } = await client.query(
+              `SELECT COUNT(*) FROM lms_chapters WHERE subject_code = $1`,
+              [subject.code]
+            );
+
+            // Count topics for each subject
+            const { rows: topicCount } = await client.query(
+              `SELECT COUNT(*) FROM lms_topics WHERE subject_code = $1`,
+              [subject.code]
+            );
+
+            return {
+              ...subject,
+              chapter_count: parseInt(chapterCount[0].count, 10),
+              topic_count: parseInt(topicCount[0].count, 10),
+            };
+          })
+        );
+
+        res.status(200).json(subjectsWithCounts);
       }
     } catch (error) {
       return res.status(500).json({ error: error.message });
@@ -219,6 +244,99 @@ router.delete(
       res.status(200).json({ message: `Subjects are successfully deleted` });
     } catch (error) {
       return res.status(500).json({ message: error.message });
+    }
+  }
+);
+
+// Menampilkan mapel berdasarkan kelas yang ditentukan guru
+router.get(
+  "/get-for-class",
+  authenticatedUser,
+  authorizeRoles("student"),
+  async (req, res) => {
+    try {
+      // Retrieve the class_code of the student
+      const student = await client.query(
+        `SELECT class_code FROM students_class WHERE nis = $1`,
+        [req.user.nis]
+      );
+
+      if (student.rows.length === 0) {
+        return res.status(404).json({ message: "Student not found." });
+      }
+
+      const classCode = student.rows[0].class_code; // Get the class_code from the student's record
+
+      // Query to get teachers who have this class_code assigned in their subject_classes
+      const { rows: teacherRows } = await client.query(
+        `SELECT id, name, subject_classes
+         FROM teachers
+         WHERE EXISTS (
+           SELECT 1
+           FROM jsonb_each(subject_classes) AS subj(subject_id, class_list)
+           WHERE class_list @> to_jsonb($1::int)  -- Convert classCode to integer
+         )`,
+        [classCode] // Pass the classCode to check within subject_classes
+      );
+
+      if (teacherRows.length === 0) {
+        return res
+          .status(404)
+          .json({ message: "No subjects found for the given class code." });
+      }
+
+      // Get subject data from subjects table for the subjectCodes found
+      const subjectCodes = new Set();
+      teacherRows.forEach((teacher) => {
+        const subjectClasses = teacher.subject_classes;
+
+        // Get the subjectCodes where the classCode is present
+        Object.entries(subjectClasses).forEach(([subjectCode, classList]) => {
+          if (classList.includes(classCode)) {
+            subjectCodes.add(subjectCode); // Add subjectCode to the set
+          }
+        });
+      });
+
+      // Query the subjects table to get the subjects' details
+      const { rows: subjects } = await client.query(
+        `SELECT id, name, code FROM subjects WHERE code = ANY($1::int[])`,
+        [Array.from(subjectCodes)] // Pass the subjectCodes as an array
+      );
+
+      if (subjects.length === 0) {
+        return res
+          .status(404)
+          .json({ message: "No subjects found for the given class code." });
+      }
+
+      const subjectsWithCounts = await Promise.all(
+        subjects.map(async (subject) => {
+          // Count chapters for each subject
+          const { rows: chapterCount } = await client.query(
+            `SELECT COUNT(*) FROM lms_chapters WHERE subject_code = $1`,
+            [subject.code]
+          );
+
+          // Count topics for each subject
+          const { rows: topicCount } = await client.query(
+            `SELECT COUNT(*) FROM lms_topics WHERE subject_code = $1`,
+            [subject.code]
+          );
+
+          return {
+            ...subject,
+            chapter_count: parseInt(chapterCount[0].count, 10), // Add the chapter count to the subject
+            topic_count: parseInt(topicCount[0].count, 10), // Add the topic count to the subject
+          };
+        })
+      );
+
+      // Respond with the subjects and their chapter and topic counts
+      res.status(200).json(subjectsWithCounts);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: error.message });
     }
   }
 );

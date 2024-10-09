@@ -344,4 +344,39 @@ router.delete(
   }
 );
 
+// Menambahkan kelas ajar
+router.post(
+  "/assign-class",
+  authenticatedUser,
+  authorizeRoles("teacher"),
+  async (req, res) => {
+    try {
+      const id = req.user.id; // Teacher ID from authenticated user
+      const { subjectId, classes } = req.body; // Expecting subjectId and class array in the body
+
+      // Fetch current subject_classes JSONB field
+      const { rows } = await client.query(
+        `SELECT subject_classes FROM teachers WHERE id = $1`,
+        [id]
+      );
+
+      const currentSubjectClasses = rows[0].subject_classes || {};
+
+      // Update the subject-specific classes in the subject_classes JSONB field
+      currentSubjectClasses[subjectId] = classes;
+
+      // Update the subject_classes field in the database
+      await client.query(
+        `UPDATE teachers SET subject_classes = $1 WHERE id = $2`,
+        [currentSubjectClasses, id]
+      );
+
+      res.status(200).json({ message: "Saved" });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: error.message });
+    }
+  }
+);
+
 export default router;
