@@ -2,7 +2,11 @@ import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
+  Checkbox,
   CircularProgress,
+  FormControl,
+  FormControlLabel,
+  FormGroup,
   Fade,
   Modal,
   TextField,
@@ -15,6 +19,7 @@ import {
 } from "../../../state-control/api/lmsApi";
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
+import { useGetClassesQuery } from "../../../state-control/api/classApi";
 
 const Chapter = ({ open, close, id }) => {
   const params = useParams();
@@ -23,13 +28,34 @@ const Chapter = ({ open, close, id }) => {
   const [addChapter, { data, isSuccess, isLoading, error, reset }] =
     useAddChapterMutation();
   const { data: chapter } = useGetChapterQuery(id, { skip: !id });
+  const { data: classes } = useGetClassesQuery();
 
   const [title, setTitle] = useState("");
+  const [goal, setGoal] = useState("");
+  const [selectedClasses, setSelectedClasses] = useState([]);
+
+  const handleCheckboxChange = (event, classCode) => {
+    if (event.target.checked) {
+      setSelectedClasses((prev) => [...prev, classCode]);
+    } else {
+      setSelectedClasses((prev) => prev.filter((id) => id !== classCode));
+    }
+  };
 
   const addHandler = (e) => {
     e.preventDefault();
 
-    const data = { id: id ? id : null, code, title };
+    if (!title) {
+      toast.error("Please enter chapter title");
+      return;
+    }
+
+    if (!selectedClasses) {
+      toast.error("Please select classes");
+      return;
+    }
+
+    const data = { id: id ? id : null, code, title, selectedClasses, goal };
 
     addChapter(data);
   };
@@ -39,6 +65,8 @@ const Chapter = ({ open, close, id }) => {
       toast.success(data.message);
       reset();
       setTitle("");
+      setGoal("");
+      setSelectedClasses([]);
       close();
       window.location.reload();
     }
@@ -52,10 +80,19 @@ const Chapter = ({ open, close, id }) => {
   useEffect(() => {
     if (chapter) {
       setTitle(chapter.title);
+      setGoal(chapter.goal);
+      setSelectedClasses(chapter?.class_code);
     }
   }, [chapter]);
+
+  const closeHandler = () => {
+    setTitle("");
+    setGoal("");
+    setSelectedClasses([]);
+    close();
+  };
   return (
-    <Modal open={open} onClose={close} closeAfterTransition>
+    <Modal open={open} onClose={closeHandler} closeAfterTransition>
       <Fade in={open}>
         <Box
           sx={{
@@ -70,23 +107,54 @@ const Chapter = ({ open, close, id }) => {
             borderRadius: "5px",
           }}
         >
-          <form onSubmit={addHandler}>
+          <form
+            style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+            onSubmit={addHandler}
+          >
             <TextField
               fullWidth
               label="Title"
               placeholder="Chapter's title"
               InputLabelProps={{ shrink: true }}
-              sx={{ my: 1 }}
               value={title || ""}
               onChange={(e) => setTitle(e.target.value)}
             />
+
+            <TextField
+              fullWidth
+              multiline
+              rows={4}
+              label="Learning Prurpose"
+              placeholder="Learning Prurpose"
+              InputLabelProps={{ shrink: true }}
+              sx={{ my: 1 }}
+              value={goal || ""}
+              onChange={(e) => setGoal(e.target.value)}
+            />
+
+            <FormControl component="fieldset">
+              <FormGroup row>
+                {classes?.map((cls) => (
+                  <FormControlLabel
+                    key={cls.id}
+                    control={
+                      <Checkbox
+                        checked={selectedClasses?.includes(cls.code)}
+                        onChange={(e) => handleCheckboxChange(e, cls.code)}
+                      />
+                    }
+                    label={cls.name}
+                  />
+                ))}
+              </FormGroup>
+            </FormControl>
 
             <Box align="end">
               <Button
                 startIcon={<CloseOutlinedIcon />}
                 variant="contained"
                 color="error"
-                onClick={close}
+                onClick={closeHandler}
                 sx={{ mr: 1 }}
               >
                 cancel

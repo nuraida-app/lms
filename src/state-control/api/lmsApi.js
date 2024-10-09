@@ -12,6 +12,10 @@ export const lmsApi = createApi({
       query: (code) => `/chapters/${code}`,
       providesTags: ["chapters"],
     }),
+    getChaptesClass: builder.query({
+      query: () => `/get-chapter-for-class`,
+      providesTags: ["chapters"],
+    }),
     getChapter: builder.query({
       query: (id) => `/chapter/${id}`,
       providesTags: ["chapter"],
@@ -59,6 +63,7 @@ export const lmsApi = createApi({
 
 export const {
   useGetChaptersQuery,
+  useGetChaptesClassQuery,
   useGetChapterQuery,
   useAddChapterMutation,
   useDeleteChapterMutation,

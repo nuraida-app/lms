@@ -6,13 +6,18 @@ export const subjectApi = createApi({
     baseUrl: `${import.meta.env.VITE_BASE}/subject`,
     credentials: "include",
   }),
+  tagTypes: ["subjects", "subject"],
   endpoints: (builder) => ({
-    getSubjects: builder.query({ query: () => "/get" }),
+    getSubjects: builder.query({
+      query: () => "/get",
+      providesTags: ["subject"],
+    }),
     getSubject: builder.mutation({
       query: (id) => ({
         url: `/detail/${id}`,
         method: "GET",
       }),
+      providesTags: ["subjects"],
     }),
     createSubject: builder.mutation({
       query: (body) => ({
@@ -20,17 +25,7 @@ export const subjectApi = createApi({
         method: "POST",
         body,
       }),
-      async onQueryStarted(queryArg, { dispatch, queryFulfilled }) {
-        try {
-          await queryFulfilled;
-
-          await dispatch(
-            subjectApi.endpoints.getSubjects.initiate(undefined, {
-              forceRefetch: true,
-            })
-          );
-        } catch (error) {}
-      },
+      invalidatesTags: ["subjects"],
     }),
     uploadSubjects: builder.mutation({
       query: (body) => ({
@@ -38,17 +33,7 @@ export const subjectApi = createApi({
         method: "POST",
         body,
       }),
-      async onQueryStarted(queryArg, { dispatch, queryFulfilled }) {
-        try {
-          await queryFulfilled;
-
-          await dispatch(
-            subjectApi.endpoints.getSubjects.initiate(undefined, {
-              forceRefetch: true,
-            })
-          );
-        } catch (error) {}
-      },
+      invalidatesTags: ["subjects"],
     }),
     updateSubject: builder.mutation({
       query: ({ id, body }) => ({
@@ -56,51 +41,25 @@ export const subjectApi = createApi({
         method: "PUT",
         body,
       }),
-      async onQueryStarted(queryArg, { dispatch, queryFulfilled }) {
-        try {
-          await queryFulfilled;
-
-          await dispatch(
-            subjectApi.endpoints.getSubjects.initiate(undefined, {
-              forceRefetch: true,
-            })
-          );
-        } catch (error) {}
-      },
+      invalidatesTags: ["subjects"],
     }),
     deleteSubject: builder.mutation({
       query: (id) => ({
         url: `/delete/${id}`,
         method: "DELETE",
       }),
-      async onQueryStarted(queryArg, { dispatch, queryFulfilled }) {
-        try {
-          await queryFulfilled;
-
-          await dispatch(
-            subjectApi.endpoints.getSubjects.initiate(undefined, {
-              forceRefetch: true,
-            })
-          );
-        } catch (error) {}
-      },
+      invalidatesTags: ["subjects"],
     }),
     deleteSubjects: builder.mutation({
       query: () => ({
         url: "/delete-data",
         method: "DELETE",
       }),
-      async onQueryStarted(queryArg, { dispatch, queryFulfilled }) {
-        try {
-          await queryFulfilled;
-
-          await dispatch(
-            subjectApi.endpoints.getSubjects.initiate(undefined, {
-              forceRefetch: true,
-            })
-          );
-        } catch (error) {}
-      },
+      invalidatesTags: ["subjects"],
+    }),
+    getSubjectsClass: builder.query({
+      query: () => "/get-for-class",
+      providesTags: ["subjects"],
     }),
   }),
 });
@@ -113,4 +72,5 @@ export const {
   useUpdateSubjectMutation,
   useDeleteSubjectMutation,
   useDeleteSubjectsMutation,
+  useGetSubjectsClassQuery,
 } = subjectApi;

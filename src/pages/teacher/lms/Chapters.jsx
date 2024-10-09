@@ -4,6 +4,7 @@ import {
   Button,
   CircularProgress,
   IconButton,
+  ListItemText,
   Paper,
   Typography,
 } from "@mui/material";
@@ -48,7 +49,11 @@ const Chapters = ({ data, number }) => {
           alignItems: "center",
         }}
       >
-        <Typography fontWeight="bold">{`Chapter ${number}: ${data.title}`}</Typography>
+        <ListItemText
+          primary={`Chapter ${number}: ${data.title}`}
+          secondary={data.goal}
+          sx={{ width: "75%" }}
+        />
 
         <Box>
           <IconButton color="warning" onClick={() => setEdit(true)}>
@@ -65,12 +70,13 @@ const Chapters = ({ data, number }) => {
         <Topics key={index} data={item} number={index + 1} />
       ))}
 
-      <Box alignSelf="flex-start" sx={{ mx: 8 }}>
+      <Box alignSelf="flex-start" sx={{ mx: 8, mt: 1 }}>
         <Button
           startIcon={<AddOutlinedIcon />}
           variant="contained"
           color="success"
           onClick={() => setTopic(true)}
+          size="small"
         >
           Topic
         </Button>

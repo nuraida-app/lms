@@ -18,7 +18,7 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import { menus } from "../menu/Menus";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Avatar, Skeleton, useMediaQuery } from "@mui/material";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import { useDispatch, useSelector } from "react-redux";
@@ -26,6 +26,12 @@ import Protect from "../../Protect";
 import { logoutUser } from "../../../../state-control/api/authApi";
 
 const drawerWidth = 240;
+
+function stringAvatar(name) {
+  return {
+    children: `${name.split(" ")[0][0]}${name.split(" ")[1][0]}`,
+  };
+}
 
 const openedMixin = (theme) => ({
   width: drawerWidth,
@@ -96,6 +102,8 @@ const Drawer = styled(MuiDrawer, {
 }));
 
 const Layout = ({ children }) => {
+  const navigate = useNavigate();
+
   const { user, isAuthLoading } = useSelector((state) => state.authentication);
 
   const theme = useTheme();
@@ -109,6 +117,8 @@ const Layout = ({ children }) => {
   const handleDrawerClose = () => {
     setOpen(false);
   };
+
+  const profilePage = () => navigate("/teacher/profile");
 
   // Logout
   const dispatch = useDispatch();
@@ -139,9 +149,23 @@ const Layout = ({ children }) => {
           {isAuthLoading ? (
             <Skeleton variant="text" width={180} sx={{ fontSize: "2rem" }} />
           ) : (
-            <Typography variant="h6" noWrap component="div">
-              {user?.name}
-            </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                width: "100%",
+              }}
+            >
+              <Typography variant="h6" noWrap component="div">
+                {user?.name}
+              </Typography>
+
+              <Avatar
+                {...stringAvatar(user?.name)}
+                onClick={profilePage}
+                sx={{ cursor: "pointer" }}
+              />
+            </Box>
           )}
         </Toolbar>
       </AppBar>

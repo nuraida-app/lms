@@ -35,17 +35,12 @@ const Subjects = ({ data }) => {
           <TableRow>
             <TableCell>Chapters</TableCell>
             <TableCell align="center">:</TableCell>
-            <TableCell align="center">8</TableCell>
+            <TableCell align="center">{data.chapter_count}</TableCell>
           </TableRow>
           <TableRow>
             <TableCell>Topics</TableCell>
             <TableCell align="center">:</TableCell>
-            <TableCell align="center">16</TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell>Assessment</TableCell>
-            <TableCell align="center">:</TableCell>
-            <TableCell align="center">8</TableCell>
+            <TableCell align="center">{data.topic_count}</TableCell>
           </TableRow>
         </TableBody>
       </Table>

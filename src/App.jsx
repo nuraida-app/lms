@@ -8,77 +8,114 @@ import { loadUser } from "./state-control/api/authApi";
 import Loader from "./Loader";
 
 const Login = lazy(() => import("./pages/Login"));
+
+// Admin
 const DashboardPage = lazy(() =>
   import("./pages/admin/dashboard/DashboardPage")
 );
 const HomebasePage = lazy(() => import("./pages/center/homebase/HomebasePage"));
+
 const SubjectsPage = lazy(() => import("./pages/admin/subjects/SubjectsPage"));
+
 const TeachersPage = lazy(() => import("./pages/admin/teachers/TeachersPage"));
+
 const GradesPage = lazy(() => import("./pages/admin/grades/GradesPage"));
+
 const ClassesPage = lazy(() => import("./pages/admin/classes/ClassesPage"));
+
 const ClassAddStudents = lazy(() =>
   import("./pages/admin/classes/ClassAddStudents")
 );
+
 const StudentsPage = lazy(() => import("./pages/admin/students/StudentsPage"));
+
 const QuizzesPage = lazy(() => import("./pages/admin/quizzes/QuizzesPage"));
+
 const QuestionsPage = lazy(() =>
   import("./pages/admin/quizzes/questions/QuestionsPage")
 );
+
 const QuestionAdd = lazy(() =>
   import("./pages/admin/quizzes/questions/QuestionAdd")
 );
+
 const QuestionEdit = lazy(() =>
   import("./pages/admin/quizzes/questions/QuestionEdit")
 );
+
 const SchedulePage = lazy(() => import("./pages/admin/schedules/SchedulePage"));
+
 const DetailPage = lazy(() =>
   import("./pages/admin/schedules/detail/DetailPage")
 );
+
+// Student
 const StudentDashboard = lazy(() =>
   import("./pages/student/dashboard/StudentDashboard")
 );
-const StudentSettingPage = lazy(() =>
-  import("./pages/student/setting/StudentSettingPage")
-);
-const StudentSubjectPage = lazy(() =>
-  import("./pages/student/subjects/StudentSubjectPage")
-);
-const StudentQuizPage = lazy(() =>
-  import("./pages/student/quizzes/StudentQuizPage")
-);
-const LearningPage = lazy(() =>
-  import("./pages/student/subjects/LearningPage")
-);
-const QuizPage = lazy(() => import("./pages/student/quizzes/quiz/QuizPage"));
-const Discussion = lazy(() => import("./pages/student/subjects/Discussion"));
-const TeacherDashboard = lazy(() =>
-  import("./pages/teacher/dashboard/TeacherDashboard")
-);
-const TeacherQuizPage = lazy(() =>
-  import("./pages/teacher/quiz/TeacherQuizPage")
-);
-const TeacherQuestionPage = lazy(() =>
-  import("./pages/teacher/quiz/questions/TeacherQuestionPage")
-);
-const TeacherQuestionAdd = lazy(() =>
-  import("./pages/teacher/quiz/questions/TeacherQuestionAdd")
-);
-const TeacherQuestionEdit = lazy(() =>
-  import("./pages/teacher/quiz/questions/TeacherQuestionEdit")
-);
-const TeacherSchPage = lazy(() =>
-  import("./pages/teacher/schedule/TeacherSchPage")
-);
-const TeacherDetailPage = lazy(() =>
-  import("./pages/teacher/schedule/detail/TeacherDetailPage")
-);
-const DatabasePage = lazy(() =>
-  import("./pages/teacher/database/DatabasePage")
-);
-const DbStudent = lazy(() => import("./pages/teacher/database/DbStudent"));
+
 const StudentProfile = lazy(() =>
   import("./pages/student/profile/StudentProfile")
 );
+
+const StudentSettingPage = lazy(() =>
+  import("./pages/student/setting/StudentSettingPage")
+);
+
+const StudentSubjectPage = lazy(() =>
+  import("./pages/student/subjects/StudentSubjectPage")
+);
+
+const StudentQuizPage = lazy(() =>
+  import("./pages/student/quizzes/StudentQuizPage")
+);
+
+const LearningPage = lazy(() =>
+  import("./pages/student/subjects/LearningPage")
+);
+
+const QuizPage = lazy(() => import("./pages/student/quizzes/quiz/QuizPage"));
+
+const Discussion = lazy(() => import("./pages/student/subjects/Discussion"));
+
+// Teacher
+const TeacherDashboard = lazy(() =>
+  import("./pages/teacher/dashboard/TeacherDashboard")
+);
+
+const TeacherProfile = lazy(() =>
+  import("./pages/teacher/profile/TeacherProfile")
+);
+
+const TeacherQuizPage = lazy(() =>
+  import("./pages/teacher/quiz/TeacherQuizPage")
+);
+
+const TeacherQuestionPage = lazy(() =>
+  import("./pages/teacher/quiz/questions/TeacherQuestionPage")
+);
+
+const TeacherQuestionAdd = lazy(() =>
+  import("./pages/teacher/quiz/questions/TeacherQuestionAdd")
+);
+
+const TeacherQuestionEdit = lazy(() =>
+  import("./pages/teacher/quiz/questions/TeacherQuestionEdit")
+);
+
+const TeacherSchPage = lazy(() =>
+  import("./pages/teacher/schedule/TeacherSchPage")
+);
+
+const TeacherDetailPage = lazy(() =>
+  import("./pages/teacher/schedule/detail/TeacherDetailPage")
+);
+
+const DatabasePage = lazy(() =>
+  import("./pages/teacher/database/DatabasePage")
+);
+
+const DbStudent = lazy(() => import("./pages/teacher/database/DbStudent"));
 
 const LmsPage = lazy(() => import("./pages/teacher/lms/LmsPage"));
 
@@ -88,15 +125,19 @@ const NoFound = lazy(() => import("./pages/NoFound"));
 
 // Admin Center
 const Center = lazy(() => import("./pages/center/dashboard/Center"));
+
 const CenterTeacherPage = lazy(() =>
   import("./pages/center/teacher/CenterTeacherPage")
 );
+
 const CenterStudentPage = lazy(() =>
   import("./pages/center/student/CenterStudentPage")
 );
+
 const CenterStatistic = lazy(() =>
   import("./pages/center/statistics/CenterStatistic")
 );
+
 const CenterAdminPage = lazy(() =>
   import("./pages/center/admin/CenterAdminPage")
 );
@@ -166,6 +207,8 @@ function App() {
 
           <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
 
+          <Route path="/teacher/profile" element={<TeacherProfile />} />
+
           <Route path="/teacher/database" element={<DatabasePage />} />
 
           <Route path="/teacher/:studentName/:nis" element={<DbStudent />} />
@@ -207,7 +250,10 @@ function App() {
 
           <Route path="/student/subjects" element={<StudentSubjectPage />} />
 
-          <Route path="/student/subjects/subject" element={<LearningPage />} />
+          <Route
+            path="/student/subjects/:code/:name"
+            element={<LearningPage />}
+          />
 
           <Route
             path="/student/subjects/subject/discussion"

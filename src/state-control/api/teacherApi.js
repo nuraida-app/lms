@@ -6,10 +6,12 @@ export const teacherApi = createApi({
     baseUrl: `${import.meta.env.VITE_BASE}/teacher`,
     credentials: "include",
   }),
+  tagTypes: ["teacher", "teachers"],
   endpoints: (builder) => ({
     // Menampilkan seluruh guru
     getTeachers: builder.query({
       query: () => "/get",
+      providesTags: ["teachers"],
     }),
     // Menampilkan guru
     getTeacher: builder.mutation({
@@ -17,6 +19,7 @@ export const teacherApi = createApi({
         url: `/detail/${id}`,
         method: "GET",
       }),
+      providesTags: ["teacher"],
     }),
     // Menambahkan guru
     createTeacher: builder.mutation({
@@ -25,17 +28,7 @@ export const teacherApi = createApi({
         method: "POST",
         body,
       }),
-      async onQueryStarted(queryArg, { dispatch, queryFulfilled }) {
-        try {
-          await queryFulfilled;
-
-          await dispatch(
-            teacherApi.endpoints.getTeachers.initiate(undefined, {
-              forceRefetch: true,
-            })
-          );
-        } catch (error) {}
-      },
+      invalidatesTags: ["teachers"],
     }),
     // upload guru
     uploadTeachers: builder.mutation({
@@ -44,19 +37,7 @@ export const teacherApi = createApi({
         method: "POST",
         body,
       }),
-      async onQueryStarted(queryArg, { dispatch, queryFulfilled }) {
-        try {
-          await queryFulfilled;
-
-          dispatch(
-            teacherApi.endpoints.getTeachers.initiate(undefined, {
-              forceRefetch: true,
-            })
-          );
-        } catch (error) {
-          console.error("Error uploading teachers:", error);
-        }
-      },
+      invalidatesTags: ["teachers"],
     }),
 
     // Mengedit guru
@@ -66,17 +47,7 @@ export const teacherApi = createApi({
         method: "PUT",
         body,
       }),
-      async onQueryStarted(queryArg, { dispatch, queryFulfilled }) {
-        try {
-          await queryFulfilled;
-
-          await dispatch(
-            teacherApi.endpoints.getTeachers.initiate(undefined, {
-              forceRefetch: true,
-            })
-          );
-        } catch (error) {}
-      },
+      invalidatesTags: ["teachers"],
     }),
     // Mengahpus guru
     deleteTeacher: builder.mutation({
@@ -84,17 +55,7 @@ export const teacherApi = createApi({
         url: `/delete/${id}`,
         method: "DELETE",
       }),
-      async onQueryStarted(queryArg, { dispatch, queryFulfilled }) {
-        try {
-          await queryFulfilled;
-
-          await dispatch(
-            teacherApi.endpoints.getTeachers.initiate(undefined, {
-              forceRefetch: true,
-            })
-          );
-        } catch (error) {}
-      },
+      invalidatesTags: ["teachers"],
     }),
     // Menghapus seluruh guru
     clearData: builder.mutation({
@@ -102,17 +63,15 @@ export const teacherApi = createApi({
         url: "/clear-data",
         method: "DELETE",
       }),
-      async onQueryStarted(queryArg, { dispatch, queryFulfilled }) {
-        try {
-          await queryFulfilled;
-
-          await dispatch(
-            teacherApi.endpoints.getTeachers.initiate(undefined, {
-              forceRefetch: true,
-            })
-          );
-        } catch (error) {}
-      },
+      invalidatesTags: ["teachers"],
+    }),
+    addAssignClass: builder.mutation({
+      query: (body) => ({
+        url: "/assign-class",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["teacher"],
     }),
   }),
 });
@@ -125,4 +84,5 @@ export const {
   useUpdateTeacherMutation,
   useDeleteTeacherMutation,
   useClearDataMutation,
+  useAddAssignClassMutation,
 } = teacherApi;

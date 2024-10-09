@@ -6,32 +6,36 @@ import {
   Card,
   CardActionArea,
   CardContent,
+  ListItemText,
+  Paper,
   Typography,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useGetChaptesClassQuery } from "../../../state-control/api/lmsApi";
+import Chapters from "./Chapters";
 
 const LearningPage = () => {
   const navigate = useNavigate();
+  const { data: chapters } = useGetChaptesClassQuery();
 
   const toDiscussion = () => navigate("/student/subjects/subject/discussion");
   return (
     <Layout>
       <PageName title={"Subject"} />
 
-      <Box container sx={{ height: "85vh", overflow: "auto" }}>
-        <Card sx={{ width: 250 }}>
-          <CardActionArea onClick={() => toDiscussion()}>
-            <CardContent>
-              <Typography color="textSecondary" fontSize={10}>
-                Discussion / Material
-              </Typography>
-              <Typography gutterBottom variant="h6" component="div">
-                Present Continuous
-              </Typography>
-              <Typography color="textSecondary">Teacher Name</Typography>
-            </CardContent>
-          </CardActionArea>
-        </Card>
+      <Box
+        container
+        sx={{
+          height: "85vh",
+          overflow: "auto",
+          display: "flex",
+          flexDirection: "column",
+          gap: 1,
+        }}
+      >
+        {chapters?.map((chapter, index) => (
+          <Chapters key={index} data={chapter} number={index + 1} />
+        ))}
       </Box>
     </Layout>
   );

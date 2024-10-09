@@ -14,8 +14,11 @@ import {
   useGetTopicQuery,
 } from "../../../state-control/api/lmsApi";
 import { toast } from "react-toastify";
+import { useParams } from "react-router-dom";
 
 const Topic = ({ open, close, id, chapter_id }) => {
+  const params = useParams();
+
   const [addTopic, { data, isSuccess, isLoading, error, reset }] =
     useAddTopicMutation();
   const { data: topic } = useGetTopicQuery(id, { skip: !id });
@@ -26,7 +29,13 @@ const Topic = ({ open, close, id, chapter_id }) => {
   const addHandler = (e) => {
     e.preventDefault();
 
-    const data = { id: id ? id : null, chapter_id, title, goal };
+    const data = {
+      id: id ? id : null,
+      chapter_id,
+      title,
+      goal,
+      subject_code: params.code,
+    };
 
     addTopic(data);
   };

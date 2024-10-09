@@ -1,7 +1,7 @@
 import Layout from "../components/layout/Layout";
 import PageName from "../../PageName";
 import { Box, Grid, Input, Paper } from "@mui/material";
-import SubjectsTable from "./SubjectTable";
+import ListSubjects from "./ListSubjects";
 
 const StudentSubjectPage = () => {
   return (
@@ -22,7 +22,9 @@ const StudentSubjectPage = () => {
         </Grid>
 
         <Grid item xs={12} md={12}>
-          <SubjectsTable />
+          <Box sx={{ display: "flex", gap: 1 }}>
+            <ListSubjects />
+          </Box>
         </Grid>
       </Box>
     </Layout>

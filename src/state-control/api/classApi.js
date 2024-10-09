@@ -6,6 +6,7 @@ export const classApi = createApi({
     baseUrl: `${import.meta.env.VITE_BASE}/class`,
     credentials: "include",
   }),
+  tagTypes: ["class", "classes"],
   endpoints: (builder) => ({
     createClass: builder.mutation({
       query: (body) => ({
@@ -13,24 +14,15 @@ export const classApi = createApi({
         method: "POST",
         body,
       }),
-      async onQueryStarted(queryArg, { dispatch, queryFulfilled }) {
-        try {
-          await queryFulfilled;
-
-          await dispatch(
-            classApi.endpoints.getClasses.initiate(undefined, {
-              forceRefetch: true,
-            })
-          );
-        } catch (error) {}
-      },
+      invalidatesTags: ["classes"],
     }),
     getClasses: builder.query({
       query: () => "/get",
+      providesTags: ["classes"],
     }),
     getClass: builder.mutation({
       query: (id) => `/detail/${id}`,
-      method: "GET",
+      providesTags: ["class"],
     }),
     updateClass: builder.mutation({
       query: ({ id, body }) => ({
@@ -38,51 +30,21 @@ export const classApi = createApi({
         method: "PUT",
         body,
       }),
-      async onQueryStarted(queryArg, { dispatch, queryFulfilled }) {
-        try {
-          await queryFulfilled;
-
-          await dispatch(
-            classApi.endpoints.getClasses.initiate(undefined, {
-              forceRefetch: true,
-            })
-          );
-        } catch (error) {}
-      },
+      invalidatesTags: ["classes"],
     }),
     deleteClass: builder.mutation({
       query: (id) => ({
         url: `/delete/${id}`,
         method: "DELETE",
       }),
-      async onQueryStarted(queryArg, { dispatch, queryFulfilled }) {
-        try {
-          await queryFulfilled;
-
-          await dispatch(
-            classApi.endpoints.getClasses.initiate(undefined, {
-              forceRefetch: true,
-            })
-          );
-        } catch (error) {}
-      },
+      invalidatesTags: ["classes"],
     }),
     clearData: builder.mutation({
       query: () => ({
         url: "/clear-data",
         method: "DELETE",
       }),
-      async onQueryStarted(queryArg, { dispatch, queryFulfilled }) {
-        try {
-          await queryFulfilled;
-
-          await dispatch(
-            classApi.endpoints.getClasses.initiate(undefined, {
-              forceRefetch: true,
-            })
-          );
-        } catch (error) {}
-      },
+      invalidatesTags: ["classes"],
     }),
   }),
 });
