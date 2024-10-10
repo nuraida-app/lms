@@ -4,6 +4,11 @@ import {
   authenticatedUser,
   authorizeRoles,
 } from "../middleware/authenticate.js";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
 
 const router = express.Router();
 
@@ -229,6 +234,150 @@ router.delete(
       ]);
       res.status(200).json({ message: "Deleted" });
     } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  }
+);
+
+// Upload file
+// Multer storage configuration
+const fileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const username = req.user.name.replace(/\s+/g, "_").toLowerCase();
+    const userFolder = `./upload/lms/${username}`;
+
+    // Create a folder if it doesn't already exist
+    if (!fs.existsSync(userFolder)) {
+      fs.mkdirSync(userFolder, { recursive: true });
+    }
+    cb(null, userFolder);
+  },
+  filename: (req, file, cb) => {
+    const username = req.user.name.replace(/\s+/g, "_").toLowerCase();
+    const fileCode = Math.floor(Math.random() * 10000000000000).toString(); // Generate a unique file code
+
+    // Sanitize filename (replace spaces and special characters)
+    const sanitizedFileCode = fileCode
+      .replace(/[^\w\s]/gi, "")
+      .replace(/\s+/g, "_");
+    const extension = path.extname(file.originalname).toLowerCase();
+
+    cb(null, `${username}_${sanitizedFileCode}${extension}`);
+  },
+});
+
+const uploadFile = multer({ storage: fileStorage });
+
+router.post(
+  "/upload-file",
+  authenticatedUser,
+  authorizeRoles("teacher"),
+  uploadFile.single("file"),
+  async (req, res) => {
+    try {
+      const { subject_code, topic_id, type, url, title } = req.body;
+      const username = req.user.name.replace(/\s+/g, "_").toLowerCase();
+      const userFolder = `${username}`;
+
+      // Check if a file was uploaded
+      if (req.file) {
+        const fileLink =
+          process.env.SERVER_2 +
+          `/upload/lms/${userFolder}/` +
+          req.file.filename;
+
+        await client.query(
+          `INSERT INTO lms_files (subject_code, topic_id, type_file, link_file, title)
+          VALUES ($1, $2, $3, $4, $5)`,
+          [subject_code, topic_id, type, fileLink, title]
+        );
+
+        return res.status(200).json({ message: "Uploaded" });
+      }
+
+      // If only a URL is provided, insert URL
+      if (url) {
+        const video = "youtube";
+        await client.query(
+          `INSERT INTO lms_files (subject_code, topic_id, type_file, link_file, title)
+          VALUES ($1, $2, $3, $4, $5)`,
+          [subject_code, topic_id, video, url, title]
+        );
+
+        return res.status(200).json({ message: "URL Uploaded Successfully" });
+      }
+
+      return res.status(400).json({ message: "No file or URL provided" });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: error.message });
+    }
+  }
+);
+
+router.get(
+  "/get-files/:topic_id",
+  authenticatedUser,
+  authorizeRoles("teacher", "student"),
+  async (req, res) => {
+    try {
+      const id = req.params.topic_id;
+
+      const data = await client.query(
+        `SELECT * FROM lms_files WHERE topic_id = $1`,
+        [id]
+      );
+
+      const files = data.rows;
+
+      res.status(200).json(files);
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  }
+);
+
+router.delete(
+  "/delete-file/:id",
+  authenticatedUser,
+  authorizeRoles("teacher"),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      // Retrieve the file link from the database
+      const result = await client.query(
+        "SELECT link_file FROM lms_files WHERE id = $1",
+        [id]
+      );
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({ message: "File not found" });
+      }
+
+      const fileLink = result.rows[0].link_file;
+      const serverUrl = process.env.SERVER_2;
+
+      // Check if the file is hosted on the server (not a URL like YouTube)
+      if (fileLink.startsWith(serverUrl)) {
+        const filePath = fileLink.replace(serverUrl, ".");
+
+        // Check if the file exists and delete it
+        if (fs.existsSync(filePath)) {
+          fs.unlink(filePath, (err) => {
+            if (err) {
+              return res.status(500).json({ message: "Failed to delete file" });
+            }
+          });
+        }
+      }
+
+      // Delete the file record from the database
+      await client.query("DELETE FROM lms_files WHERE id = $1", [id]);
+
+      res.status(200).json({ message: "File deleted successfully" });
+    } catch (error) {
+      console.error(error);
       return res.status(500).json({ message: error.message });
     }
   }
