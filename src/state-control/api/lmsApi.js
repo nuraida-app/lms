@@ -6,7 +6,7 @@ export const lmsApi = createApi({
     baseUrl: `${import.meta.env.VITE_BASE}/lms`,
     credentials: "include",
   }),
-  tagTypes: ["chapters", "chapter", "topic", "topics"],
+  tagTypes: ["chapters", "chapter", "topic", "topics", "files"],
   endpoints: (builder) => ({
     getChapters: builder.query({
       query: (code) => `/chapters/${code}`,
@@ -58,6 +58,25 @@ export const lmsApi = createApi({
       }),
       invalidatesTags: ["topics"],
     }),
+    uploadFile: builder.mutation({
+      query: (body) => ({
+        url: "/upload-file",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["files"],
+    }),
+    getFiles: builder.query({
+      query: (id) => `/get-files/${id}`,
+      providesTags: ["files"],
+    }),
+    deleteFile: builder.mutation({
+      query: (id) => ({
+        url: `/delete-file/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["files"],
+    }),
   }),
 });
 
@@ -71,4 +90,7 @@ export const {
   useGetTopicsQuery,
   useGetTopicQuery,
   useDeleteTopicMutation,
+  useUploadFileMutation,
+  useGetFilesQuery,
+  useDeleteFileMutation,
 } = lmsApi;

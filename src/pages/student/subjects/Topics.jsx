@@ -1,12 +1,12 @@
-import { ListItemText, Paper } from "@mui/material";
+import { Box, ListItemText, Paper } from "@mui/material";
 const Topics = ({ data, number }) => {
   return (
-    <Paper sx={{ p: 1, mx: 8 }}>
+    <Box sx={{ p: 1, mx: 8, boxShadow: 4, borderRadius: 1 }}>
       <ListItemText
-        primary={`Topic ${1}: ${data.title}`}
+        primary={`Topic ${number}: ${data.title}`}
         secondary={data.goal}
       />
-    </Paper>
+    </Box>
   );
 };
 

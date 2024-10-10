@@ -4,9 +4,12 @@ import {
   Box,
   Button,
   CircularProgress,
+  Fade,
   Grow,
   IconButton,
   ListItemText,
+  Modal,
+  TextField,
 } from "@mui/material";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
@@ -14,23 +17,68 @@ import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import PictureAsPdfOutlinedIcon from "@mui/icons-material/PictureAsPdfOutlined";
 import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
 import InsertLinkOutlinedIcon from "@mui/icons-material/InsertLinkOutlined";
-import { useDeleteTopicMutation } from "../../../state-control/api/lmsApi";
+import YouTubeIcon from "@mui/icons-material/YouTube";
+import SaveIcon from "@mui/icons-material/Save";
+import {
+  useDeleteTopicMutation,
+  useGetFilesQuery,
+  useUploadFileMutation,
+} from "../../../state-control/api/lmsApi";
 import { toast } from "react-toastify";
+import { useParams } from "react-router-dom";
+import Files from "./Files";
 
 const Topics = ({ data, number }) => {
+  const params = useParams();
+  const code = params.code;
+
+  const { data: files } = useGetFilesQuery(data.id, { skip: !data.id });
+
   const [deleteTopic, { data: msg, isSuccess, isLoading, error, reset }] =
     useDeleteTopicMutation();
+  const [
+    uploadFile,
+    {
+      data: upMsg,
+      isSuccess: upSuccess,
+      isLoading: upLoading,
+      error: upError,
+      reset: upReset,
+    },
+  ] = useUploadFileMutation();
 
   const [open, setOpen] = useState(false);
+  const [urlOpen, setUrlOpen] = useState(false);
+  const [fileOpen, setFileOpen] = useState(false);
+  const [file, setFile] = useState(null);
+  const [type, setType] = useState("");
+  const [title, setTitle] = useState("");
+  const [url, setUrl] = useState("");
 
   const handlePdf = (event) => {
     const file = event.target.files[0];
-    console.log(file);
+
+    setFile(file);
+    setType("pdf");
   };
 
   const handleDoc = (event) => {
     const file = event.target.files[0];
-    console.log(file);
+
+    setFile(file);
+    setType("doc");
+  };
+
+  const uploadHandler = () => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("type", type);
+    formData.append("title", title);
+    formData.append("subject_code", code);
+    formData.append("topic_id", data.id);
+    formData.append("url", url);
+
+    uploadFile(formData);
   };
 
   useEffect(() => {
@@ -44,6 +92,23 @@ const Topics = ({ data, number }) => {
       reset();
     }
   }, [msg, isSuccess, error]);
+
+  useEffect(() => {
+    if (upSuccess) {
+      toast.success(upMsg.message);
+      upReset();
+      setTitle("");
+      setUrl("");
+      setFile(null);
+      setFileOpen(false);
+      setUrlOpen(false);
+    }
+
+    if (upError) {
+      toast.error(upError.data.message);
+      upReset();
+    }
+  }, [upMsg, upSuccess, upError]);
 
   return (
     <Box sx={{ my: 1, mx: 8, borderRadius: 1, p: 1, boxShadow: 4 }}>
@@ -89,19 +154,77 @@ const Topics = ({ data, number }) => {
               variant="contained"
               color="error"
               startIcon={<PictureAsPdfOutlinedIcon />}
-              component="label"
+              onClick={() => setFileOpen(true)}
             >
-              pdf
-              <input
-                type="file"
-                hidden
-                accept=".pdf"
-                onChange={(e) => handlePdf(e, setPdfFileName)}
-              />
+              Pdf / doc
             </Button>
           </Grow>
 
           <Grow in={open}>
+            <Button
+              size="small"
+              variant="contained"
+              color="warning"
+              startIcon={<InsertLinkOutlinedIcon />}
+              onClick={() => setUrlOpen(true)}
+            >
+              url
+            </Button>
+          </Grow>
+        </Box>
+      </Box>
+
+      {/* FILES */}
+      {files && files?.map((file) => <Files key={file.id} file={file} />)}
+
+      {/* FILE */}
+      <Modal
+        open={fileOpen}
+        onClose={() => setFileOpen(false)}
+        closeAfterTransition
+      >
+        <Fade in={fileOpen}>
+          <Box
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: { xs: 350, md: 400 },
+              bgcolor: "#ffff",
+              boxShadow: 24,
+              p: 2,
+              borderRadius: "5px",
+            }}
+          >
+            <TextField
+              label="Title"
+              placeholder="Please give title for file"
+              InputLabelProps={{ shrink: true }}
+              fullWidth
+              size="small"
+              sx={{ mb: 1 }}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+
+            <Button
+              size="small"
+              variant="contained"
+              color="error"
+              startIcon={<PictureAsPdfOutlinedIcon />}
+              component="label"
+              sx={{ mr: 1 }}
+            >
+              Pdf
+              <input
+                type="file"
+                hidden
+                accept=".pdf"
+                onChange={(e) => handlePdf(e)}
+              />
+            </Button>
+
             <Button
               size="small"
               variant="contained"
@@ -114,23 +237,81 @@ const Topics = ({ data, number }) => {
                 type="file"
                 hidden
                 accept=".doc,.docx"
-                onChange={(e) => handleDoc(e, setDocFileName)}
+                onChange={(e) => handleDoc(e)}
               />
             </Button>
-          </Grow>
 
-          <Grow in={open}>
-            <Button
+            <Box sx={{ display: "flex", justifyContent: "end" }}>
+              <Button
+                variant="contained"
+                color="success"
+                size="small"
+                startIcon={<SaveIcon />}
+                onClick={uploadHandler}
+              >
+                Save
+              </Button>
+            </Box>
+          </Box>
+        </Fade>
+      </Modal>
+
+      {/* URL */}
+      <Modal
+        open={urlOpen}
+        onClose={() => setUrlOpen(false)}
+        closeAfterTransition
+      >
+        <Fade in={urlOpen}>
+          <Box
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: { xs: 350, md: 400 },
+              bgcolor: "#ffff",
+              boxShadow: 24,
+              p: 2,
+              borderRadius: "5px",
+            }}
+          >
+            <TextField
+              label="Title"
+              placeholder="Plese give title"
+              InputLabelProps={{ shrink: true }}
+              fullWidth
               size="small"
-              variant="contained"
-              color="warning"
-              startIcon={<InsertLinkOutlinedIcon />}
-            >
-              url
-            </Button>
-          </Grow>
-        </Box>
-      </Box>
+              sx={{ mb: 2 }}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+
+            <TextField
+              label="YouTube's Url"
+              placeholder="Paste YouTube's URL"
+              InputLabelProps={{ shrink: true }}
+              fullWidth
+              size="small"
+              sx={{ mb: 2 }}
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+            />
+
+            <Box sx={{ display: "flex", justifyContent: "end" }}>
+              <Button
+                variant="contained"
+                color="success"
+                size="small"
+                startIcon={<SaveIcon />}
+                onClick={uploadHandler}
+              >
+                Save
+              </Button>
+            </Box>
+          </Box>
+        </Fade>
+      </Modal>
     </Box>
   );
 };
