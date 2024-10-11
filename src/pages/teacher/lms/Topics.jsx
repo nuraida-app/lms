@@ -11,162 +11,126 @@ import {
   Modal,
   TextField,
 } from "@mui/material";
-import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
-import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import PictureAsPdfOutlinedIcon from "@mui/icons-material/PictureAsPdfOutlined";
-import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
-import InsertLinkOutlinedIcon from "@mui/icons-material/InsertLinkOutlined";
-import YouTubeIcon from "@mui/icons-material/YouTube";
-import SaveIcon from "@mui/icons-material/Save";
+import {
+  AddOutlined as AddIcon,
+  CloseOutlined as CloseIcon,
+  EditOutlined as EditIcon,
+  PictureAsPdfOutlined as PdfIcon,
+  ArticleOutlined as DocIcon,
+  InsertLinkOutlined as LinkIcon,
+  Save as SaveIcon,
+} from "@mui/icons-material";
+import { useParams } from "react-router-dom";
 import {
   useDeleteTopicMutation,
   useGetFilesQuery,
   useUploadFileMutation,
 } from "../../../state-control/api/lmsApi";
 import { toast } from "react-toastify";
-import { useParams } from "react-router-dom";
 import Files from "./Files";
 
 const Topics = ({ data, number }) => {
-  const params = useParams();
-  const code = params.code;
-
+  const { code } = useParams();
   const { data: files } = useGetFilesQuery(data.id, { skip: !data.id });
-
-  const [deleteTopic, { data: msg, isSuccess, isLoading, error, reset }] =
-    useDeleteTopicMutation();
+  const [deleteTopic, { isLoading }] = useDeleteTopicMutation();
   const [
     uploadFile,
     {
-      data: upMsg,
-      isSuccess: upSuccess,
       isLoading: upLoading,
+      isSuccess: upSuccess,
       error: upError,
       reset: upReset,
     },
   ] = useUploadFileMutation();
 
-  const [open, setOpen] = useState(false);
-  const [urlOpen, setUrlOpen] = useState(false);
-  const [fileOpen, setFileOpen] = useState(false);
-  const [file, setFile] = useState(null);
-  const [type, setType] = useState("");
-  const [title, setTitle] = useState("");
-  const [url, setUrl] = useState("");
+  const [modalState, setModalState] = useState({
+    open: false,
+    fileOpen: false,
+    urlOpen: false,
+  });
+  const [formData, setFormData] = useState({
+    file: null,
+    type: "",
+    title: "",
+    url: "",
+  });
 
-  const handlePdf = (event) => {
+  const handleFileChange = (event, fileType) => {
     const file = event.target.files[0];
-
-    setFile(file);
-    setType("pdf");
-  };
-
-  const handleDoc = (event) => {
-    const file = event.target.files[0];
-
-    setFile(file);
-    setType("doc");
+    setFormData({ ...formData, file, type: fileType });
   };
 
   const uploadHandler = () => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("type", type);
-    formData.append("title", title);
-    formData.append("subject_code", code);
-    formData.append("topic_id", data.id);
-    formData.append("url", url);
-
-    uploadFile(formData);
+    const { file, type, title, url } = formData;
+    const payload = new FormData();
+    payload.append("file", file);
+    payload.append("type", type);
+    payload.append("title", title);
+    payload.append("subject_code", code);
+    payload.append("topic_id", data.id);
+    payload.append("url", url);
+    uploadFile(payload);
   };
 
   useEffect(() => {
-    if (isSuccess) {
-      toast.success(msg.message);
-      reset();
-    }
-
-    if (error) {
-      toast.error(error.data.message);
-      reset();
-    }
-  }, [msg, isSuccess, error]);
-
-  useEffect(() => {
     if (upSuccess) {
-      toast.success(upMsg.message);
+      toast.success("File uploaded successfully");
       upReset();
-      setTitle("");
-      setUrl("");
-      setFile(null);
-      setFileOpen(false);
-      setUrlOpen(false);
+      setFormData({ file: null, type: "", title: "", url: "" });
+      setModalState({ ...modalState, fileOpen: false, urlOpen: false });
     }
-
-    if (upError) {
-      toast.error(upError.data.message);
-      upReset();
-    }
-  }, [upMsg, upSuccess, upError]);
+    if (upError) toast.error("Error uploading file");
+  }, [upSuccess, upError]);
 
   return (
     <Box sx={{ my: 1, mx: 8, borderRadius: 1, p: 1, boxShadow: 4 }}>
       <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
         <Avatar>{number}</Avatar>
         <ListItemText
-          sx={{ width: "70%" }}
           primary={data.title}
           secondary={data.goal}
+          sx={{ width: "70%" }}
         />
         <div>
           <IconButton color="warning">
-            <EditOutlinedIcon />
+            <EditIcon />
           </IconButton>
-
           <IconButton color="error" onClick={() => deleteTopic(data.id)}>
-            {isLoading ? <CircularProgress size={24} /> : <CloseOutlinedIcon />}
+            {isLoading ? <CircularProgress size={24} /> : <CloseIcon />}
           </IconButton>
         </div>
       </Box>
       <Box sx={{ mx: 6, mt: 1, display: "flex", gap: 2 }}>
         <Button
-          startIcon={<AddOutlinedIcon />}
+          startIcon={<AddIcon />}
           size="small"
           variant="outlined"
           color="success"
-          onClick={() => setOpen(!open)}
+          onClick={() =>
+            setModalState({ ...modalState, open: !modalState.open })
+          }
         >
           Add File
         </Button>
-
-        <Box
-          sx={{
-            display: "flex",
-            gap: 2,
-            justifyContent: "center",
-            width: "50%",
-          }}
-        >
-          <Grow in={open}>
+        <Box sx={{ display: "flex", gap: 2, width: "50%" }}>
+          <Grow in={modalState.open}>
             <Button
               size="small"
               variant="contained"
               color="error"
-              startIcon={<PictureAsPdfOutlinedIcon />}
-              onClick={() => setFileOpen(true)}
+              startIcon={<PdfIcon />}
+              onClick={() => setModalState({ ...modalState, fileOpen: true })}
             >
               Pdf / doc
             </Button>
           </Grow>
-
-          <Grow in={open}>
+          <Grow in={modalState.open}>
             <Button
               size="small"
               variant="contained"
               color="warning"
-              startIcon={<InsertLinkOutlinedIcon />}
-              onClick={() => setUrlOpen(true)}
+              startIcon={<LinkIcon />}
+              onClick={() => setModalState({ ...modalState, urlOpen: true })}
             >
               url
             </Button>
@@ -174,46 +138,30 @@ const Topics = ({ data, number }) => {
         </Box>
       </Box>
 
-      {/* FILES */}
-      {files && files?.map((file) => <Files key={file.id} file={file} />)}
+      {files && files.map((file) => <Files key={file.id} file={file} />)}
 
-      {/* FILE */}
       <Modal
-        open={fileOpen}
-        onClose={() => setFileOpen(false)}
+        open={modalState.fileOpen}
+        onClose={() => setModalState({ ...modalState, fileOpen: false })}
         closeAfterTransition
       >
-        <Fade in={fileOpen}>
-          <Box
-            sx={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              width: { xs: 350, md: 400 },
-              bgcolor: "#ffff",
-              boxShadow: 24,
-              p: 2,
-              borderRadius: "5px",
-            }}
-          >
+        <Fade in={modalState.fileOpen}>
+          <Box sx={modalStyle}>
             <TextField
               label="Title"
-              placeholder="Please give title for file"
-              InputLabelProps={{ shrink: true }}
               fullWidth
               size="small"
               sx={{ mb: 1 }}
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              value={formData.title}
+              onChange={(e) =>
+                setFormData({ ...formData, title: e.target.value })
+              }
             />
-
             <Button
-              size="small"
+              component="label"
               variant="contained"
               color="error"
-              startIcon={<PictureAsPdfOutlinedIcon />}
-              component="label"
+              startIcon={<PdfIcon />}
               sx={{ mr: 1 }}
             >
               Pdf
@@ -221,26 +169,23 @@ const Topics = ({ data, number }) => {
                 type="file"
                 hidden
                 accept=".pdf"
-                onChange={(e) => handlePdf(e)}
+                onChange={(e) => handleFileChange(e, "pdf")}
               />
             </Button>
-
             <Button
-              size="small"
+              component="label"
               variant="contained"
               color="primary"
-              startIcon={<ArticleOutlinedIcon />}
-              component="label"
+              startIcon={<DocIcon />}
             >
               doc
               <input
                 type="file"
                 hidden
                 accept=".doc,.docx"
-                onChange={(e) => handleDoc(e)}
+                onChange={(e) => handleFileChange(e, "doc")}
               />
             </Button>
-
             <Box sx={{ display: "flex", justifyContent: "end" }}>
               <Button
                 variant="contained"
@@ -248,56 +193,42 @@ const Topics = ({ data, number }) => {
                 size="small"
                 startIcon={<SaveIcon />}
                 onClick={uploadHandler}
+                disabled={upLoading}
               >
-                Save
+                {upLoading ? <CircularProgress size={24} /> : "Save"}
               </Button>
             </Box>
           </Box>
         </Fade>
       </Modal>
 
-      {/* URL */}
       <Modal
-        open={urlOpen}
-        onClose={() => setUrlOpen(false)}
+        open={modalState.urlOpen}
+        onClose={() => setModalState({ ...modalState, urlOpen: false })}
         closeAfterTransition
       >
-        <Fade in={urlOpen}>
-          <Box
-            sx={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              width: { xs: 350, md: 400 },
-              bgcolor: "#ffff",
-              boxShadow: 24,
-              p: 2,
-              borderRadius: "5px",
-            }}
-          >
+        <Fade in={modalState.urlOpen}>
+          <Box sx={modalStyle}>
             <TextField
               label="Title"
-              placeholder="Plese give title"
-              InputLabelProps={{ shrink: true }}
               fullWidth
               size="small"
               sx={{ mb: 2 }}
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              value={formData.title}
+              onChange={(e) =>
+                setFormData({ ...formData, title: e.target.value })
+              }
             />
-
             <TextField
               label="YouTube's Url"
-              placeholder="Paste YouTube's URL"
-              InputLabelProps={{ shrink: true }}
               fullWidth
               size="small"
               sx={{ mb: 2 }}
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
+              value={formData.url}
+              onChange={(e) =>
+                setFormData({ ...formData, url: e.target.value })
+              }
             />
-
             <Box sx={{ display: "flex", justifyContent: "end" }}>
               <Button
                 variant="contained"
@@ -305,8 +236,9 @@ const Topics = ({ data, number }) => {
                 size="small"
                 startIcon={<SaveIcon />}
                 onClick={uploadHandler}
+                disabled={upLoading}
               >
-                Save
+                {upLoading ? <CircularProgress size={24} /> : "Save"}
               </Button>
             </Box>
           </Box>
@@ -314,6 +246,18 @@ const Topics = ({ data, number }) => {
       </Modal>
     </Box>
   );
+};
+
+const modalStyle = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: { xs: 350, md: 400 },
+  bgcolor: "#fff",
+  boxShadow: 24,
+  p: 2,
+  borderRadius: "5px",
 };
 
 export default Topics;
