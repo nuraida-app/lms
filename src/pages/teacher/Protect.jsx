@@ -18,7 +18,7 @@ const Protect = () => {
 
   useEffect(() => {
     if (isLogout) {
-      window.location.href = "/";
+      navigate("/");
       localStorage.removeItem("login");
     }
   }, [isLogout]);

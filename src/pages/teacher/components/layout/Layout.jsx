@@ -123,7 +123,11 @@ const Layout = ({ children }) => {
   // Logout
   const dispatch = useDispatch();
 
-  const logout = () => dispatch(logoutUser());
+  const logout = () => {
+    navigate("/");
+    localStorage.removeItem("login");
+    dispatch(logoutUser());
+  };
 
   Protect();
 
