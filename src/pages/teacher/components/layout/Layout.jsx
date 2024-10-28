@@ -28,11 +28,17 @@ import { logoutUser } from "../../../../state-control/api/authApi";
 const drawerWidth = 240;
 
 function stringAvatar(name) {
-  return {
-    children: `${name.split(" ")[0][0]}${name.split(" ")[1][0]}`,
-  };
+  const nameParts = name.split(" ");
+  if (nameParts.length === 1) {
+    return {
+      children: `${nameParts[0][0]}`,
+    };
+  } else {
+    return {
+      children: `${nameParts[0][0]}${nameParts[1][0]}`,
+    };
+  }
 }
-
 const openedMixin = (theme) => ({
   width: drawerWidth,
   transition: theme.transitions.create("width", {

@@ -12,7 +12,7 @@ const TeachersPage = () => {
       <Grid
         container
         sx={{
-          minHeight: "80vh",
+          minHeight: "85vh",
           display: "flex",
           flexDirection: "column",
           gap: 2,

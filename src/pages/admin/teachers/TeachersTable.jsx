@@ -124,7 +124,7 @@ const TeachersTable = () => {
       ) : (
         <Paper sx={{ width: "100%", overflowX: "auto" }}>
           <TableContainer
-            sx={{ height: { xs: 500, md: 530, xl: 638 }, overflow: "auto" }}
+            sx={{ height: { xs: 500, md: 530, xl: 700 }, overflow: "auto" }}
           >
             <Table stickyHeader aria-label="sticky table">
               <TableHead>
