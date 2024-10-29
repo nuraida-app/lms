@@ -129,9 +129,34 @@ router.get(
 
       const data = await client.query(
         `SELECT students_class.id, students_class.nis,
-        students.name, homebase.name AS homebase FROM students_class
+        students.name, homebase.name AS homebase,
+        (
+          SELECT ROUND(
+            COUNT(value) * 100.0 / 41, 2
+          )
+          FROM (
+            SELECT unnest(ARRAY[
+              db_students.id::text, db_students.name, db_students.nisn::text, 
+              db_students.nis::text, db_students.birth_place, db_students.height::text,
+              db_students.weight::text, db_students.around_head::text, db_students.order_birth::text,
+              db_students.siblings::text, db_students.province_id::text, db_students.province_name,
+              db_students.regency_id::text, db_students.regency_name, db_students.district_id::text,
+              db_students.district_name, db_students.village_id::text, db_students.village_name,
+              db_students.address, db_students.postal_code::text, db_students.father_nik::text,
+              db_students.father_name, db_students.father_birth_place, db_students.father_job,
+              db_students.father_position, db_students.father_earning::text, db_students.father_phone,
+              db_students.mother_nik::text,
+              db_students.mother_name, db_students.mother_birth_place, db_students.mother_job,
+              db_students.mother_position, db_students.mother_earning::text, db_students.mother_phone,
+              db_students.family_info::text, db_students.health_records::text, db_students.status,
+              db_students.createdat::text
+            ]::text[]) AS value
+          ) AS fields WHERE value IS NOT NULL
+        ) AS percentage
+        FROM students_class
         INNER JOIN students ON students.nis = students_class.nis
         INNER JOIN homebase ON homebase.id = students_class.homebase_id
+        LEFT JOIN db_students ON db_students.nis = students_class.nis
         WHERE students_class.homebase_id = $1 
         ORDER BY students.name`,
         [homebase]
