@@ -33,7 +33,7 @@ const DbTable = ({ students, database }) => {
   return (
     <TableContainer
       component={Paper}
-      sx={{ height: { xs: 500, md: 530, lg: 600 }, overflow: "auto" }}
+      sx={{ height: { xs: 500, md: 530, lg: 750 }, overflow: "auto" }}
     >
       <Table stickyHeader aria-label="sticky table">
         <TableHead>

@@ -20,6 +20,7 @@ const Protect = () => {
     if (isLogout) {
       navigate("/");
       localStorage.removeItem("login");
+      console.log(isLogout);
     }
   }, [isLogout]);
 };

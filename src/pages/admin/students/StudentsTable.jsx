@@ -5,7 +5,12 @@ import {
   Input,
   Menu,
   MenuItem,
+  LinearProgress,
+  linearProgressClasses,
   Paper,
+  Stack,
+  Tooltip,
+  Typography,
   Table,
   TableBody,
   TableCell,
@@ -13,17 +18,37 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
+import { styled } from "@mui/material/styles";
 import React, { Fragment, useEffect, useState } from "react";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import StudentEdit from "./StudentEdit";
 import { useGetStudentMutation } from "../../../state-control/api/studentApi";
 import { toast } from "react-toastify";
 
+const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
+  height: 10,
+  borderRadius: 5,
+  [`&.${linearProgressClasses.colorPrimary}`]: {
+    backgroundColor: theme.palette.grey[200],
+    ...theme.applyStyles("dark", {
+      backgroundColor: theme.palette.grey[800],
+    }),
+  },
+  [`& .${linearProgressClasses.bar}`]: {
+    borderRadius: 5,
+    backgroundColor: "#1a90ff",
+    ...theme.applyStyles("dark", {
+      backgroundColor: "#308fe8",
+    }),
+  },
+}));
+
 const columns = [
   { label: "No", width: 40 },
   { label: "NIS", width: 100 },
   { label: "Name", width: 170 },
   { label: "Homebase", width: 80 },
+  { label: "Database", width: 80 },
   { label: "Actions", width: 100 },
 ];
 
@@ -86,7 +111,7 @@ const StudentsTable = ({ students, loading }) => {
 
       <Paper>
         <TableContainer
-          sx={{ height: { xs: 500, md: 530, lg: 630 }, overflow: "auto" }}
+          sx={{ height: { xs: 500, md: 530, lg: 700 }, overflow: "auto" }}
         >
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
@@ -109,6 +134,19 @@ const StudentsTable = ({ students, loading }) => {
                   <TableCell align="center">{student.nis}</TableCell>
                   <TableCell align="left">{student.name}</TableCell>
                   <TableCell align="center">{student.homebase}</TableCell>
+                  <TableCell align="center">
+                    <Tooltip
+                      title={`${student.percentage}%`}
+                      placement="top-end"
+                    >
+                      <Stack sx={{ flexGrow: 1 }}>
+                        <BorderLinearProgress
+                          variant="determinate"
+                          value={Number(student.percentage)} // Ensure percentage is numeric
+                        />
+                      </Stack>
+                    </Tooltip>
+                  </TableCell>
                   <TableCell align="center">
                     <IconButton
                       color="primary"

@@ -27,18 +27,6 @@ import { logoutUser } from "../../../../state-control/api/authApi";
 
 const drawerWidth = 240;
 
-function stringAvatar(name) {
-  const nameParts = name.split(" ");
-  if (nameParts.length === 1) {
-    return {
-      children: `${nameParts[0][0]}`,
-    };
-  } else {
-    return {
-      children: `${nameParts[0][0]}${nameParts[1][0]}`,
-    };
-  }
-}
 const openedMixin = (theme) => ({
   width: drawerWidth,
   transition: theme.transitions.create("width", {
@@ -108,6 +96,8 @@ const Drawer = styled(MuiDrawer, {
 }));
 
 const Layout = ({ children }) => {
+  Protect();
+
   const navigate = useNavigate();
 
   const { user, isAuthLoading } = useSelector((state) => state.authentication);
@@ -130,12 +120,11 @@ const Layout = ({ children }) => {
   const dispatch = useDispatch();
 
   const logout = () => {
-    navigate("/");
     localStorage.removeItem("login");
     dispatch(logoutUser());
-  };
 
-  Protect();
+    navigate("/");
+  };
 
   const menuItems = menus();
 
@@ -170,11 +159,7 @@ const Layout = ({ children }) => {
                 {user?.name}
               </Typography>
 
-              <Avatar
-                {...stringAvatar(user?.name)}
-                onClick={profilePage}
-                sx={{ cursor: "pointer" }}
-              />
+              <Avatar onClick={profilePage} sx={{ cursor: "pointer" }} />
             </Box>
           )}
         </Toolbar>
