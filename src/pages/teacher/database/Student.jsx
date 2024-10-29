@@ -198,7 +198,6 @@ const Student = ({ provinces, info, name, nis }) => {
               name="name"
               value={formData.name || ""}
               onChange={handleChange}
-              required
             />
             <TextField
               fullWidth
@@ -208,7 +207,6 @@ const Student = ({ provinces, info, name, nis }) => {
               name="nisn"
               value={formData.nisn || ""}
               onChange={handleChange}
-              required
             />
             <TextField
               fullWidth
@@ -218,7 +216,6 @@ const Student = ({ provinces, info, name, nis }) => {
               name="nis"
               value={formData.nis || ""}
               onChange={handleChange}
-              required
             />
             <TextField
               fullWidth
@@ -228,7 +225,6 @@ const Student = ({ provinces, info, name, nis }) => {
               name="birth_place"
               value={formData.birth_place || ""}
               onChange={handleChange}
-              required
             />
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
@@ -249,7 +245,6 @@ const Student = ({ provinces, info, name, nis }) => {
               name="order_birth"
               value={formData.order_birth}
               onChange={handleChange}
-              required
             />
             <TextField
               fullWidth
@@ -260,7 +255,6 @@ const Student = ({ provinces, info, name, nis }) => {
               name="siblings"
               value={formData.siblings || ""}
               onChange={handleChange}
-              required
             />
             <TextField
               fullWidth
@@ -271,7 +265,6 @@ const Student = ({ provinces, info, name, nis }) => {
               name="height"
               value={formData.height || ""}
               onChange={handleChange}
-              required
             />
             <TextField
               fullWidth
@@ -282,7 +275,6 @@ const Student = ({ provinces, info, name, nis }) => {
               name="weight"
               value={formData.weight || ""}
               onChange={handleChange}
-              required
             />
           </Grid>
           <Grid
@@ -300,7 +292,6 @@ const Student = ({ provinces, info, name, nis }) => {
               name="around_head"
               value={formData.around_head || ""}
               onChange={handleChange}
-              required
             />
             <FormControl fullWidth variant="standard">
               <InputLabel>--Province--</InputLabel>
@@ -308,7 +299,6 @@ const Student = ({ provinces, info, name, nis }) => {
                 name="province_id"
                 value={formData.province_id || ""}
                 onChange={handleChange}
-                required
               >
                 {provinces?.map((item) => (
                   <MenuItem key={item.id} value={item.id}>
@@ -324,7 +314,6 @@ const Student = ({ provinces, info, name, nis }) => {
                   name="regency_id"
                   value={formData.regency_id || ""}
                   onChange={handleChange}
-                  required
                 >
                   {regencies?.map((item) => (
                     <MenuItem key={item.id} value={item.id}>
@@ -341,7 +330,6 @@ const Student = ({ provinces, info, name, nis }) => {
                   name="district_id"
                   value={formData.district_id || ""}
                   onChange={handleChange}
-                  required
                 >
                   {districts?.map((item) => (
                     <MenuItem key={item.id} value={item.id}>
@@ -358,7 +346,6 @@ const Student = ({ provinces, info, name, nis }) => {
                   name="village_id"
                   value={formData.village_id || ""}
                   onChange={handleChange}
-                  required
                 >
                   {villages?.map((item) => (
                     <MenuItem key={item.id.trim()} value={item.id.trim()}>
@@ -377,7 +364,6 @@ const Student = ({ provinces, info, name, nis }) => {
               name="address"
               value={formData.address || ""}
               onChange={handleChange}
-              required
             />
             <TextField
               fullWidth
@@ -387,7 +373,6 @@ const Student = ({ provinces, info, name, nis }) => {
               name="postal_code"
               value={formData.postal_code || ""}
               onChange={handleChange}
-              required
             />
           </Grid>
         </Grid>
