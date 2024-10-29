@@ -122,8 +122,6 @@ const Layout = ({ children }) => {
   const logout = () => {
     localStorage.removeItem("login");
     dispatch(logoutUser());
-
-    navigate("/");
   };
 
   const menuItems = menus();
