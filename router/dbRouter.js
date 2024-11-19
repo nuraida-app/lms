@@ -65,7 +65,7 @@ router.get("/get-villages/:districtId", authenticatedUser, async (req, res) => {
 router.post(
   "/add-student-data",
   authenticatedUser,
-  authorizeRoles("admin", "teacher"),
+  authorizeRoles("admin", "teacher", "student"),
   async (req, res) => {
     const {
       name,
@@ -193,7 +193,7 @@ router.post(
 router.post(
   "/add-parents-data",
   authenticatedUser,
-  authorizeRoles("admin", "teacher"),
+  authorizeRoles("admin", "teacher", "student"),
   async (req, res) => {
     const {
       nis,
@@ -278,7 +278,7 @@ router.post(
 router.post(
   "/add-family-data",
   authenticatedUser,
-  authorizeRoles("admin", "teacher"),
+  authorizeRoles("admin", "teacher", "student"),
   async (req, res) => {
     const { nis, familyData } = req.body;
 
@@ -329,7 +329,7 @@ router.post(
 router.delete(
   "/delete-family-data",
   authenticatedUser,
-  authorizeRoles("admin", "teacher"),
+  authorizeRoles("admin", "teacher", "student"),
   async (req, res) => {
     const { nis, familyId } = req.body;
 
@@ -369,7 +369,7 @@ router.delete(
 router.post(
   "/add-health-data",
   authenticatedUser,
-  authorizeRoles("admin", "teacher"),
+  authorizeRoles("admin", "teacher", "student"),
   async (req, res) => {
     const { nis, healthData } = req.body;
 
@@ -413,7 +413,7 @@ router.post(
 router.delete(
   "/delete-health-data",
   authenticatedUser,
-  authorizeRoles("admin", "teacher"),
+  authorizeRoles("admin", "teacher", "student"),
   async (req, res) => {
     const { nis, healthId } = req.body;
 
