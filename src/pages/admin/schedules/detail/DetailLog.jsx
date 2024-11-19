@@ -24,9 +24,9 @@ import { toast } from "react-toastify";
 const columns = [
   { label: "No", width: 30 },
   { label: "NIS", width: 100 },
-  { label: "Name", width: 150 },
-  { label: "Class", width: 30 },
-  { label: "Join", width: 110 },
+  { label: "Nama", width: 150 },
+  { label: "Kelas", width: 30 },
+  { label: "Masuk", width: 110 },
   { label: "IP", width: 110 },
   { label: "Browser", width: 110 },
   { label: "Status", width: 100 },

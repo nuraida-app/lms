@@ -16,7 +16,7 @@ const ListSubjects = () => {
         <Paper key={index} sx={{ p: 1, width: "25%" }}>
           <ListItemText
             primary={subject.name}
-            secondary={`${subject.chapter_count} Chapters ${subject.topic_count} Topics`}
+            secondary={`${subject.chapter_count} Bab ${subject.topic_count} Topik`}
           />
 
           <Box sx={{ display: "flex", justifyContent: "end" }}>
@@ -25,7 +25,7 @@ const ListSubjects = () => {
               variant="contained"
               onClick={() => toPage(subject.code, subject.name)}
             >
-              Learn
+              Detail
             </Button>
           </Box>
         </Paper>

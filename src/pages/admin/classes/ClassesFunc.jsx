@@ -28,7 +28,7 @@ const ClassesFunc = () => {
         onClick={() => setOpenAdd(true)}
         sx={{ width: 120 }}
       >
-        add
+        Tambah
       </Button>
 
       <Button
@@ -38,7 +38,7 @@ const ClassesFunc = () => {
         onClick={() => setConfirm(true)}
         sx={{ width: 120 }}
       >
-        Delete
+        Hapus
       </Button>
 
       <ClassAdd open={openAdd} close={() => setOpenAdd(false)} />

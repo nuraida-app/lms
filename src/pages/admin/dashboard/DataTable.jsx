@@ -52,8 +52,8 @@ const DataTable = ({ type }) => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell align="center">Name</TableCell>
-              <TableCell align="center">Total</TableCell>
+              <TableCell align="center">Nama</TableCell>
+              <TableCell align="center">Jumlah</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

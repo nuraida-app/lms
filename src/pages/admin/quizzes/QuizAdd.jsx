@@ -100,12 +100,12 @@ const QuizAdd = ({ open, close }) => {
         >
           <form className="form-quiz" onSubmit={createHandler}>
             <FormControl fullWidth>
-              <InputLabel>--Teacher--</InputLabel>
+              <InputLabel>--Guru--</InputLabel>
               <Select
                 value={teacherId}
                 onChange={(e) => setTeacherId(e.target.value)}
                 required
-                label="--Teacher--"
+                label="--Guru--"
               >
                 {teachers?.map((teacher) => (
                   <MenuItem key={teacher.id} value={teacher.id}>
@@ -116,12 +116,12 @@ const QuizAdd = ({ open, close }) => {
             </FormControl>
 
             <FormControl fullWidth>
-              <InputLabel>--Grade--</InputLabel>
+              <InputLabel>--Tingkat--</InputLabel>
               <Select
                 value={gradeId}
                 onChange={(e) => setGradeId(e.target.value)}
                 required
-                label="--Grade--"
+                label="--Tingkat--"
               >
                 {grades?.map((item) => (
                   <MenuItem key={item.id} value={item.id}>
@@ -132,25 +132,26 @@ const QuizAdd = ({ open, close }) => {
             </FormControl>
 
             <FormControl fullWidth>
-              <InputLabel>--Shuffle--</InputLabel>
+              <InputLabel>--Acak--</InputLabel>
               <Select
                 value={shuffle}
                 onChange={(e) => setShuffle(e.target.value)}
                 required
-                label="--Grade--"
+                label="--Acak--"
               >
-                <MenuItem value={true}>yes</MenuItem>
-                <MenuItem value={false}>No</MenuItem>
+                <MenuItem value={true}>ya</MenuItem>
+                <MenuItem value={false}>Tidak</MenuItem>
               </Select>
             </FormControl>
 
             <TextField
               fullWidth
               required
-              label="Quiz Name"
-              placeholder="Quiz Name"
+              label="Nama Ujian"
+              placeholder="Nama Ujian"
               value={quizName}
               onChange={(e) => setQuizName(e.target.value)}
+              InputLabelProps={{ shrink: true }}
             />
 
             <Box sx={{ display: "flex", gap: 1 }}>
@@ -158,10 +159,11 @@ const QuizAdd = ({ open, close }) => {
                 fullWidth
                 required
                 type="number"
-                label="MC"
+                label="PG"
                 placeholder="eg: 80"
                 value={mc}
                 onChange={(e) => setMc(e.target.value)}
+                InputLabelProps={{ shrink: true }}
               />
 
               <TextField
@@ -172,6 +174,7 @@ const QuizAdd = ({ open, close }) => {
                 placeholder="eg: 20"
                 value={essay}
                 onChange={(e) => setEssay(e.target.value)}
+                InputLabelProps={{ shrink: true }}
               />
             </Box>
             <Box
@@ -182,7 +185,7 @@ const QuizAdd = ({ open, close }) => {
               }}
             >
               <Button variant="outlined" color="error" onClick={closeHandler}>
-                cancel
+                tutup
               </Button>
               <Button variant="contained" color="success" type="submit">
                 {tLoad || gLoad || qLoad ? (

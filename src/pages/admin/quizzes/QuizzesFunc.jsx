@@ -24,7 +24,7 @@ const QuizzesFunc = () => {
         onClick={() => setOpenAdd(true)}
         sx={{ width: 120 }}
       >
-        add
+        Tambah
       </Button>
 
       <Button
@@ -34,7 +34,7 @@ const QuizzesFunc = () => {
         onClick={() => setConfirm(true)}
         sx={{ width: 120 }}
       >
-        Delete
+        Hapus
       </Button>
 
       <QuizAdd open={openAdd} close={() => setOpenAdd(false)} />

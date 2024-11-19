@@ -112,7 +112,7 @@ const DetailFunc = () => {
             startIcon={<CloudSyncIcon />}
             onClick={handleRefetch}
           >
-            update data
+            Prbarui Data
           </Button>
           <Button
             sx={{ width: { xs: 130, md: 180, lg: 155 } }}
@@ -130,7 +130,7 @@ const DetailFunc = () => {
             color="success"
             onClick={toMcPage}
           >
-            mc
+            pg
           </Button>
           <Button
             sx={{ width: { xs: 130, md: 180, lg: 155 } }}
@@ -148,7 +148,7 @@ const DetailFunc = () => {
             color="success"
             onClick={toScorePage}
           >
-            scores
+            Nilai
           </Button>
         </Box>
       </Paper>

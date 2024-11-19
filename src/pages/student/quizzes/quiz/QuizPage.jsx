@@ -125,7 +125,7 @@ const QuizPage = () => {
               onClick={() => handlePageChange(null, currentPage - 1)}
               disabled={currentPage === 1}
             >
-              Previous
+              Sebelumnya
             </Button>
 
             {currentPage !== Math.ceil(questions.length / questionsPerPage) ? (
@@ -135,7 +135,7 @@ const QuizPage = () => {
                 color="primary"
                 onClick={() => handlePageChange(null, currentPage + 1)}
               >
-                Next
+                selanjutnya
               </Button>
             ) : (
               <Button
@@ -143,7 +143,7 @@ const QuizPage = () => {
                 color="success"
                 onClick={finishHandler}
               >
-                Finish
+                Selesai
               </Button>
             )}
           </Paper>

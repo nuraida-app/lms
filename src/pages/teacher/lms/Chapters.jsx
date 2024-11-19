@@ -50,7 +50,7 @@ const Chapters = ({ data, number }) => {
         }}
       >
         <ListItemText
-          primary={`Chapter ${number}: ${data.title}`}
+          primary={`Bab ${number}: ${data.title}`}
           secondary={data.goal}
           sx={{ width: "75%" }}
         />
@@ -78,7 +78,7 @@ const Chapters = ({ data, number }) => {
           onClick={() => setTopic(true)}
           size="small"
         >
-          Topic
+          Topik
         </Button>
       </Box>
 

@@ -15,11 +15,11 @@ import * as XLSX from "xlsx";
 const columns = [
   { label: "No", width: 30 },
   { label: "NIS", width: 80 },
-  { label: "Name", width: 200 },
-  { label: "Class", width: 30 },
-  { label: "MC", width: 30 },
+  { label: "Nama", width: 200 },
+  { label: "Kelas", width: 30 },
+  { label: "Pg", width: 30 },
   { label: "Essay", width: 30 },
-  { label: "Score", width: 30 },
+  { label: "Nilai", width: 30 },
 ];
 
 const DetailScores = ({ data, quizname }) => {

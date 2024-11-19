@@ -28,7 +28,7 @@ const GradesFunc = () => {
         onClick={() => setOpenAdd(true)}
         sx={{ width: 120 }}
       >
-        add
+        Tambah
       </Button>
 
       <Button
@@ -38,7 +38,7 @@ const GradesFunc = () => {
         onClick={() => setConfirm(true)}
         sx={{ width: 120 }}
       >
-        Delete
+        Hapus
       </Button>
 
       <GradeAdd open={openAdd} close={() => setOpenAdd(false)} />

@@ -68,7 +68,7 @@ const StudentAdd = ({ open, close }) => {
         >
           <form className="form-class" onSubmit={findStudent}>
             <Input
-              placeholder="Input NIS"
+              placeholder="Masukan NIS"
               value={nis}
               onChange={(e) => setNis(e.target.value)}
               required
@@ -78,7 +78,7 @@ const StudentAdd = ({ open, close }) => {
               {isLoading ? (
                 <CircularProgress size={20} color="inherit" />
               ) : (
-                "add"
+                "Tambah"
               )}
             </Button>
           </form>

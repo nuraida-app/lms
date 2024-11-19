@@ -16,17 +16,17 @@ export const menus = () => {
       icon: <SpaceDashboardIcon sx={{ color: "white" }} />,
     },
     {
-      label: "Subjects",
+      label: "Mata Pelajaran",
       link: "/teacher/subjects",
       icon: <StyleIcon sx={{ color: "white" }} />,
     },
     {
-      label: "Quizzes",
+      label: "Bank Soal",
       link: "/teacher/quizzes",
       icon: <FolderCopyIcon sx={{ color: "white" }} />,
     },
     {
-      label: "Schedules",
+      label: "Jadwal Ujian",
       link: "/teacher/schedules",
       icon: <CalendarMonthIcon sx={{ color: "white" }} />,
     },
@@ -36,7 +36,7 @@ export const menus = () => {
   if (user?.homeroom === 1) {
     menuItems.splice(1, 0, {
       label: "Database",
-      link: "/teacher/database",
+      link: "/database",
       icon: <StorageIcon sx={{ color: "white" }} />,
     });
   }

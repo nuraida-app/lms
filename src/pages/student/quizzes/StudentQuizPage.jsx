@@ -16,7 +16,7 @@ const StudentQuizPage = () => {
 
   return (
     <Layout>
-      <PageName title={"Quiz"} />
+      <PageName title={"Ujian"} />
       <Box
         sx={{
           height: "82vh",
@@ -26,7 +26,7 @@ const StudentQuizPage = () => {
         }}
       >
         <Paper sx={{ p: 1 }}>
-          <Input placeholder="Search Exam" />
+          <Input placeholder="Cari Ujian" />
         </Paper>
 
         {/* <QuizTable /> */}

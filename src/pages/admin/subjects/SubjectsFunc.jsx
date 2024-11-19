@@ -34,7 +34,7 @@ const SubjectsFunc = () => {
         onClick={() => setOpenAdd(true)}
         sx={{ width: 120 }}
       >
-        add
+        Tambah
       </Button>
 
       <Button
@@ -44,7 +44,7 @@ const SubjectsFunc = () => {
         onClick={() => setUpload(true)}
         sx={{ width: 120 }}
       >
-        Upload
+        Unggah
       </Button>
 
       <Button
@@ -64,7 +64,7 @@ const SubjectsFunc = () => {
         onClick={() => setConfirm(true)}
         sx={{ width: 120 }}
       >
-        Delete
+        Hapus
       </Button>
 
       <SubjectAdd open={openAdd} close={() => setOpenAdd(false)} />

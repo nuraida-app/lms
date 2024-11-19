@@ -15,7 +15,7 @@ const DataTwo = () => {
       <Grid item xs={12} md={6} sx={{ p: 1 }}>
         <Paper sx={{ p: 1 }}>
           <Typography align="center" fontWeight="bold">
-            Provinces
+            Provinsi
           </Typography>
           {data && <BarChart data={provinces} />}
         </Paper>
@@ -23,7 +23,7 @@ const DataTwo = () => {
       <Grid item xs={12} md={6} sx={{ p: 1 }}>
         <Paper sx={{ p: 1 }}>
           <Typography align="center" fontWeight="bold">
-            Cities
+            Kota
           </Typography>
           {data && <BarChart data={cities} />}
         </Paper>

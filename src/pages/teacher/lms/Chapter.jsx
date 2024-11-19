@@ -113,8 +113,8 @@ const Chapter = ({ open, close, id }) => {
           >
             <TextField
               fullWidth
-              label="Title"
-              placeholder="Chapter's title"
+              label="Nama Bab"
+              placeholder="Nama Bab"
               InputLabelProps={{ shrink: true }}
               value={title || ""}
               onChange={(e) => setTitle(e.target.value)}
@@ -124,8 +124,8 @@ const Chapter = ({ open, close, id }) => {
               fullWidth
               multiline
               rows={4}
-              label="Learning Prurpose"
-              placeholder="Learning Prurpose"
+              label="Tujuan Pembelajaran"
+              placeholder="Tujuan Pembelajaran"
               InputLabelProps={{ shrink: true }}
               sx={{ my: 1 }}
               value={goal || ""}
@@ -157,7 +157,7 @@ const Chapter = ({ open, close, id }) => {
                 onClick={closeHandler}
                 sx={{ mr: 1 }}
               >
-                cancel
+                tutup
               </Button>
 
               <Button
@@ -166,7 +166,7 @@ const Chapter = ({ open, close, id }) => {
                 color="success"
                 type="submit"
               >
-                {isLoading ? <CircularProgress size={24} /> : "Add"}
+                {isLoading ? <CircularProgress size={24} /> : "simpan"}
               </Button>
             </Box>
           </form>

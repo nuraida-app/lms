@@ -33,12 +33,12 @@ const Subjects = ({ data }) => {
       <Table>
         <TableBody>
           <TableRow>
-            <TableCell>Chapters</TableCell>
+            <TableCell>Bab</TableCell>
             <TableCell align="center">:</TableCell>
             <TableCell align="center">{data.chapter_count}</TableCell>
           </TableRow>
           <TableRow>
-            <TableCell>Topics</TableCell>
+            <TableCell>Topik</TableCell>
             <TableCell align="center">:</TableCell>
             <TableCell align="center">{data.topic_count}</TableCell>
           </TableRow>

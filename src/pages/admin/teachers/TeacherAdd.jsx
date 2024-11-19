@@ -76,21 +76,23 @@ const TeacherAdd = ({ open, close }) => {
               placeholder="NIP"
               value={nip}
               onChange={(e) => setNip(e.target.value)}
+              InputLabelProps={{ shrink: true }}
             />
 
             <TextField
               fullWidth
-              label="Full Name"
+              label="Nama Lengkap"
               placeholder="Full Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              InputLabelProps={{ shrink: true }}
             />
 
             <FormControl>
-              <InputLabel>--Subjects--</InputLabel>
+              <InputLabel>--Mapel--</InputLabel>
               <Select
                 required
-                label="--Subjects--"
+                label="--Mapel--"
                 multiple
                 value={subjectIds}
                 onChange={(e) => setSubjectIds(e.target.value)}
@@ -111,13 +113,13 @@ const TeacherAdd = ({ open, close }) => {
               }}
             >
               <Button variant="outlined" color="error" onClick={close}>
-                cancel
+                tutup
               </Button>
               <Button variant="contained" color="success" type="submit">
                 {isLoading ? (
                   <CircularProgress size={20} color="inherit" />
                 ) : (
-                  "Add"
+                  "tambah"
                 )}
               </Button>
             </Box>

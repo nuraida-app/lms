@@ -106,10 +106,10 @@ const TeacherEdit = ({ open, close, teacher }) => {
             />
 
             <FormControl>
-              <InputLabel>--Subjects--</InputLabel>
+              <InputLabel>--Mapel--</InputLabel>
               <Select
                 required
-                label="--Subjects--"
+                label="--Mapel--"
                 multiple
                 value={subjectIds || []}
                 onChange={(e) => setSubjectIds(e.target.value)}

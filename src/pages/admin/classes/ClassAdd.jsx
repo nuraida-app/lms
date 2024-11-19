@@ -67,10 +67,10 @@ const ClassAdd = ({ open, close }) => {
         >
           <form className="form-class" onSubmit={addHandler}>
             <FormControl>
-              <InputLabel>--Grade--</InputLabel>
+              <InputLabel>--Tingkat--</InputLabel>
               <Select
                 required
-                label="--Grade--"
+                label="--Tingkat--"
                 value={gradeId}
                 onChange={(e) => setGradeId(e.target.value)}
               >
@@ -84,10 +84,11 @@ const ClassAdd = ({ open, close }) => {
 
             <TextField
               fullWidth
-              label="Class code"
-              placeholder="Must be NUMBER"
+              label="kode Kelas"
+              placeholder="harus ANGKA"
               value={code}
               onChange={(e) => setCode(e.target.value)}
+              InputLabelProps={{ shrink: true }}
             />
 
             <TextField
@@ -96,6 +97,7 @@ const ClassAdd = ({ open, close }) => {
               placeholder="Class"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              InputLabelProps={{ shrink: true }}
             />
 
             <Box
@@ -106,13 +108,13 @@ const ClassAdd = ({ open, close }) => {
               }}
             >
               <Button variant="outlined" color="error" onClick={close}>
-                cancel
+                tutup
               </Button>
               <Button variant="contained" color="success" type="submit">
                 {isLoading ? (
                   <CircularProgress size={20} color="inherit" />
                 ) : (
-                  "add"
+                  "tambah"
                 )}
               </Button>
             </Box>

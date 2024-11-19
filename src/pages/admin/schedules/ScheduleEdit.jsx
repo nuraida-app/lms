@@ -122,12 +122,12 @@ const ScheduleEdit = ({ open, close, id }) => {
         >
           <form className="form-schedule" onSubmit={updateHandler}>
             <FormControl fullWidth>
-              <InputLabel>--Teacher--</InputLabel>
+              <InputLabel>--Guru--</InputLabel>
               <Select
                 value={teacherId}
                 onChange={(e) => setTeacherId(e.target.value)}
                 required
-                label="--Teacher--"
+                label="--Guru--"
               >
                 {teachers?.map((teacher) => (
                   <MenuItem key={teacher.id} value={teacher.id}>
@@ -138,12 +138,12 @@ const ScheduleEdit = ({ open, close, id }) => {
             </FormControl>
 
             <FormControl fullWidth>
-              <InputLabel>--Grade--</InputLabel>
+              <InputLabel>--Tingkat--</InputLabel>
               <Select
                 value={gradeId}
                 onChange={(e) => setGradeId(e.target.value)}
                 required
-                label="--Grade--"
+                label="--Tingkat--"
               >
                 {grades?.map((item) => (
                   <MenuItem key={item.id} value={item.id}>
@@ -155,12 +155,12 @@ const ScheduleEdit = ({ open, close, id }) => {
 
             {teacherId && (
               <FormControl fullWidth>
-                <InputLabel>--Quiz--</InputLabel>
+                <InputLabel>--Bank Soal--</InputLabel>
                 <Select
                   value={quizId}
                   onChange={(e) => setQuizId(e.target.value)}
                   required
-                  label="--Grade--"
+                  label="--Bank Soal--"
                 >
                   {qiuzFilter?.map((item) => (
                     <MenuItem key={item.id} value={item.id}>
@@ -174,17 +174,19 @@ const ScheduleEdit = ({ open, close, id }) => {
             <TextField
               fullWidth
               required
-              placeholder="Schedule"
+              placeholder="Nama Ujian"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              InputLabelProps={{ shrink: true }}
             />
 
             <TextField
               fullWidth
               required
-              placeholder="Description"
+              placeholder="Keterangan"
               value={desc}
               onChange={(e) => setDesc(e.target.value)}
+              InputLabelProps={{ shrink: true }}
             />
 
             <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -205,7 +207,7 @@ const ScheduleEdit = ({ open, close, id }) => {
 
             <Box sx={{ display: "flex", justifyContent: "end", gap: 1 }}>
               <Button variant="contained" color="error" onClick={close}>
-                cancel
+                tutup
               </Button>
               <Button variant="contained" color="success" type="submit">
                 {isLoading ? (

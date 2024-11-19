@@ -28,13 +28,13 @@ import { toast } from "react-toastify";
 
 const columns = [
   { label: "No", width: 50 },
-  { label: "Teacher", width: 170 },
-  { label: "Bank", width: 170 },
-  { label: "Grade", width: 70 },
-  { label: "MC", width: 70 },
+  { label: "Guru", width: 170 },
+  { label: "Bank Soal", width: 170 },
+  { label: "Tingkat", width: 70 },
+  { label: "PG", width: 70 },
   { label: "Essay", width: 70 },
-  { label: "Questions", width: 70 },
-  { label: "Actions", width: 170 },
+  { label: "Pertanyaan", width: 70 },
+  { label: "Aksi", width: 170 },
 ];
 
 const QuizzesTable = () => {
@@ -117,7 +117,7 @@ const QuizzesTable = () => {
         }}
       >
         <Input
-          placeholder="Search Teacher"
+          placeholder="Cari Guru"
           value={searchTerm}
           onChange={searchFunction}
         />
@@ -146,7 +146,7 @@ const QuizzesTable = () => {
                 <TableRow key={index}>
                   <TableCell align="center">{index + 1}</TableCell>
                   <TableCell align="left">{item.teacher}</TableCell>
-                  <TableCell align="center">{item.quiz_name}</TableCell>
+                  <TableCell align="left">{item.quiz_name}</TableCell>
                   <TableCell align="center">{item.grade}</TableCell>
                   <TableCell align="center">{item.mc}</TableCell>
                   <TableCell align="center">{item.essay}</TableCell>
@@ -156,7 +156,7 @@ const QuizzesTable = () => {
                       color="success"
                       onClick={() => addQuestion(item.quiz_name, item.id)}
                     >
-                      Add
+                      tambah
                     </Button>
                   </TableCell>
                   <TableCell align="center">
@@ -194,7 +194,7 @@ const QuizzesTable = () => {
         }}
       >
         <MenuItem onClick={() => editHandler()}>Edit</MenuItem>
-        <MenuItem onClick={deleteHandler}>Delete</MenuItem>
+        <MenuItem onClick={deleteHandler}>Hapus</MenuItem>
       </Menu>
     </Fragment>
   );

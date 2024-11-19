@@ -82,8 +82,8 @@ const Topic = ({ open, close, id, chapter_id }) => {
           <form onSubmit={addHandler}>
             <TextField
               fullWidth
-              label="Title"
-              placeholder="Topic's title"
+              label="Nama Topik"
+              placeholder="Nama Topik"
               InputLabelProps={{ shrink: true }}
               sx={{ my: 1 }}
               value={title || ""}
@@ -94,8 +94,8 @@ const Topic = ({ open, close, id, chapter_id }) => {
               fullWidth
               multiline
               rows={4}
-              label="Learning Prurpose"
-              placeholder="Learning Prurpose"
+              label="Capaian Pembelajaran"
+              placeholder="Capaian Pembelajaran"
               InputLabelProps={{ shrink: true }}
               sx={{ my: 1 }}
               value={goal || ""}
@@ -110,7 +110,7 @@ const Topic = ({ open, close, id, chapter_id }) => {
                 onClick={close}
                 sx={{ mr: 1 }}
               >
-                cancel
+                tutup
               </Button>
 
               <Button
@@ -119,7 +119,7 @@ const Topic = ({ open, close, id, chapter_id }) => {
                 color="success"
                 type="submit"
               >
-                {isLoading ? <CircularProgress size={24} /> : "Add"}
+                {isLoading ? <CircularProgress size={24} /> : "simpan"}
               </Button>
             </Box>
           </form>

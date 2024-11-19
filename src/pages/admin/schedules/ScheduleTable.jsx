@@ -31,14 +31,14 @@ import ScheduleEdit from "./ScheduleEdit";
 
 const columns = [
   { label: "No", width: 30 },
-  { label: "Teacher", width: 120 },
-  { label: "Schedule", width: 120 },
-  { label: "Quiz", width: 120 },
-  { label: "Grade", width: 30 },
+  { label: "Guru", width: 120 },
+  { label: "Ujian", width: 120 },
+  { label: "bank Soal", width: 120 },
+  { label: "Tingkat", width: 30 },
   { label: "Status", width: 80 },
-  { label: "Note", width: 30 },
+  { label: "Ket", width: 30 },
   { label: "Token", width: 90 },
-  { label: "Actions", width: 90 },
+  { label: "Aksi", width: 90 },
 ];
 
 const ScheduleTable = () => {
@@ -215,10 +215,10 @@ const ScheduleTable = () => {
           "aria-labelledby": "basic-button",
         }}
       >
-        <MenuItem onClick={schedule}>Schedule</MenuItem>
+        <MenuItem onClick={schedule}>Jadwal</MenuItem>
         <MenuItem onClick={detailPage}>Detail</MenuItem>
         <MenuItem onClick={editHandler}>Edit</MenuItem>
-        <MenuItem onClick={deleteHandler}>Delete</MenuItem>
+        <MenuItem onClick={deleteHandler}>Hapus</MenuItem>
       </Menu>
 
       <ScheduleDetail

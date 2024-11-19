@@ -89,7 +89,7 @@ const CenterAdminPage = () => {
           <Table>
             <TableHead>
               <TableRow>
-                {["Name", "Email", "Role", "Action"].map((item) => (
+                {["Nama", "Email", "Level", "Aksi"].map((item) => (
                   <TableCell key={item} align="center">
                     {item}
                   </TableCell>
@@ -133,7 +133,7 @@ const CenterAdminPage = () => {
           }}
         >
           <MenuItem onClick={editHandler}>Edit</MenuItem>
-          <MenuItem onClick={removeHandler}>Delete</MenuItem>
+          <MenuItem onClick={removeHandler}>Hapus</MenuItem>
         </Menu>
 
         <Admin open={edit} close={() => setEdit(false)} admin={admin} />

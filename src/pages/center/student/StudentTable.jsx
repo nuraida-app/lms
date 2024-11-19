@@ -26,8 +26,8 @@ import { toast } from "react-toastify";
 const columns = [
   { label: "No", width: 40 },
   { label: "NIS", width: 100 },
-  { label: "Name", width: 170 },
-  { label: "Actions", width: 100 },
+  { label: "Nama", width: 170 },
+  { label: "Aksi", width: 100 },
 ];
 
 const StudentTable = ({ students, loading }) => {

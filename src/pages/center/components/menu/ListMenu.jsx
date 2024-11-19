@@ -34,27 +34,27 @@ const Menus = [
     link: "/admin-center/admin",
   },
   {
-    label: "Homebase",
+    label: "Satuan",
     icon: <SchoolIcon color="success" />,
     link: "/admin-center/homebase",
   },
   {
-    label: "Teachers",
+    label: "Guru",
     icon: <SupervisorAccountOutlinedIcon color="success" />,
     link: "/admin-center/teachers",
   },
   {
-    label: "Students",
+    label: "Siswa",
     icon: <PeopleAltIcon color="success" />,
     link: "/admin-center/students",
   },
   {
-    label: "Statistic",
+    label: "Statistik",
     icon: <DonutLargeIcon color="success" />,
     link: "/admin-center/statistic",
   },
   {
-    label: "Setting",
+    label: "Pengaturan",
     icon: <SettingsIcon color="success" />,
     link: "/admin-center/setting",
   },

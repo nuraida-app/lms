@@ -14,9 +14,9 @@ import { useEffect } from "react";
 import { toast } from "react-toastify";
 
 const colums = [
-  { label: "Homebase", width: 170 },
-  { label: "Grade", width: 170 },
-  { label: "Actions", width: 170 },
+  { label: "Satuan", width: 170 },
+  { label: "Tingkat", width: 170 },
+  { label: "Aksi", width: 170 },
 ];
 
 const GradesTable = ({ grades }) => {

@@ -110,7 +110,7 @@ const Topics = ({ data, number }) => {
             setModalState({ ...modalState, open: !modalState.open })
           }
         >
-          Add File
+          tambah file
         </Button>
         <Box sx={{ display: "flex", gap: 2, width: "50%" }}>
           <Grow in={modalState.open}>
@@ -220,7 +220,7 @@ const Topics = ({ data, number }) => {
               }
             />
             <TextField
-              label="YouTube's Url"
+              label="Link YouTube"
               fullWidth
               size="small"
               sx={{ mb: 2 }}

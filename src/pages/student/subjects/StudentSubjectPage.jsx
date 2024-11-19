@@ -17,7 +17,7 @@ const StudentSubjectPage = () => {
       >
         <Grid item xs={12} md={12}>
           <Paper sx={{ p: 1 }}>
-            <Input placeholder="Search Subject" />
+            <Input placeholder="Cari Mapel" />
           </Paper>
         </Grid>
 

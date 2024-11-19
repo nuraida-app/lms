@@ -43,7 +43,7 @@ const DashboardData = () => {
         <PeopleAltOutlinedIcon sx={{ fontSize: 40 }} />
         <Box>
           <Typography variant="body" fontWeight="bold">
-            Students
+            Siswa
           </Typography>
           <Typography variant="body2">{students?.length}</Typography>
         </Box>
@@ -65,7 +65,7 @@ const DashboardData = () => {
         <FolderSharedOutlinedIcon sx={{ fontSize: 40 }} />
         <Box>
           <Typography variant="body" fontWeight="bold">
-            Class
+            Kelas
           </Typography>
           <Typography variant="body2">{classes?.length}</Typography>
         </Box>
@@ -87,7 +87,7 @@ const DashboardData = () => {
         <AssignmentIndIcon sx={{ fontSize: 40 }} />
         <Box>
           <Typography variant="body" fontWeight="bold">
-            Teachers
+            Guru
           </Typography>
           <Typography variant="body2">{teachers?.length}</Typography>
         </Box>
@@ -109,7 +109,7 @@ const DashboardData = () => {
         <BookOutlinedIcon sx={{ fontSize: 40 }} />
         <Box>
           <Typography variant="body" fontWeight="bold">
-            Subjects
+            Mapel
           </Typography>
           <Typography variant="body2">{subjects?.length}</Typography>
         </Box>

@@ -30,7 +30,7 @@ const Subject = () => {
           color="success"
           onClick={() => setOpen(true)}
         >
-          Chapter
+          Bab
         </Button>
       </Box>
 

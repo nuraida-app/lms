@@ -16,12 +16,12 @@ import { toast } from "react-toastify";
 
 const columns = [
   { label: "No", width: 40 },
-  { label: "Homebase", width: 100 },
-  { label: "Actions", width: 100 },
+  { label: "Satuan", width: 100 },
+  { label: "Aksi", width: 100 },
 ];
 
 const HomebaseTable = ({ data }) => {
-  const [deleteHomebase, { data: msg, isSuccess, isLoadin, error, reset }] =
+  const [deleteHomebase, { data: msg, isSuccess, isLoading, error, reset }] =
     useDeleteHomebaseMutation();
 
   const delHandler = (id) => deleteHomebase(id);
@@ -61,7 +61,7 @@ const HomebaseTable = ({ data }) => {
                 <TableCell align="center">{item.name}</TableCell>
                 <TableCell align="center">
                   <IconButton color="error" onClick={() => delHandler(item.id)}>
-                    {isLoadin ? (
+                    {isLoading ? (
                       <CircularProgress size={24} />
                     ) : (
                       <RemoveCircleOutlineIcon />

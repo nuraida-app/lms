@@ -7,15 +7,15 @@ import Data from "./Data";
 import Targeted from "./Targeted";
 
 const CenterStatistic = () => {
-  const [activeTab, setActiveTab] = useState("Province");
+  const [activeTab, setActiveTab] = useState("Provinsi");
   const { data } = useGetDemographicQuery();
 
   const tabs = [
-    { name: "Province", component: <Data type={data?.provinces} /> },
-    { name: "City", component: <Data type={data?.regencies} /> },
-    { name: "District", component: <Data type={data?.districts} /> },
-    { name: "Village", component: <Data type={data?.villages} /> },
-    { name: "Targeted", component: <Targeted /> },
+    { name: "Provinsi", component: <Data type={data?.provinces} /> },
+    { name: "Kota", component: <Data type={data?.regencies} /> },
+    { name: "Kecamatan", component: <Data type={data?.districts} /> },
+    { name: "Desa", component: <Data type={data?.villages} /> },
+    { name: "Market", component: <Targeted /> },
   ];
 
   const currentTab = tabs.find((tab) => tab.name === activeTab)?.component;

@@ -15,24 +15,24 @@ const DataOne = ({ data }) => {
 
   const items = [
     {
-      label: "Homebase",
+      label: "Satuan",
       icon: <SchoolOutlinedIcon sx={{ color: "white", fontSize: 35 }} />,
       number: homebase,
     },
     {
-      label: "Classes",
+      label: "Kelas",
       icon: <MapsHomeWorkOutlinedIcon sx={{ color: "white", fontSize: 35 }} />,
       number: classes,
     },
     {
-      label: "Teachers",
+      label: "Guru",
       icon: (
         <SupervisorAccountOutlinedIcon sx={{ color: "white", fontSize: 35 }} />
       ),
       number: teachers,
     },
     {
-      label: "Students",
+      label: "Siswa",
       icon: <PeopleAltOutlinedIcon sx={{ color: "white", fontSize: 35 }} />,
       number: students,
     },

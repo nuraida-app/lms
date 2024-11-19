@@ -25,10 +25,10 @@ const createMarkup = (html) => {
 const columns = [
   { label: "No", width: 30 },
   { label: "NIS", width: 80 },
-  { label: "Name", width: 200 },
-  { label: "Class", width: 30 },
-  { label: "Score", width: 30 },
-  { label: "Correction", width: 30 },
+  { label: "Nama", width: 200 },
+  { label: "Kelas", width: 30 },
+  { label: "Nilai", width: 30 },
+  { label: "Koreksi Jawaban", width: 30 },
 ];
 
 const DetailEssay = ({ data, questions }) => {
@@ -158,7 +158,7 @@ const DetailEssay = ({ data, questions }) => {
                       color="info"
                       onClick={() => checkHandler(item.nis)}
                     >
-                      score
+                      koreksi
                     </Button>
                   </TableCell>
                 </TableRow>

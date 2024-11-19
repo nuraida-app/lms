@@ -25,10 +25,10 @@ import SubjectEdit from "./SubjectEdit";
 
 const columns = [
   { label: "No", minWidth: 30 },
-  { label: "Code", minWidth: 50 },
-  { label: "Homebase", minWidth: 50 },
-  { label: "Name", minWidth: 100 },
-  { label: "Actions", minWidth: 50 },
+  { label: "Kode", minWidth: 50 },
+  { label: "Satuan", minWidth: 50 },
+  { label: "Nama", minWidth: 100 },
+  { label: "Aksi", minWidth: 50 },
 ];
 
 const SubjectsTable = ({ subjects }) => {
@@ -104,7 +104,7 @@ const SubjectsTable = ({ subjects }) => {
         }}
       >
         <Input
-          placeholder="Search Subject"
+          placeholder="Cari Mapel"
           value={searchTerm}
           onChange={serachFunction}
         />
@@ -167,7 +167,7 @@ const SubjectsTable = ({ subjects }) => {
         }}
       >
         <MenuItem onClick={detailHandler}>Edit</MenuItem>
-        <MenuItem onClick={deleteHandler}>Delete</MenuItem>
+        <MenuItem onClick={deleteHandler}>Hapus</MenuItem>
       </Menu>
       <SubjectEdit
         open={edit}

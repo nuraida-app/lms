@@ -24,12 +24,12 @@ import ClassEdit from "./ClassEdit";
 
 const colums = [
   { label: "No", width: 40 },
-  { label: "Homebase", width: 100 },
-  { label: "Grade", width: 100 },
-  { label: "Code", width: 40 },
-  { label: "Class", width: 100 },
-  { label: "Students", width: 50 },
-  { label: "Actions", width: 50 },
+  { label: "Satuan", width: 100 },
+  { label: "Tingkat", width: 100 },
+  { label: "Kode", width: 40 },
+  { label: "Kelas", width: 100 },
+  { label: "Siswa", width: 50 },
+  { label: "Aksi", width: 50 },
 ];
 
 const ClassTable = () => {
@@ -146,9 +146,9 @@ const ClassTable = () => {
             "aria-labelledby": "basic-button",
           }}
         >
-          <MenuItem onClick={addStudents}>Add Students</MenuItem>
+          <MenuItem onClick={addStudents}>Tambah</MenuItem>
           <MenuItem onClick={detailHandler}>Edit</MenuItem>
-          <MenuItem onClick={deleteHandler}>Delete</MenuItem>
+          <MenuItem onClick={deleteHandler}>Hapus</MenuItem>
         </Menu>
 
         <ClassEdit

@@ -107,7 +107,7 @@ const Login = () => {
             sx={{ bgcolor: "#f48e21", "&:hover": { bgcolor: "#f48e21" } }}
             onClick={() => setRole("student")}
           >
-            student
+            siswa
           </Button>
           <Button
             fullWidth
@@ -115,7 +115,7 @@ const Login = () => {
             sx={{ bgcolor: "#7462ff", "&:hover": { bgcolor: "#7462ff" } }}
             onClick={() => setRole("teacher")}
           >
-            teacher
+            guru
           </Button>
           <Button
             fullWidth

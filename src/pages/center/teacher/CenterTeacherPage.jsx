@@ -28,13 +28,13 @@ import {
 
 const colums = [
   { label: "No", width: 60 },
-  { label: "Homebase", width: 90 },
+  { label: "Satuan", width: 90 },
   { label: "NIP", width: 90 },
-  { label: "Name", width: 170 },
-  { label: "Subjects", width: 170 },
-  { label: "Homeroom", width: 50 },
-  { label: "Class", width: 50 },
-  { label: "Actions", width: 50 },
+  { label: "Nama", width: 170 },
+  { label: "Mapel", width: 170 },
+  { label: "Walas", width: 50 },
+  { label: "Kelas", width: 50 },
+  { label: "Aksi", width: 50 },
 ];
 
 const CenterTeacherPage = () => {

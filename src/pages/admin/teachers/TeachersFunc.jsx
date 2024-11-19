@@ -33,7 +33,7 @@ const TeachersFunc = () => {
         onClick={() => setOpenAdd(true)}
         sx={{ width: 120 }}
       >
-        add
+        tambah
       </Button>
 
       <Button
@@ -43,7 +43,7 @@ const TeachersFunc = () => {
         onClick={() => setUpload(true)}
         sx={{ width: 120 }}
       >
-        Upload
+        Unggah
       </Button>
 
       <Button
@@ -63,7 +63,7 @@ const TeachersFunc = () => {
         onClick={() => setConfirm(true)}
         sx={{ width: 120 }}
       >
-        Delete
+        Hapus
       </Button>
 
       <TeacherAdd open={openAdd} close={() => setOpenAdd(false)} />

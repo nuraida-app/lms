@@ -78,6 +78,10 @@ const QuizPage = lazy(() => import("./pages/student/quizzes/quiz/QuizPage"));
 
 const Discussion = lazy(() => import("./pages/student/subjects/Discussion"));
 
+const StudentDatabase = lazy(() =>
+  import("./pages/student/database/DbStudent")
+);
+
 // Teacher
 const TeacherDashboard = lazy(() =>
   import("./pages/teacher/dashboard/TeacherDashboard")
@@ -209,8 +213,6 @@ function App() {
 
           <Route path="/teacher/profile" element={<TeacherProfile />} />
 
-          <Route path="/teacher/database" element={<DatabasePage />} />
-
           <Route path="/teacher/:studentName/:nis" element={<DbStudent />} />
 
           <Route path="/teacher/quizzes" element={<TeacherQuizPage />} />
@@ -241,6 +243,8 @@ function App() {
 
           <Route path="/teacher/subjects/:code/:name" element={<Subject />} />
 
+          <Route path="/database" element={<DatabasePage />} />
+
           {/* Student */}
           <Route path="/student/dashboard" element={<StudentDashboard />} />
 
@@ -267,6 +271,11 @@ function App() {
             element={<QuizPage />}
           />
 
+          <Route
+            path="/database/:studentName/:nis"
+            element={<StudentDatabase />}
+          />
+
           {/* Admin Center */}
 
           <Route path="/admin-center" element={<Center />} />
@@ -286,6 +295,8 @@ function App() {
           <Route path="/admin-center/statistic" element={<CenterStatistic />} />
 
           <Route path="/admin-center/homebase" element={<HomebasePage />} />
+
+          {/* Universal */}
         </Routes>
       </Suspense>
     </BrowserRouter>

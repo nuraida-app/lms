@@ -17,7 +17,7 @@ const ScheduleFunc = () => {
         onClick={() => setOpenAdd(true)}
         sx={{ width: 120 }}
       >
-        add
+        Tambah
       </Button>
 
       <Button
@@ -27,7 +27,7 @@ const ScheduleFunc = () => {
         onClick={() => setConfirm(true)}
         sx={{ width: 120 }}
       >
-        Delete
+        hapus
       </Button>
 
       <ScheduleAdd open={openAdd} close={() => setOpenAdd(false)} />

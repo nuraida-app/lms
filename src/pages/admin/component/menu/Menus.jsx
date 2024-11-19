@@ -20,38 +20,38 @@ export const menus = [
   //   icon: <HomeIcon sx={{ color: "white" }} />,
   // },
   {
-    label: "Grades",
+    label: "Tingkat",
     link: "/admin/grades",
     icon: <AlignHorizontalLeftIcon sx={{ color: "white" }} />,
   },
   {
-    label: "Classes",
+    label: "Kelas",
     link: "/admin/classes",
     icon: <ClassIcon sx={{ color: "white" }} />,
   },
   {
-    label: "Subjects",
+    label: "Mapel",
     link: "/admin/subjects",
     icon: <StyleIcon sx={{ color: "white" }} />,
   },
   {
-    label: "Teachers",
+    label: "Guru",
     link: "/admin/teachers",
     icon: <AssignmentIndIcon sx={{ color: "white" }} />,
   },
 
   {
-    label: "Students",
+    label: "Siswa",
     link: "/admin/students",
     icon: <PeopleAltIcon sx={{ color: "white" }} />,
   },
   {
-    label: "Quizzes",
+    label: "Ujian",
     link: "/admin/quizzes",
     icon: <FolderCopyIcon sx={{ color: "white" }} />,
   },
   {
-    label: "Schedules",
+    label: "Jadwal Ujian",
     link: "/admin/schedules",
     icon: <CalendarMonthIcon sx={{ color: "white" }} />,
   },

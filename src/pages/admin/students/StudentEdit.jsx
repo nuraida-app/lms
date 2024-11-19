@@ -80,8 +80,8 @@ const StudentEdit = ({ open, close, student }) => {
 
             <TextField
               fullWidth
-              label="Full name"
-              placeholder="Full name"
+              label="Nama Lengkap"
+              placeholder="Nama Lengkap"
               value={name || ""}
               onChange={(e) => setName(e.target.value)}
             />

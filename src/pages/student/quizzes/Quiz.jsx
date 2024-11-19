@@ -61,28 +61,28 @@ const Quiz = ({ data, user, log }) => {
     e.preventDefault();
 
     if (confirmToken !== token) {
-      return toast.error("Token is mismatch");
+      return toast.error("Token tidak sama");
     }
 
     if (!status) {
-      return toast.error("Quiz is inactive");
+      return toast.error("Ujian tidak aktif");
     }
 
     const currentTime = new Date();
     if (currentTime < new Date(start)) {
-      return toast.error("Quiz have not started yet");
+      return toast.error("Ujian belum dimulai");
     }
 
     if (currentTime > new Date(end)) {
-      return toast.error("Quiz is finished");
+      return toast.error("Ujian telah selesai");
     }
 
     if (log && log.isDone && log.quiz_id === quizId) {
-      return toast.error("You have already joined this exam");
+      return toast.error("Anda sudah mengikuti ujian ini");
     }
 
     if (log && log.isActive && log.quiz_id === quizId) {
-      return toast.error("You are joining this exam");
+      return toast.error("Anda sudah mengerjakan ujian ini");
     }
 
     const data = { quizId, nis: user.nis };

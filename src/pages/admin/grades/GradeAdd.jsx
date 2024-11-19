@@ -57,10 +57,11 @@ const GradeAdd = ({ open, close }) => {
           <form className="form-grade" onSubmit={addHandler}>
             <TextField
               fullWidth
-              label="Grade"
-              placeholder="Grade"
+              label="Tingkat"
+              placeholder="Tingkat"
               value={grade}
               onChange={(e) => setGrade(e.target.value)}
+              InputLabelProps={{ shrink: true }}
             />
 
             <Box
@@ -71,13 +72,13 @@ const GradeAdd = ({ open, close }) => {
               }}
             >
               <Button variant="outlined" color="error" onClick={close}>
-                cancel
+                Tutup
               </Button>
               <Button variant="contained" color="success" type="submit">
                 {isLoading ? (
                   <CircularProgress size={20} color="inherit" />
                 ) : (
-                  "add"
+                  "Tambah"
                 )}
               </Button>
             </Box>

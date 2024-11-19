@@ -26,10 +26,10 @@ import { toast } from "react-toastify";
 const columns = [
   { label: "No", width: 40 },
   { label: "NIS", width: 100 },
-  { label: "Name", width: 170 },
-  { label: "Grade", width: 40 },
-  { label: "Class", width: 40 },
-  { label: "Actions", width: 100 },
+  { label: "Nama", width: 170 },
+  { label: "Tingkat", width: 40 },
+  { label: "Kelas", width: 40 },
+  { label: "Aksi", width: 100 },
 ];
 
 const ClassStudentsTable = () => {
@@ -85,7 +85,7 @@ const ClassStudentsTable = () => {
         }}
       >
         <Input
-          placeholder="Search Student"
+          placeholder="Cari Siswa"
           value={searchTerm}
           onChange={searchFunction}
         />

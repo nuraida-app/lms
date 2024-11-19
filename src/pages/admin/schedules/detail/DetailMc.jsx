@@ -120,13 +120,13 @@ const DetailMc = ({ data, questions, quizname }) => {
                     </TableCell>
                   ))}
                 <TableCell rowSpan={2} align="center">
-                  Correct
+                  Benar
                 </TableCell>
                 <TableCell rowSpan={2} align="center">
-                  Wrong
+                  Salah
                 </TableCell>
                 <TableCell rowSpan={2} align="center">
-                  Score
+                  Nilai
                 </TableCell>
               </TableRow>
               <TableRow>
