@@ -1,0 +1,1 @@
+import{i as r,j as t}from"./index-DseGlEn2.js";import{r as a}from"./createSvgIcon-DE2C_iXj.js";var e={},o=r;Object.defineProperty(e,"__esModule",{value:!0});var u=e.default=void 0,v=o(a()),i=t;u=e.default=(0,v.default)((0,i.jsx)("path",{d:"M2 20h20v-4H2zm2-3h2v2H4zM2 4v4h20V4zm4 3H4V5h2zm-4 7h20v-4H2zm2-3h2v2H4z"}),"Storage");export{u as d};
