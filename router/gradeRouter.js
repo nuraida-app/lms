@@ -46,17 +46,30 @@ router.get(
   async (req, res) => {
     try {
       const homebase = req.user.homebase_id;
-      const data = await client.query(
-        "SELECT grades.id, grades.grade, homebase.name AS homebase FROM grades " +
-          "INNER JOIN homebase ON grades.homebase_id = homebase.id " +
-          "WHERE homebase_id = $1 " +
-          "ORDER BY CAST(grades.grade AS INTEGER) ASC",
-        [homebase]
-      );
 
-      const grades = data.rows;
+      if (req.user.id === 158) {
+        const data = await client.query(
+          "SELECT grades.id, grades.grade, homebase.name AS homebase FROM grades " +
+            "INNER JOIN homebase ON grades.homebase_id = homebase.id " +
+            "ORDER BY CAST(grades.grade AS INTEGER) ASC"
+        );
 
-      res.status(200).json(grades);
+        const grades = data.rows;
+
+        res.status(200).json(grades);
+      } else {
+        const data = await client.query(
+          "SELECT grades.id, grades.grade, homebase.name AS homebase FROM grades " +
+            "INNER JOIN homebase ON grades.homebase_id = homebase.id " +
+            "WHERE homebase_id = $1 " +
+            "ORDER BY CAST(grades.grade AS INTEGER) ASC",
+          [homebase]
+        );
+
+        const grades = data.rows;
+
+        res.status(200).json(grades);
+      }
     } catch (error) {
       console.log(error);
       return res.status(500).json({ message: error.message });
