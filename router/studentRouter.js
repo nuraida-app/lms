@@ -409,18 +409,27 @@ router.get(
   async (req, res) => {
     try {
       const students = await client.query(
-        "SELECT students_class.id, students_class.nis, grades.grade, students.name, " +
-          "classes.name AS class FROM students_class " +
-          "INNER JOIN classes ON students_class.class_code = classes.code " +
-          "INNER JOIN grades ON students_class.grade_id = grades.id " +
-          "INNER JOIN students on students_class.nis = students.nis " +
-          "WHERE students_class.class_code = $1 " +
-          "ORDER BY classes.name ASC, students.name ASC",
+        // "SELECT students_class.id, students_class.nis, grades.grade, students.name, " +
+        //   "classes.name AS class FROM students_class " +
+        //   "INNER JOIN classes ON students_class.class_code = classes.code " +
+        //   "INNER JOIN grades ON students_class.grade_id = grades.id " +
+        //   "INNER JOIN students on students_class.nis = students.nis " +
+        //   "WHERE students_class.class_code = $1 " +
+        //   "ORDER BY classes.name ASC, students.name ASC",
+        `SELECT DISTINCT students_class.id, students_class.nis, grades.grade, students.name,
+                classes.name AS class
+                FROM students_class
+                INNER JOIN classes ON students_class.class_code = classes.code
+                INNER JOIN grades ON students_class.grade_id = grades.id
+                INNER JOIN students ON students_class.nis = students.nis
+                WHERE students_class.class_code = $1
+                ORDER BY classes.name ASC, students.name ASC`,
         [req.params.class]
       );
 
       res.status(200).json(students.rows);
     } catch (error) {
+      console.log(error);
       return res.status(500).json({ error: error.message });
     }
   }
