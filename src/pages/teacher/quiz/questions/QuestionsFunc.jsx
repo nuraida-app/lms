@@ -1,4 +1,4 @@
-import { Box, Button } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import FolderDeleteIcon from "@mui/icons-material/FolderDelete";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
@@ -27,7 +27,7 @@ const QuestionsFunc = () => {
     <Box
       sx={{
         display: "flex",
-        justifyContent: { xs: "start", md: "end" },
+        justifyContent: "space-between",
         gap: 1,
         flexWrap: "wrap",
         bgcolor: "white",
@@ -36,45 +36,47 @@ const QuestionsFunc = () => {
         boxShadow: 2,
       }}
     >
-      <Button
-        variant="contained"
-        color="success"
-        startIcon={<AddCircleIcon />}
-        onClick={addPage}
-        sx={{ width: 120 }}
-      >
-        add
-      </Button>
-
-      <Button
-        startIcon={<UploadFileIcon />}
-        variant="contained"
-        color="secondary"
-        onClick={() => setUpload(true)}
-        sx={{ width: 120 }}
-      >
-        Upload
-      </Button>
-
-      <Button
-        startIcon={<InsertDriveFileOutlinedIcon />}
-        variant="contained"
-        color="warning"
-        sx={{ width: 120 }}
-        onClick={download}
-      >
-        Template
-      </Button>
-
-      <Button
-        startIcon={<FolderDeleteIcon />}
-        variant="contained"
-        color="error"
-        onClick={() => setConfirm(true)}
-        sx={{ width: 120 }}
-      >
-        Delete
-      </Button>
+      <Typography sx={{ alignContent: "center", fontWeight: "bold" }}>
+        {params.quizname?.replaceAll("_", " ")}
+      </Typography>
+      <Box sx={{ display: "flex", gap: 1 }}>
+        <Button
+          variant="contained"
+          color="success"
+          startIcon={<AddCircleIcon />}
+          onClick={addPage}
+          sx={{ width: 120 }}
+        >
+          add
+        </Button>
+        <Button
+          startIcon={<UploadFileIcon />}
+          variant="contained"
+          color="secondary"
+          onClick={() => setUpload(true)}
+          sx={{ width: 120 }}
+        >
+          Upload
+        </Button>
+        <Button
+          startIcon={<InsertDriveFileOutlinedIcon />}
+          variant="contained"
+          color="warning"
+          sx={{ width: 120 }}
+          onClick={download}
+        >
+          Template
+        </Button>
+        <Button
+          startIcon={<FolderDeleteIcon />}
+          variant="contained"
+          color="error"
+          onClick={() => setConfirm(true)}
+          sx={{ width: 120 }}
+        >
+          Delete
+        </Button>
+      </Box>
 
       <Confirm open={confirm} close={() => setConfirm(false)} />
       <Upload open={upload} close={() => setUpload(false)} />

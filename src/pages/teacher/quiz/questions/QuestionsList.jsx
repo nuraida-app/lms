@@ -63,8 +63,9 @@ const QuestionsList = () => {
         bgcolor: "white",
         borderRadius: 1,
         boxShadow: 2,
-        minHeight: { xs: 500, md: 530, xl: 630 },
+        maxHeight: { xs: 500, md: 530, lg: 630 },
         p: 1,
+        overflow: "auto",
       }}
     >
       <Grid item xs={12} md={12}>
