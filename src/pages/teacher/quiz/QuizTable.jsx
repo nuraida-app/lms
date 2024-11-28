@@ -92,7 +92,7 @@ const QuizTable = () => {
   // search function
   const [searchTerm, setSearchTerm] = useState("");
   const filtering = (quiz) => {
-    return quiz.teacher.toLowerCase().includes(searchTerm.toLowerCase());
+    return quiz.quiz_name.toLowerCase().includes(searchTerm.toLowerCase());
   };
 
   const filtered = data?.filter(filtering);
@@ -116,7 +116,7 @@ const QuizTable = () => {
         }}
       >
         <Input
-          placeholder="Search Teacher"
+          placeholder="Cari Bank Soal"
           value={searchTerm}
           onChange={searchFunction}
         />
