@@ -48,11 +48,11 @@ const Student = ({ provinces, info, name, nis }) => {
     nis: nis,
     birth_place: "",
     birth_date: dayjs(),
-    height: "",
-    weight: "",
-    around_head: "",
-    order_birth: "",
-    siblings: "",
+    height: 0,
+    weight: 0,
+    around_head: 0,
+    order_birth: 0,
+    siblings: 1,
     province_id: "",
     province_name: "",
     regency_id: "",
@@ -241,7 +241,7 @@ const Student = ({ provinces, info, name, nis }) => {
               size="small"
               variant="standard"
               name="order_birth"
-              value={formData.order_birth}
+              value={formData.order_birth || 0}
               onChange={handleChange}
             />
             <TextField
@@ -251,7 +251,7 @@ const Student = ({ provinces, info, name, nis }) => {
               size="small"
               variant="standard"
               name="siblings"
-              value={formData.siblings || ""}
+              value={formData.siblings || 1}
               onChange={handleChange}
             />
             <TextField
@@ -261,7 +261,7 @@ const Student = ({ provinces, info, name, nis }) => {
               size="small"
               variant="standard"
               name="height"
-              value={formData.height || ""}
+              value={formData.height || 0}
               onChange={handleChange}
             />
             <TextField
@@ -271,7 +271,7 @@ const Student = ({ provinces, info, name, nis }) => {
               size="small"
               variant="standard"
               name="weight"
-              value={formData.weight || ""}
+              value={formData.weight || 0}
               onChange={handleChange}
             />
           </Grid>
@@ -288,7 +288,7 @@ const Student = ({ provinces, info, name, nis }) => {
               size="small"
               variant="standard"
               name="around_head"
-              value={formData.around_head || ""}
+              value={formData.around_head || 0}
               onChange={handleChange}
             />
             <FormControl fullWidth variant="standard">

@@ -64,7 +64,7 @@ const DbTable = ({ students, database }) => {
             const growAnimation = createGrowAnimation(percentage);
 
             return (
-              <TableRow key={student.id}>
+              <TableRow key={index}>
                 <TableCell align="center">{index + 1}</TableCell>
                 <TableCell align="center">{student.nis}</TableCell>
                 <TableCell>{student.name}</TableCell>
