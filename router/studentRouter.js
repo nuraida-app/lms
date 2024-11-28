@@ -16,7 +16,7 @@ router.post(
   authorizeRoles("admin", "super-admin"),
   async (req, res) => {
     try {
-      const { nis, name, homebase } = req.body;
+      const { nis, name } = req.body;
 
       const password = "12345678";
       const role = "student";
@@ -35,10 +35,10 @@ router.post(
         }
 
         const insertionQuery =
-          "INSERT INTO students (nis, name, password, role, homebase_id) " +
-          "VALUES ($1, $2, $3, $4, $5) RETURNING *";
+          "INSERT INTO students (nis, name, password, role,) " +
+          "VALUES ($1, $2, $3, $4 ) RETURNING *";
 
-        const insertionValues = [nis, name, hash, role, homebase];
+        const insertionValues = [nis, name, hash, role];
 
         try {
           const process = await client.query(insertionQuery, insertionValues);
