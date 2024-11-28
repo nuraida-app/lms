@@ -35,8 +35,8 @@ router.post(
         }
 
         const insertionQuery =
-          "INSERT INTO students (nis, name, password, role,) " +
-          "VALUES ($1, $2, $3, $4 ) RETURNING *";
+          "INSERT INTO students (nis, name, password, role) " +
+          "VALUES ($1, $2, $3, $4) RETURNING *";
 
         const insertionValues = [nis, name, hash, role];
 
