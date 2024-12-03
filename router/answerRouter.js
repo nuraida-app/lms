@@ -222,25 +222,149 @@ router.get(
 );
 
 // Menampilkan jawaban pilihan ganda dan essay
+// router.get(
+//   "/get-students-answer/:quizId/:gradeId",
+//   authenticatedUser,
+//   authorizeRoles("admin", "teacher"),
+//   async (req, res) => {
+//     try {
+//       // Query for student info
+//       const { rows: studentsData } = await client.query(
+//         `SELECT students_class.nis, students.name, classes.name AS class, grades.grade
+//    FROM students_class
+//    INNER JOIN students ON students.nis = students_class.nis
+//    INNER JOIN grades ON grades.id = students_class.grade_id
+//    INNER JOIN classes ON classes.code = students_class.class_code
+//    WHERE students_class.grade_id = $1
+//    ORDER BY classes.name, students.name`,
+//         [req.params.gradeId]
+//       );
+
+//       // Query for answers from the answers table where the quiz ID matches
+//       const { rows: answersData } = await client.query(
+//         `SELECT DISTINCT ON (quiz_id, question_id, nis) *
+//          FROM answers
+//          WHERE quiz_id = $1
+//          ORDER BY quiz_id, question_id, nis, createdAt DESC`,
+//         [req.params.quizId]
+//       );
+
+//       // Query for questions associated with the quiz
+//       const { rows: questionsData } = await client.query(
+//         `SELECT * FROM questions WHERE quiz_id = $1`,
+//         [req.params.quizId]
+//       );
+
+//       // Query for quiz weights
+//       const { rows: quizData } = await client.query(
+//         "SELECT * FROM quizzes WHERE id = $1",
+//         [req.params.quizId]
+//       );
+
+//       // Extract mcWeight and essayWeight as percentages
+//       const mcWeight = quizData[0].mc_weight / 100;
+//       const essayWeight = quizData[0].essay_weight / 100;
+
+//       // Array to hold student answers
+//       const result = studentsData.map((student) => {
+//         // Initialize counters for each student
+//         let essayPoin = 0;
+//         let mcPoin = 0;
+//         let correct = 0;
+//         let wrong = 0;
+
+//         // Create the studentAnswer object
+//         const studentAnswer = {
+//           nis: student.nis,
+//           name: student.name,
+//           grade: student.grade,
+//           class: student.class,
+//           essayPoin: 0,
+//           mcPoin: 0,
+//           totalPoin: 0,
+//           correct: 0,
+//           wrong: 0,
+//           answers: [],
+//         };
+
+//         // Filter answers by student
+//         const studentAnswers = answersData.filter(
+//           (answer) => answer.nis === student.nis
+//         );
+
+//         // Populate the answers array
+//         studentAnswers.forEach((answer) => {
+//           const matchingQuestion = questionsData.find(
+//             (question) => question.id === answer.question_id
+//           );
+
+//           if (matchingQuestion) {
+//             const isCorrect = answer.mc === matchingQuestion.key;
+
+//             // Calculate points and correctness
+//             if (matchingQuestion.type === 1) {
+//               // Multiple-choice question
+//               if (isCorrect) {
+//                 correct++;
+//                 mcPoin += answer.poin;
+//               } else {
+//                 wrong++;
+//               }
+//             } else if (matchingQuestion.type === 2) {
+//               // Essay question
+//               essayPoin += answer.poin;
+//             }
+
+//             studentAnswer.answers.push({
+//               questionId: answer.question_id,
+//               key: matchingQuestion.key, // Add the key from the question
+//               mc: answer.mc,
+//               essay: answer.essay,
+//               poin: isCorrect ? answer.poin : 0, // Display answer.poin if correct, otherwise 0
+//             });
+//           }
+//         });
+
+//         console.log(mcPoin);
+
+//         // Apply weights to mcPoin and essayPoin
+//         studentAnswer.mcPoin = (parseFloat(mcPoin) * mcWeight).toFixed(2);
+//         studentAnswer.essayPoin = (essayPoin * essayWeight).toFixed(2);
+
+//         // Calculate total points
+//         studentAnswer.totalPoin = (
+//           parseFloat(studentAnswer.mcPoin) + parseFloat(studentAnswer.essayPoin)
+//         ).toFixed(2);
+//         studentAnswer.correct = correct;
+//         studentAnswer.wrong = wrong;
+
+//         return studentAnswer;
+//       });
+
+//       // Send the result array as JSON
+//       res.status(200).json(result);
+//     } catch (error) {
+//       return res.status(500).json({ message: error.message });
+//     }
+//   }
+// );
 router.get(
   "/get-students-answer/:quizId/:gradeId",
   authenticatedUser,
   authorizeRoles("admin", "teacher"),
   async (req, res) => {
     try {
-      // Query for student info
       const { rows: studentsData } = await client.query(
         `SELECT students_class.nis, students.name, classes.name AS class, grades.grade
-   FROM students_class
-   INNER JOIN students ON students.nis = students_class.nis
-   INNER JOIN grades ON grades.id = students_class.grade_id
-   INNER JOIN classes ON classes.code = students_class.class_code
-   WHERE students_class.grade_id = $1
-   ORDER BY classes.name, students.name`,
+         FROM students_class
+         INNER JOIN students ON students.nis = students_class.nis
+         INNER JOIN grades ON grades.id = students_class.grade_id
+         INNER JOIN classes ON classes.code = students_class.class_code
+         WHERE students_class.grade_id = $1
+         ORDER BY classes.name, students.name`,
         [req.params.gradeId]
       );
 
-      // Query for answers from the answers table where the quiz ID matches
       const { rows: answersData } = await client.query(
         `SELECT DISTINCT ON (quiz_id, question_id, nis) *
          FROM answers 
@@ -249,31 +373,26 @@ router.get(
         [req.params.quizId]
       );
 
-      // Query for questions associated with the quiz
       const { rows: questionsData } = await client.query(
         `SELECT * FROM questions WHERE quiz_id = $1`,
         [req.params.quizId]
       );
 
-      // Query for quiz weights
       const { rows: quizData } = await client.query(
         "SELECT * FROM quizzes WHERE id = $1",
         [req.params.quizId]
       );
 
-      // Extract mcWeight and essayWeight as percentages
       const mcWeight = quizData[0].mc_weight / 100;
       const essayWeight = quizData[0].essay_weight / 100;
 
-      // Array to hold student answers
       const result = studentsData.map((student) => {
-        // Initialize counters for each student
-        let essayPoin = 0;
+        // Reset poin dan statistik per siswa
         let mcPoin = 0;
+        let essayPoin = 0;
         let correct = 0;
         let wrong = 0;
 
-        // Create the studentAnswer object
         const studentAnswer = {
           nis: student.nis,
           name: student.name,
@@ -287,12 +406,10 @@ router.get(
           answers: [],
         };
 
-        // Filter answers by student
         const studentAnswers = answersData.filter(
           (answer) => answer.nis === student.nis
         );
 
-        // Populate the answers array
         studentAnswers.forEach((answer) => {
           const matchingQuestion = questionsData.find(
             (question) => question.id === answer.question_id
@@ -301,45 +418,64 @@ router.get(
           if (matchingQuestion) {
             const isCorrect = answer.mc === matchingQuestion.key;
 
-            // Calculate points and correctness
             if (matchingQuestion.type === 1) {
-              // Multiple-choice question
+              // Soal multiple choice
               if (isCorrect) {
                 correct++;
-                mcPoin += answer.poin;
-              } else {
-                wrong++;
               }
+              studentAnswer.answers.push({
+                questionId: answer.question_id,
+                key: matchingQuestion.key,
+                mc: answer.mc,
+                essay: answer.essay,
+                poin: isCorrect ? answer.poin : 0,
+              });
             } else if (matchingQuestion.type === 2) {
-              // Essay question
-              essayPoin += answer.poin;
+              // Soal essay
+              studentAnswer.answers.push({
+                questionId: answer.question_id,
+                key: matchingQuestion.key,
+                mc: answer.mc,
+                essay: answer.essay,
+                poin: answer.poin || 0, // Use essay points directly
+              });
             }
-
-            studentAnswer.answers.push({
-              questionId: answer.question_id,
-              key: matchingQuestion.key, // Add the key from the question
-              mc: answer.mc,
-              essay: answer.essay,
-              poin: isCorrect ? answer.poin : 0, // Display answer.poin if correct, otherwise 0
-            });
           }
         });
 
-        // Apply weights to mcPoin and essayPoin
+        // Update mcPoin using reduce for multiple choice questions
+        mcPoin = studentAnswer.answers
+          .filter((answer) =>
+            questionsData.find(
+              (q) => q.id === answer.questionId && q.type === 1
+            )
+          )
+          .reduce((acc, answer) => acc + (parseFloat(answer.poin) || 0), 0);
+
+        // Update essayPoin using reduce for essay questions
+        essayPoin = studentAnswer.answers
+          .filter((answer) =>
+            questionsData.find(
+              (q) => q.id === answer.questionId && q.type === 2
+            )
+          )
+          .reduce((acc, answer) => acc + (parseFloat(answer.poin) || 0), 0);
+
+        // Terapkan bobot poin
         studentAnswer.mcPoin = (mcPoin * mcWeight).toFixed(2);
         studentAnswer.essayPoin = (essayPoin * essayWeight).toFixed(2);
 
-        // Calculate total points
+        // Hitung total poin
         studentAnswer.totalPoin = (
           parseFloat(studentAnswer.mcPoin) + parseFloat(studentAnswer.essayPoin)
         ).toFixed(2);
+
         studentAnswer.correct = correct;
         studentAnswer.wrong = wrong;
 
         return studentAnswer;
       });
 
-      // Send the result array as JSON
       res.status(200).json(result);
     } catch (error) {
       return res.status(500).json({ message: error.message });
