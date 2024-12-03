@@ -94,8 +94,8 @@ const DetailMc = ({ data, questions, quizname }) => {
       </Paper>
       <Paper
         sx={{
-          overflowX: "auto",
-          overflowY: "auto",
+          overflow: "auto",
+          width: { md: 850, lg: 1080, xl: 1300 },
         }}
       >
         <TableContainer sx={{ maxHeight: { md: 480, xl: 570 } }}>

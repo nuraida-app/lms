@@ -22,7 +22,7 @@ const columns = [
   { label: "Nilai", width: 30 },
 ];
 
-const DetailScores = ({ data, quizname }) => {
+const DetailScores = ({ data, quizname, questions }) => {
   const [selectedClass, setClass] = useState("");
 
   const classes = [...new Set(data?.map((item) => item.class))];

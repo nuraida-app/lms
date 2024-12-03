@@ -115,7 +115,6 @@ const DetailFunc = () => {
             Prbarui Data
           </Button>
           <Button
-            sx={{ width: { xs: 130, md: 180, lg: 155 } }}
             startIcon={<SyncAltIcon />}
             variant="contained"
             color="success"
@@ -124,7 +123,6 @@ const DetailFunc = () => {
             Log
           </Button>
           <Button
-            sx={{ width: { xs: 130, md: 180, lg: 155 } }}
             startIcon={<AutoGraphIcon />}
             variant="contained"
             color="success"
@@ -133,7 +131,6 @@ const DetailFunc = () => {
             pg
           </Button>
           <Button
-            sx={{ width: { xs: 130, md: 180, lg: 155 } }}
             startIcon={<ManageSearchIcon />}
             variant="contained"
             color="success"
@@ -142,7 +139,6 @@ const DetailFunc = () => {
             essay
           </Button>
           <Button
-            sx={{ width: { xs: 130, md: 180, lg: 155 } }}
             startIcon={<ScoreIcon />}
             variant="contained"
             color="success"
@@ -161,7 +157,13 @@ const DetailFunc = () => {
 
       {essayPage && <DetailEssay data={filtered} questions={questions} />}
 
-      {scorePage && <DetailScores data={filtered} quizname={quizname} />}
+      {scorePage && (
+        <DetailScores
+          data={filtered}
+          quizname={quizname}
+          questions={questions}
+        />
+      )}
     </Fragment>
   );
 };

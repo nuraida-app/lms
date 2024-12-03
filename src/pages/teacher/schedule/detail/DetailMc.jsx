@@ -94,12 +94,11 @@ const DetailMc = ({ data, questions, quizname }) => {
       </Paper>
       <Paper
         sx={{
-          overflowX: "auto",
-          overflowY: "auto",
-          width: { md: 900, lg: 1220, xl: 1400 },
+          overflow: "auto",
+          width: { md: 850, lg: 1080, xl: 1300 },
         }}
       >
-        <TableContainer sx={{ maxHeight: { md: 480, xl: 570 }, width: "100%" }}>
+        <TableContainer sx={{ maxHeight: { md: 480, xl: 570 } }}>
           <Table
             stickyHeader
             aria-label="sticky table"
