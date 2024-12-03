@@ -428,7 +428,7 @@ router.get(
                 key: matchingQuestion.key,
                 mc: answer.mc,
                 essay: answer.essay,
-                poin: isCorrect ? answer.poin : 0,
+                poin: isCorrect ? matchingQuestion.score : 0,
               });
             } else if (matchingQuestion.type === 2) {
               // Soal essay
