@@ -1,0 +1,1 @@
+import{g as t}from"./getThemeProps-C9w7lDtp.js";import{bb as p}from"./index-Pi4NK-hc.js";function i({props:o,name:s,defaultTheme:m,themeId:r}){let e=p(m);return r&&(e=e[r]||e),t({theme:e,name:s,props:o})}export{i as u};
