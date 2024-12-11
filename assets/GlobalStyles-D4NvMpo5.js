@@ -1,1 +1,0 @@
-import{bb as n,j as o,bc as b,at as r,bd as u,be as c}from"./index-Pi4NK-hc.js";function f({styles:e,themeId:s,defaultTheme:a={}}){const t=n(a),l=typeof e=="function"?e(s&&t[s]||t):e;return o.jsx(b,{styles:l})}function p(e){return o.jsx(f,r({},e,{defaultTheme:u,themeId:c}))}export{p as G};
