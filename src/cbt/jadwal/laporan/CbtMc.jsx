@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import Layout from "../../components/Layout";
 import TableContainer from "../../../components/tabel/TabelContainer";
 
@@ -24,10 +24,10 @@ const columns = [
   { label: "Nilai" },
 ];
 
-const CbtMc = () => {
+const CbtMc = ({ tableRef }) => {
   return (
     <TableContainer>
-      <table className="table table-striped table-hover">
+      <table ref={tableRef} className="table table-striped table-hover">
         <thead>
           <tr>
             {columns.map((column, i) => (

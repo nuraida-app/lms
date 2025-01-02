@@ -35,11 +35,11 @@ const CbtBankList = () => {
   return (
     <Layout>
       <div className="row" style={{ height: "100%" }}>
-        <div className="col-lg-2 col-12">
+        <div className="col-lg-3 col-12">
           <Addbank />
         </div>
         <div
-          className="col-lg-10 cool-12"
+          className="col-lg-9 cool-12"
           style={{ maxHeight: "calc(100vh - 70px)", overflow: "auto" }}
         >
           <TableContainer>

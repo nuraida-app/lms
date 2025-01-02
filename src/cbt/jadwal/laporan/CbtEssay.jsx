@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React from "react";
 import TableContainer from "../../../components/tabel/TabelContainer";
 
 const usersData = [
@@ -18,17 +18,14 @@ const columns = [
   { label: "NIS" },
   { label: "Nama Siswa" },
   { label: "Kelas" },
-  { label: "Login" },
-  { label: "Ip Address" },
-  { label: "Browser" },
-  { label: "Status" },
-  { label: "Reset" },
+  { label: "Nilai" },
+  { label: "Aksi" },
 ];
 
-const CbtLogs = ({ tableRef }) => {
+const CbtEssay = ({ tabelRef }) => {
   return (
     <TableContainer>
-      <table ref={tableRef} className="table table-striped table-hover">
+      <table ref={tabelRef} className="table table-striped table-hover">
         <thead>
           <tr>
             {columns.map((column, i) => (
@@ -45,15 +42,8 @@ const CbtLogs = ({ tableRef }) => {
               <td>{user.first}</td>
               <td>{user.last}</td>
               <td>{user.last}</td>
-              <td>{user.last}</td>
-              <td>{user.last}</td>
-              <td>{user.last}</td>
-
               <td>
-                <div className="d-flex justify-content-center gap-2">
-                  <button className="btn btn-warning">Edit</button>
-                  <button className="btn btn-danger">Hapus</button>
-                </div>
+                <button className="btn btn-primary">Korensi Jawaban</button>
               </td>
             </tr>
           ))}
@@ -63,4 +53,4 @@ const CbtLogs = ({ tableRef }) => {
   );
 };
 
-export default CbtLogs;
+export default CbtEssay;

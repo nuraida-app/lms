@@ -27,6 +27,9 @@ const AdminSubjects = lazy(() => import("./admin/mapel/AdminSubjects"));
 const AdminTeacher = lazy(() => import("./admin/guru/AdminTeacher"));
 const AdminStudents = lazy(() => import("./admin/siswa/AdminStudents"));
 
+const TeacherProfile = lazy(() => import("./guru/profil/TeacherProfile"));
+const TeacherSubjects = lazy(() => import("./guru/mapel/TeacherSubjects"));
+
 function App() {
   return (
     <BrowserRouter>
@@ -37,6 +40,7 @@ function App() {
 
           <Route path="/signup" element={<SignUp />} />
 
+          {/* CBT */}
           <Route path="/cbt-bank-soal" element={<CbtBankList />} />
 
           <Route path="/cbt-bank-soal/:id/soal" element={<AddQuestion />} />
@@ -80,6 +84,11 @@ function App() {
           <Route path="/admin-guru" element={<AdminTeacher />} />
 
           <Route path="/admin-siswa" element={<AdminStudents />} />
+
+          {/* Guru */}
+          <Route path="/guru-profil" element={<TeacherProfile />} />
+
+          <Route path="/guru-mapel" element={<TeacherSubjects />} />
         </Routes>
       </Suspense>
     </BrowserRouter>
