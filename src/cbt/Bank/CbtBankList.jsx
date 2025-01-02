@@ -1,7 +1,7 @@
 import React from "react";
-import Layout from "../components/layout/Layout";
-import FormComponent from "./FormComponent";
+import Layout from "../components/Layout";
 import TableContainer from "../../components/tabel/TabelContainer";
+import Addbank from "./forms/Addbank";
 import { useNavigate } from "react-router-dom";
 
 const usersData = [
@@ -17,34 +17,40 @@ const usersData = [
   { id: 10, first: "Dwight", last: "Schrute", handle: "@dschrute" },
 ];
 
-const AdminClass = () => {
+const columns = [
+  { label: "No" },
+  { label: "Nama Guru" },
+  { label: "Nama Bank Soal" },
+  { label: "Tingkat" },
+  { label: "PG" },
+  { label: "Essay" },
+
+  { label: "Aksi" },
+];
+
+const CbtBankList = () => {
   const navigate = useNavigate();
 
-  const goToLink = (code) => navigate(`/admin-kelas-daftar-siswa/${code}`);
-
+  const goToLink = (id) => navigate(`/cbt-bank-soal/${id}/soal`);
   return (
     <Layout>
       <div className="row" style={{ height: "100%" }}>
-        <div className="col-lg-3 col-12">
-          <FormComponent />
+        <div className="col-lg-2 col-12">
+          <Addbank />
         </div>
-        <div className="col-lg-9 col-12">
+        <div
+          className="col-lg-10 cool-12"
+          style={{ maxHeight: "calc(100vh - 70px)", overflow: "auto" }}
+        >
           <TableContainer>
             <table className="table table-striped table-hover mt-2">
               <thead>
                 <tr>
-                  <th scope="col" className="text-center">
-                    #
-                  </th>
-                  <th scope="col" className="text-center">
-                    First
-                  </th>
-                  <th scope="col" className="text-center">
-                    Last
-                  </th>
-                  <th scope="col" className="text-center">
-                    Handle
-                  </th>
+                  {columns.map((column, i) => (
+                    <th key={i} scope="col" className="text-center">
+                      {column.label}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
@@ -55,13 +61,17 @@ const AdminClass = () => {
                     </th>
                     <td>{user.first}</td>
                     <td>{user.last}</td>
+                    <td>{user.last}</td>
+                    <td>{user.last}</td>
+                    <td>{user.last}</td>
+
                     <td>
-                      <div className="d-flex justify-content-center gap-2">
+                      <div className="d-flex flex-column justify-content-center gap-2">
                         <button
-                          className="btn btn-primary"
-                          onClick={() => goToLink(201)}
+                          className="btn btn-success"
+                          onClick={() => goToLink(index)}
                         >
-                          Tambah Siswa
+                          + Tambah Soal
                         </button>
                         <button className="btn btn-warning">Edit</button>
                         <button className="btn btn-danger">Hapus</button>
@@ -78,4 +88,4 @@ const AdminClass = () => {
   );
 };
 
-export default AdminClass;
+export default CbtBankList;

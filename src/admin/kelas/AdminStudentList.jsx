@@ -1,7 +1,7 @@
 import React from "react";
 import Layout from "../components/layout/Layout";
-import FormComponent from "./FormComponent";
 import TableContainer from "../../components/tabel/TabelContainer";
+import AddStudent from "./AddStudent";
 
 const usersData = [
   { id: 1, first: "Mark", last: "Otto", handle: "@mdo" },
@@ -16,13 +16,14 @@ const usersData = [
   { id: 10, first: "Dwight", last: "Schrute", handle: "@dschrute" },
 ];
 
-const AdminTeacher = () => {
+const AdminStudentList = () => {
   return (
     <Layout>
       <div className="row" style={{ height: "100%" }}>
         <div className="col-lg-3 col-12">
-          <FormComponent />
+          <AddStudent />
         </div>
+
         <div className="col-lg-9 col-12">
           <TableContainer>
             <table className="table table-striped table-hover mt-2">
@@ -50,7 +51,12 @@ const AdminTeacher = () => {
                     </th>
                     <td>{user.first}</td>
                     <td>{user.last}</td>
-                    <td>{user.handle}</td>
+                    <td>
+                      <div className="d-flex justify-content-center gap-2">
+                        <button className="btn btn-warning">Edit</button>
+                        <button className="btn btn-danger">Hapus</button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -62,4 +68,4 @@ const AdminTeacher = () => {
   );
 };
 
-export default AdminTeacher;
+export default AdminStudentList;

@@ -1,6 +1,5 @@
 import React from "react";
 import Layout from "../components/layout/Layout";
-import FormComponent from "./FormComponent";
 import TableContainer from "../../components/tabel/TabelContainer";
 
 const usersData = [
@@ -16,30 +15,29 @@ const usersData = [
   { id: 10, first: "Dwight", last: "Schrute", handle: "@dschrute" },
 ];
 
-const AdminTeacher = () => {
+const columns = [
+  { label: "No" },
+  { label: "Nama Lengkap" },
+  { label: "Tingkat" },
+  { label: "Kelas" },
+  { label: "Database" },
+  { label: "Aksi" },
+];
+
+const AdminStudents = () => {
   return (
     <Layout>
       <div className="row" style={{ height: "100%" }}>
-        <div className="col-lg-3 col-12">
-          <FormComponent />
-        </div>
-        <div className="col-lg-9 col-12">
+        <div className="col-12">
           <TableContainer>
-            <table className="table table-striped table-hover mt-2">
+            <table className="table table-striped table-hover">
               <thead>
                 <tr>
-                  <th scope="col" className="text-center">
-                    #
-                  </th>
-                  <th scope="col" className="text-center">
-                    First
-                  </th>
-                  <th scope="col" className="text-center">
-                    Last
-                  </th>
-                  <th scope="col" className="text-center">
-                    Handle
-                  </th>
+                  {columns.map((columns, i) => (
+                    <th key={i} scope="col" className="text-center">
+                      {columns.label}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
@@ -50,7 +48,14 @@ const AdminTeacher = () => {
                     </th>
                     <td>{user.first}</td>
                     <td>{user.last}</td>
-                    <td>{user.handle}</td>
+                    <td>{user.last}</td>
+                    <td>{user.last}</td>
+                    <td>
+                      <div className="d-flex justify-content-center gap-2">
+                        <button className="btn btn-warning">Edit</button>
+                        <button className="btn btn-danger">Hapus</button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -62,4 +67,4 @@ const AdminTeacher = () => {
   );
 };
 
-export default AdminTeacher;
+export default AdminStudents;

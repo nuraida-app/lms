@@ -1,29 +1,63 @@
-import React from "react";
+import React, { useState } from "react";
 
 const FormComponent = () => {
+  const [value, setValue] = useState("default");
   return (
     <div className="mt-2 p-2 shadow rounded d-flex flex-column gap-2">
-      <p className="h5">Tambahkan Peseta Didik</p>
-      <form className="d-flex flex-column gap-2">
+      <p className="h5">Tambahkan Guru</p>
+
+      <form action="" className="d-flex flex-column gap-2">
         <input
           type="number"
-          name="name"
+          name="nip"
           id=""
-          placeholder="NIS"
           className="form-control"
+          placeholder="NIP"
         />
 
         <input
           type="text"
-          name="name"
+          name="nama"
           id=""
-          placeholder="Nama Lengkap"
           className="form-control"
+          placeholder="Nama Lengkap"
         />
 
-        <button type="button" className="btn btn-success">
-          + Tambahkan
-        </button>
+        <select
+          className="form-select"
+          aria-label="Default select example"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+        >
+          <option value="default">--Pilih Mapel--</option>
+          <option value="province">Provinsi</option>
+          <option value="region">Kota / Kabupaten</option>
+          <option value="district">Desa</option>
+        </select>
+
+        <div className="custom-control custom-radio d-flex gap-3 ">
+          <input
+            type="radio"
+            className="custom-control-input pointer"
+            id="customCheck1"
+          />
+          <label className="custom-control-label" htmlFor="customCheck1">
+            SMP
+          </label>
+        </div>
+
+        <div className="custom-control custom-radio d-flex gap-3 ">
+          <input
+            type="radio"
+            className="custom-control-input pointer"
+            id="customCheck1"
+          />
+          <label className="custom-control-label" htmlFor="customCheck1">
+            SMA
+          </label>
+        </div>
+
+        <button className="btn btn-success">+ Tambahkan</button>
       </form>
 
       <button
@@ -48,7 +82,7 @@ const FormComponent = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title" id="staticBackdropLabel">
-                Pilih file
+                Pilih Berkas
               </h5>
               <button
                 type="button"

@@ -16,7 +16,7 @@ const usersData = [
   { id: 10, first: "Dwight", last: "Schrute", handle: "@dschrute" },
 ];
 
-const AdminTeacher = () => {
+const CenterTeacher = () => {
   return (
     <Layout>
       <div className="row" style={{ height: "100%" }}>
@@ -62,4 +62,4 @@ const AdminTeacher = () => {
   );
 };
 
-export default AdminTeacher;
+export default CenterTeacher;

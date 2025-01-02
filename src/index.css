@@ -1,3 +1,56 @@
+body {
+  scroll-behavior: smooth;
+}
+
 .pointer {
   cursor: pointer;
+}
+
+/* React Quill */
+.react-quill {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.react-quill .ql-container {
+  flex: 1; /* Agar container konten mengambil seluruh tinggi yang tersedia */
+  overflow-y: auto; /* Tambahkan scroll jika kontennya melampaui area */
+}
+
+.ql-container {
+  border: none !important;
+}
+.ql-toolbar {
+  border: none !important;
+}
+.ql-editor {
+  border: none !important;
+}
+
+/* Untuk scrollbar di browser WebKit (misalnya Chrome/Safari) */
+::-webkit-scrollbar {
+  width: 5px; /* Ubah lebar scrollbar sesuai kebutuhan */
+  height: 5px;
+}
+
+/* Track (bagian latar belakang scrollbar) */
+::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Warna latar belakang track */
+}
+
+/* Thumb (bagian pegangan scrollbar) */
+::-webkit-scrollbar-thumb {
+  background: #888; /* Warna pegangan scrollbar */
+  border-radius: 10px;
+}
+
+/* Saat thumb digerakkan (hover) */
+::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Warna pegangan scrollbar saat hover */
+}
+
+* {
+  scrollbar-width: thin; /* Mengubah lebar scrollbar */
+  scrollbar-color: #888 #f1f1f1; /* thumb color track color */
 }

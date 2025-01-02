@@ -4,5 +4,5 @@ export const menus = [
   { label: "Mata Pelajaran", link: "/admin-mapel" },
   { label: "Guru", link: "/admin-guru" },
   { label: "Siswa", link: "/admin-siswa" },
-  { label: "Bank Soal", link: "/admin-bank" },
+  { label: "Bank Soal", link: "/cbt-bank-soal" },
 ];

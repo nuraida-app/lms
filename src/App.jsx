@@ -6,6 +6,11 @@ import "react-toastify/dist/ReactToastify.css";
 import SignIn from "./components/otentikasi/SignIn";
 import SignUp from "./components/otentikasi/SignUp";
 
+const CbtBankList = lazy(() => import("./cbt/Bank/CbtBankList"));
+const AddQuestion = lazy(() => import("./cbt/Bank/forms/AddQuestion"));
+const CbtSchedules = lazy(() => import("./cbt/jadwal/CbtSchedules"));
+const CbtReport = lazy(() => import("./cbt/jadwal/laporan/CbtReport"));
+
 const CenterDash = lazy(() => import("./center/dashboard/CenterDash"));
 const CenterAdmin = lazy(() => import("./center/admin/CenterAdmin"));
 const CenterSch = lazy(() => import("./center/sekolah/CenterSch"));
@@ -17,6 +22,10 @@ const CenterDb = lazy(() => import("./center/database/CenterDb"));
 const AdminDash = lazy(() => import("./admin/dashboard/AdminDash"));
 const AdminGrade = lazy(() => import("./admin/tingkat/AdminGrade"));
 const AdminClass = lazy(() => import("./admin/kelas/AdminClass"));
+const AdminStudentList = lazy(() => import("./admin/kelas/AdminStudentList"));
+const AdminSubjects = lazy(() => import("./admin/mapel/AdminSubjects"));
+const AdminTeacher = lazy(() => import("./admin/guru/AdminTeacher"));
+const AdminStudents = lazy(() => import("./admin/siswa/AdminStudents"));
 
 function App() {
   return (
@@ -27,6 +36,17 @@ function App() {
           <Route path="/" element={<SignIn />} />
 
           <Route path="/signup" element={<SignUp />} />
+
+          <Route path="/cbt-bank-soal" element={<CbtBankList />} />
+
+          <Route path="/cbt-bank-soal/:id/soal" element={<AddQuestion />} />
+
+          <Route path="/cbt-ujian" element={<CbtSchedules />} />
+
+          <Route
+            path="/cbt-laporan/:name/:bankid/:gradeid"
+            element={<CbtReport />}
+          />
 
           {/* Center */}
           <Route path="/center-dashboard" element={<CenterDash />} />
@@ -49,6 +69,17 @@ function App() {
           <Route path="/admin-tingkat" element={<AdminGrade />} />
 
           <Route path="/admin-kelas" element={<AdminClass />} />
+
+          <Route
+            path="/admin-kelas-daftar-siswa/:code"
+            element={<AdminStudentList />}
+          />
+
+          <Route path="/admin-mapel" element={<AdminSubjects />} />
+
+          <Route path="/admin-guru" element={<AdminTeacher />} />
+
+          <Route path="/admin-siswa" element={<AdminStudents />} />
         </Routes>
       </Suspense>
     </BrowserRouter>
