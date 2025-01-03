@@ -1,6 +1,6 @@
 import React, { Fragment } from "react";
 import { useNavigate } from "react-router-dom";
-import { menus } from "./Menus";
+import { AdminMenus } from "./Menus";
 
 const Layout = ({ children }) => {
   const navigate = useNavigate();
@@ -40,7 +40,7 @@ const Layout = ({ children }) => {
               id="navbarsExample11"
             >
               <div className="navbar-nav col-12 justify-content-lg-end d-flex gap-2">
-                {menus.map((menu, i) => (
+                {AdminMenus.map((menu, i) => (
                   <button
                     key={i}
                     className="btn btn-light"

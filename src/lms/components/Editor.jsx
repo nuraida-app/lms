@@ -26,7 +26,7 @@ class Editor extends Component {
     const { placeholder } = this.props;
 
     return (
-      <div className="d-flex mb-2" style={{ height: 300 }}>
+      <div className="d-flex" style={{ height: 200 }}>
         <ReactQuill
           ref={(el) => {
             this.reactQuillRef = el;
@@ -38,7 +38,7 @@ class Editor extends Component {
           formats={Editor.formats}
           placeholder={placeholder}
           style={{ width: "100%" }}
-          className="react-quill rounded shadow"
+          className="react-quill rounded border"
         />
       </div>
     );

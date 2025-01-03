@@ -1,13 +1,9 @@
 import React, { Fragment } from "react";
 import { useNavigate } from "react-router-dom";
-import { AdminMenus } from "../../admin/components/layout/Menus";
-import { TeacherMenus } from "../../guru/components/layout/Menus";
+import { StudentMenus } from "../menu/Menus";
 
 const Layout = ({ children }) => {
   const navigate = useNavigate();
-
-  const role = "teacher";
-  const name = "Muajaddid Al Magribi";
 
   const goToLink = (link) => {
     navigate(link);
@@ -22,9 +18,9 @@ const Layout = ({ children }) => {
           <div className="container-fluid">
             <a
               className="navbar-brand col-lg-2 me-0 text-white"
-              href={role === "admin" ? "/admin-dashboard" : "/guru-dashboard"}
+              href="/guru-dashboard"
             >
-              {role === "admin" ? "Admin Satuan" : name}
+              Halaman Siswa
             </a>
 
             <button
@@ -44,17 +40,15 @@ const Layout = ({ children }) => {
               id="navbarsExample11"
             >
               <div className="navbar-nav col-12 justify-content-lg-end d-flex gap-2">
-                {(role === "admin" ? AdminMenus : TeacherMenus).map(
-                  (menu, i) => (
-                    <button
-                      key={i}
-                      className="btn btn-light"
-                      onClick={() => goToLink(menu.link)}
-                    >
-                      {menu.label}
-                    </button>
-                  )
-                )}
+                {StudentMenus.map((menu, i) => (
+                  <button
+                    key={i}
+                    className="btn btn-light"
+                    onClick={() => goToLink(menu.link)}
+                  >
+                    {menu.label}
+                  </button>
+                ))}
 
                 <button className="btn btn-danger">Logout</button>
               </div>
@@ -64,11 +58,8 @@ const Layout = ({ children }) => {
       </div>
 
       <div
-        className="container-fluid bg-white"
-        style={{
-          marginTop: "65px",
-          height: "calc(100vh - 65px)",
-        }}
+        className="container-fluid"
+        style={{ marginTop: "65px", height: "calc(100vh - 65px)" }}
       >
         {children}
       </div>

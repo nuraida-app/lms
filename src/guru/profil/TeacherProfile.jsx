@@ -46,11 +46,8 @@ const TeacherProfile = () => {
   return (
     <Layout>
       <div className="row" style={{ height: "100%" }}>
-        <div className="col-lg-4 col-12 d-flex align-items-center justify-content-center">
-          <div
-            className="rounded shadow p-4 d-flex align-items-center justify-content-center mb-3"
-            style={{ height: 250, width: 250 }}
-          >
+        <div className="col-12 d-flex align-items-center justify-content-center">
+          <div className="d-flex flex-column align-items-center gap-2 p-3 rounded shadow">
             <img
               src="https://images.pexels.com/photos/1097456/pexels-photo-1097456.jpeg"
               alt="foto_profile"
@@ -59,35 +56,31 @@ const TeacherProfile = () => {
               className="rounded-circle"
               style={{ objectFit: "cover" }}
             />
-          </div>
-        </div>
-        <div className="col-lg-8 col-12 d-flex align-items-center justify-content-center">
-          <form
-            action=""
-            className="d-flex flex-column gap-3 align-items-center justify-content-center p-3 rounded shadow"
-          >
-            {forms.map((item, i) => (
-              <div key={i} className="input-group">
-                <span
-                  style={{ width: 150 }}
-                  className="input-group-text"
-                  id="basic-addon1"
-                >
-                  {item.label}
-                </span>
-                <input
-                  type={item.type}
-                  className="form-control"
-                  placeholder={item.placeholder}
-                  aria-label={item.label}
-                />
-              </div>
-            ))}
 
-            <button type="submit" className="btn btn-success">
-              Perbarui Profil
-            </button>
-          </form>
+            <form action="" className="d-flex flex-column gap-3">
+              {forms.map((item, i) => (
+                <div key={i} className="input-group">
+                  <span
+                    style={{ width: 150 }}
+                    className="input-group-text"
+                    id="basic-addon1"
+                  >
+                    {item.label}
+                  </span>
+                  <input
+                    type={item.type}
+                    className="form-control"
+                    placeholder={item.placeholder}
+                    aria-label={item.label}
+                  />
+                </div>
+              ))}
+
+              <button type="submit" className="btn btn-success">
+                Perbarui Profil
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     </Layout>

@@ -11,6 +11,8 @@ const AddQuestion = lazy(() => import("./cbt/Bank/forms/AddQuestion"));
 const CbtSchedules = lazy(() => import("./cbt/jadwal/CbtSchedules"));
 const CbtReport = lazy(() => import("./cbt/jadwal/laporan/CbtReport"));
 
+const LmsMapel = lazy(() => import("./lms/LmsMapel"));
+
 const CenterDash = lazy(() => import("./center/dashboard/CenterDash"));
 const CenterAdmin = lazy(() => import("./center/admin/CenterAdmin"));
 const CenterSch = lazy(() => import("./center/sekolah/CenterSch"));
@@ -29,6 +31,9 @@ const AdminStudents = lazy(() => import("./admin/siswa/AdminStudents"));
 
 const TeacherProfile = lazy(() => import("./guru/profil/TeacherProfile"));
 const TeacherSubjects = lazy(() => import("./guru/mapel/TeacherSubjects"));
+
+const StudentExam = lazy(() => import("./siswa/ujian/StudentExam"));
+const StudentExamPage = lazy(() => import("./cbt/ujian/CbtPage"));
 
 function App() {
   return (
@@ -51,6 +56,9 @@ function App() {
             path="/cbt-laporan/:name/:bankid/:gradeid"
             element={<CbtReport />}
           />
+
+          {/* LMS */}
+          <Route path="/lms-mapel" element={<LmsMapel />} />
 
           {/* Center */}
           <Route path="/center-dashboard" element={<CenterDash />} />
@@ -89,6 +97,14 @@ function App() {
           <Route path="/guru-profil" element={<TeacherProfile />} />
 
           <Route path="/guru-mapel" element={<TeacherSubjects />} />
+
+          {/* Siswa */}
+          <Route path="/cbt-jawdal-ujian" element={<StudentExam />} />
+
+          <Route
+            path="/cbt-halaman/:name/:bankId/:start/:end"
+            element={<StudentExamPage />}
+          />
         </Routes>
       </Suspense>
     </BrowserRouter>

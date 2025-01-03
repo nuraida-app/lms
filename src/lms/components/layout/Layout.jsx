@@ -1,7 +1,7 @@
 import React, { Fragment } from "react";
 import { useNavigate } from "react-router-dom";
-import { AdminMenus } from "../../admin/components/layout/Menus";
-import { TeacherMenus } from "../../guru/components/layout/Menus";
+import { AdminMenus } from "../../../admin/components/layout/Menus";
+import { TeacherMenus } from "../../../guru/components/layout/Menus";
 
 const Layout = ({ children }) => {
   const navigate = useNavigate();
@@ -67,7 +67,7 @@ const Layout = ({ children }) => {
         className="container-fluid bg-white"
         style={{
           marginTop: "65px",
-          height: "calc(100vh - 65px)",
+          minHeight: "calc(100vh - 65px)",
         }}
       >
         {children}
