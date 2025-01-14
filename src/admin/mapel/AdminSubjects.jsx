@@ -1,59 +1,148 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "../components/layout/Layout";
 import FormComponent from "./FormComponent";
 import TableContainer from "../../components/tabel/TabelContainer";
+import {
+  useDeleteSubjectMutation,
+  useDeleteSubjectsMutation,
+  useGetSubjectQuery,
+  useGetSubjectsQuery,
+} from "../../control/api/subjectApi";
+import { toast } from "react-toastify";
+import BtnLoader from "../../components/loader/BtnLoader";
 
-const usersData = [
-  { id: 1, first: "Mark", last: "Otto", handle: "@mdo" },
-  { id: 2, first: "Jacob", last: "Thornton", handle: "@fat" },
-  { id: 3, first: "Larry", last: "Bird", handle: "@twitter" },
-  { id: 4, first: "John", last: "Doe", handle: "@jdoe" },
-  { id: 5, first: "Jane", last: "Smith", handle: "@jsmith" },
-  { id: 6, first: "Chris", last: "Evans", handle: "@cevans" },
-  { id: 7, first: "Emily", last: "Clark", handle: "@eclark" },
-  { id: 8, first: "Michael", last: "Scott", handle: "@mscott" },
-  { id: 9, first: "Pam", last: "Beesly", handle: "@pbeesly" },
-  { id: 10, first: "Dwight", last: "Schrute", handle: "@dschrute" },
+const columns = [
+  { label: "No" },
+  { label: "Kode" },
+  { label: "Satuan" },
+  { label: "Nama" },
+  { label: "Aksi" },
 ];
 
 const AdminSubjects = () => {
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [search, setSearch] = useState("");
+  const [id, setId] = useState("");
+
+  const { data: detail } = useGetSubjectQuery(id, { skip: !id });
+  const {
+    data: rowData = {},
+    isLoading,
+    error,
+  } = useGetSubjectsQuery({
+    page,
+    limit,
+    search,
+  });
+  const { subjects = [], totalPages, total } = rowData;
+  const [
+    deleteSubject,
+    {
+      data: delMsg,
+      isSuccess: dSuccess,
+      isLoading: dLoading,
+      error: dError,
+      reset: dReset,
+    },
+  ] = useDeleteSubjectMutation();
+  const [deleteSubjects] = useDeleteSubjectsMutation();
+
+  const deleteHandler = (code) => {
+    const confirm = window.confirm(
+      `Apakah anda yakin menghapus mata pelajaran, bab, topik dan file?`
+    );
+
+    if (confirm) {
+      deleteSubject(code);
+    }
+  };
+
+  const clearData = () => {
+    const confirm = window.confirm(
+      `Apakah anda yakin akan menghapus database mapel?`
+    );
+
+    if (confirm) {
+      deleteSubjects();
+    }
+  };
+
+  useEffect(() => {
+    if (dSuccess) {
+      toast.success(delMsg.message);
+      dReset();
+      window.location.reload();
+    }
+
+    if (dError) {
+      toast.error(dError.data.message);
+      dReset();
+    }
+  }, [delMsg, dSuccess, dError]);
+
   return (
-    <Layout>
-      <div className="row" style={{ height: "10%" }}>
+    <Layout title={"Mata Pelajaran"}>
+      <div className="row" style={{ height: "100%" }}>
         <div className="col-lg-3 col-12">
-          <FormComponent />
+          <FormComponent detail={detail} id={id} />
         </div>
         <div className="col-lg-9 col-12">
-          <TableContainer>
+          <TableContainer
+            page={page}
+            setLimit={(e) => setLimit(e)}
+            setPage={(e) => setPage(e)}
+            onValue={(e) => setSearch(e)}
+            totalPages={totalPages}
+          >
+            <div className="d-flex justify-content-between align-items-center">
+              <p className="m-0">
+                Total Mata Pelajaran: <span>{total}</span>
+              </p>
+
+              <button className="btn btn-danger" onClick={clearData}>
+                Kosongkan Data
+              </button>
+            </div>
             <table className="table table-striped table-hover">
               <thead>
                 <tr>
-                  <th scope="col" className="text-center">
-                    #
-                  </th>
-                  <th scope="col" className="text-center">
-                    First
-                  </th>
-                  <th scope="col" className="text-center">
-                    Last
-                  </th>
-                  <th scope="col" className="text-center">
-                    Handle
-                  </th>
+                  {columns?.map((column) => (
+                    <th className="text-center" scope="col" key={column.label}>
+                      {column.label}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
-                {usersData.map((user, index) => (
-                  <tr key={user.id}>
-                    <th scope="row" className="text-center">
-                      {index + 1}
+                {subjects.map((subject, index) => (
+                  <tr key={subject.id}>
+                    <th scope="row" className="text-center align-middle">
+                      {(page - 1) * limit + index + 1}
                     </th>
-                    <td>{user.first}</td>
-                    <td>{user.last}</td>
+                    <td className="text-center align-middle">{subject.code}</td>
+                    <td className="text-center align-middle">
+                      {subject.homebase}
+                    </td>
+                    <td className="align-middle">{subject.name}</td>
                     <td>
                       <div className="d-flex justify-content-center gap-2">
-                        <button className="btn btn-warning">Edit</button>
-                        <button className="btn btn-danger">Hapus</button>
+                        <button
+                          className="btn btn-warning"
+                          onClick={() => setId(subject.id)}
+                        >
+                          Edit
+                        </button>
+                        {dLoading ? (
+                          <BtnLoader />
+                        ) : (
+                          <button
+                            className="btn btn-danger"
+                            onClick={() => deleteHandler(subject.code)}
+                          >
+                            Hapus
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

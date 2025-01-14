@@ -5,6 +5,10 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import SignIn from "./components/otentikasi/SignIn";
 import SignUp from "./components/otentikasi/SignUp";
+import { useDispatch } from "react-redux";
+import { useLoadMutation } from "./control/api/authApi";
+import MetaData from "./components/meta/MetaData";
+import { setLogin } from "./control/slice/authSlice";
 
 const CbtBankList = lazy(() => import("./cbt/Bank/CbtBankList"));
 const AddQuestion = lazy(() => import("./cbt/Bank/forms/AddQuestion"));
@@ -36,10 +40,40 @@ const StudentExam = lazy(() => import("./siswa/ujian/StudentExam"));
 const StudentExamPage = lazy(() => import("./cbt/ujian/CbtPage"));
 
 function App() {
+  const dispatch = useDispatch();
+  const [load] = useLoadMutation();
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const user = await load().unwrap();
+        dispatch(setLogin(user));
+      } catch (error) {
+        console.error("Failed to load user data", error);
+      }
+    };
+
+    fetchUser();
+  }, [dispatch, load]);
+
   return (
     <BrowserRouter>
       <ToastContainer autoClose={2000} />
-      <Suspense fallback={"Loading ..."}>
+      <MetaData
+        title={"Pilih Akun"}
+        desc={
+          "LMS mempermudah pembelajaran online dengan fitur interaktif. Solusi ideal untuk pengajar dan pelajar modern."
+        }
+      />
+      <Suspense
+        fallback={
+          <div className="h-100 d-flex align-items-center justify-content-center">
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        }
+      >
         <Routes>
           <Route path="/" element={<SignIn />} />
 
@@ -83,7 +117,7 @@ function App() {
           <Route path="/admin-kelas" element={<AdminClass />} />
 
           <Route
-            path="/admin-kelas-daftar-siswa/:code"
+            path="/admin-kelas-daftar-siswa/:gradeId/:name/:code"
             element={<AdminStudentList />}
           />
 

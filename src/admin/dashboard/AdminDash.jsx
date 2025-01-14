@@ -2,6 +2,7 @@ import React from "react";
 import Layout from "../components/layout/Layout";
 import Data1 from "./Data1";
 import TableContainer from "../../components/tabel/TabelContainer";
+import { useAdminDashboardQuery } from "../../control/api/adminApi";
 
 const usersData = [
   { id: 1, first: "Mark", last: "Otto", handle: "@mdo" },
@@ -25,13 +26,15 @@ const columns = [
 ];
 
 const AdminDash = () => {
+  const { data } = useAdminDashboardQuery();
+
   return (
     <Layout>
       <div className="row" style={{ height: "100%" }}>
-        <div className="col-lg-3 col-12">
-          <Data1 />
+        <div className="col-lg-2 col-12">
+          <Data1 data={data} />
         </div>
-        <div className="col-lg-9 col-12">
+        <div className="col-lg-10 col-12">
           <p className="m-0 h5">Kelengkapan Database Peserta Didik</p>
           <TableContainer>
             <table className="table table-striped table-hover mt-2">

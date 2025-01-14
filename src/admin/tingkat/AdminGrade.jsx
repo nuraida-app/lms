@@ -1,24 +1,44 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "../components/layout/Layout";
 import FormComponent from "./FormComponent";
 import TableContainer from "../../components/tabel/TabelContainer";
+import MetaData from "../../components/meta/MetaData";
+import {
+  useDeleteGradeMutation,
+  useGetGradesQuery,
+} from "../../control/api/gradeApi";
+import { toast } from "react-toastify";
+import BtnLoader from "../../components/loader/BtnLoader";
 
-const usersData = [
-  { id: 1, first: "Mark", last: "Otto", handle: "@mdo" },
-  { id: 2, first: "Jacob", last: "Thornton", handle: "@fat" },
-  { id: 3, first: "Larry", last: "Bird", handle: "@twitter" },
-  { id: 4, first: "John", last: "Doe", handle: "@jdoe" },
-  { id: 5, first: "Jane", last: "Smith", handle: "@jsmith" },
-  { id: 6, first: "Chris", last: "Evans", handle: "@cevans" },
-  { id: 7, first: "Emily", last: "Clark", handle: "@eclark" },
-  { id: 8, first: "Michael", last: "Scott", handle: "@mscott" },
-  { id: 9, first: "Pam", last: "Beesly", handle: "@pbeesly" },
-  { id: 10, first: "Dwight", last: "Schrute", handle: "@dschrute" },
+const colomns = [
+  { label: "No" },
+  { label: "Satuan" },
+  { label: "Tingkat" },
+  { label: "Aksi" },
 ];
 
 const AdminGrade = () => {
+  const { data } = useGetGradesQuery();
+  const [deleteGrade, { data: msg, isLoading, isSuccess, error, reset }] =
+    useDeleteGradeMutation();
+
+  const delData = (id) => deleteGrade(id);
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success(msg.message);
+      reset();
+    }
+
+    if (error) {
+      toast.error(error.data.message);
+      reset();
+    }
+  }, [msg, isSuccess, error]);
+
   return (
     <Layout>
+      <MetaData title={"Admin Tingkat"} />
       <div className="row" style={{ height: "100%" }}>
         <div className="col-lg-3 col-12">
           <FormComponent />
@@ -28,29 +48,35 @@ const AdminGrade = () => {
             <table className="table table-striped table-hover">
               <thead>
                 <tr>
-                  <th scope="col" className="text-center">
-                    #
-                  </th>
-                  <th scope="col" className="text-center">
-                    First
-                  </th>
-                  <th scope="col" className="text-center">
-                    Last
-                  </th>
-                  <th scope="col" className="text-center">
-                    Handle
-                  </th>
+                  {colomns.map((item, i) => (
+                    <th key={i} scope="col" className="text-center">
+                      {item.label}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
-                {usersData.map((user, index) => (
-                  <tr key={user.id}>
+                {data?.map((item, index) => (
+                  <tr key={item.id}>
                     <th scope="row" className="text-center">
                       {index + 1}
                     </th>
-                    <td>{user.first}</td>
-                    <td>{user.last}</td>
-                    <td>{user.handle}</td>
+                    <td>{item.homebase}</td>
+                    <td className="text-center">{item.grade}</td>
+                    <td>
+                      <div className="d-flex align-items-center justify-content-center gap-2">
+                        {isLoading ? (
+                          <BtnLoader />
+                        ) : (
+                          <button
+                            className="btn btn-danger"
+                            onClick={() => delData(item.id)}
+                          >
+                            - Hapus
+                          </button>
+                        )}
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>

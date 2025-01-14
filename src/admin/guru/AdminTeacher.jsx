@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import Layout from "../components/layout/Layout";
 import FormComponent from "./FormComponent";
 import TableContainer from "../../components/tabel/TabelContainer";
+import { useGetTeachersQuery } from "../../control/api/teacherApi";
 
 const usersData = [
   { id: 1, first: "Mark", last: "Otto", handle: "@mdo" },
@@ -16,41 +17,88 @@ const usersData = [
   { id: 10, first: "Dwight", last: "Schrute", handle: "@dschrute" },
 ];
 
+const colums = [
+  { label: "No" },
+  { label: "NIP" },
+  { label: "Nama" },
+  { label: "Mapel" },
+  { label: "Wali Kelas" },
+  { label: "Kelas" },
+  { label: "Aksi" },
+];
+
 const CenterTeacher = () => {
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [search, setSearch] = useState("");
+
+  const { data: rowData = {} } = useGetTeachersQuery({ page, limit, search });
+  const { teachers = [], totalPages, total } = rowData;
+
   return (
-    <Layout>
+    <Layout title={"Daftar Guru"}>
       <div className="row" style={{ height: "100%" }}>
         <div className="col-lg-3 col-12">
           <FormComponent />
         </div>
         <div className="col-lg-9 col-12">
-          <TableContainer>
+          <TableContainer
+            page={page}
+            setPage={(e) => setPage(e)}
+            setLimit={(e) => setLimit(e)}
+            onValue={(e) => setSearch(e)}
+            totalPages={totalPages}
+          >
+            <div className="d-flex align-items-center justify-content-between">
+              <p className="h6">
+                Jumlah Guru: <span>{total}</span>
+              </p>
+
+              <button className="btn btn-danger">Kosongkan Data</button>
+            </div>
             <table className="table table-striped table-hover mt-2">
               <thead>
                 <tr>
-                  <th scope="col" className="text-center">
-                    #
-                  </th>
-                  <th scope="col" className="text-center">
-                    First
-                  </th>
-                  <th scope="col" className="text-center">
-                    Last
-                  </th>
-                  <th scope="col" className="text-center">
-                    Handle
-                  </th>
+                  {colums?.map((column) => (
+                    <th key={column.label} scope="col" className="text-center">
+                      {column.label}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
-                {usersData.map((user, index) => (
-                  <tr key={user.id}>
-                    <th scope="row" className="text-center">
-                      {index + 1}
+                {teachers.map((teacher, index) => (
+                  <tr key={teacher.id}>
+                    <th scope="row" className="align-middle text-center">
+                      {(page - 1) * limit + index + 1}
                     </th>
-                    <td>{user.first}</td>
-                    <td>{user.last}</td>
-                    <td>{user.handle}</td>
+                    <td className="align-middle text-center">{teacher.nip}</td>
+                    <td className="align-middle">{teacher.name}</td>
+                    <td className="align-middle">
+                      {teacher.subjects.map((subject, index) => (
+                        <p key={index} className="m-0">
+                          {subject.subject}
+                        </p>
+                      ))}
+                    </td>
+                    <td className="align-middle text-center">
+                      <input
+                        type="checkbox"
+                        name=""
+                        id=""
+                        checked={teacher.homeroom === 1 ? "checked" : null}
+                        readOnly
+                      />
+                    </td>
+                    <td className="align-middle text-center">
+                      {teacher.class}
+                    </td>
+                    <td className="align-middle">
+                      <div className="d-flex align-items-center justify-content-center gap-2">
+                        <button className="btn btn-warning">Edit</button>
+                        <button className="btn btn-danger">Hapus</button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>

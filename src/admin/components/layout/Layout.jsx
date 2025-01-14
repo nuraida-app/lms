@@ -1,15 +1,48 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AdminMenus } from "./Menus";
+import MetaData from "../../../components/meta/MetaData";
+import { useDispatch, useSelector } from "react-redux";
+import { setLogout } from "../../../control/slice/authSlice";
+import { useLogoutMutation } from "../../../control/api/authApi";
+import Protected from "../../../components/otentikasi/Protected";
 
-const Layout = ({ children }) => {
+const Layout = ({ children, title }) => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { user } = useSelector((state) => state.auth);
+  const [logout, { isloading, error }] = useLogoutMutation();
 
   const goToLink = (link) => {
     navigate(link);
   };
+
+  const logutHandler = async () => {
+    try {
+      await logout().unwrap();
+
+      dispatch(setLogout());
+
+      navigate("/");
+    } catch (error) {
+      console.log(error.data.message);
+    }
+  };
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (user?.role !== "admin") {
+        navigate("/");
+      }
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [user, navigate]);
+
   return (
     <Fragment>
+      <Protected roles={["admin"]} />
+      <MetaData title={title} />
       <div className="container-fluid fixed-top bg-info">
         <nav
           className="navbar navbar-expand-lg"
@@ -20,7 +53,7 @@ const Layout = ({ children }) => {
               className="navbar-brand col-lg-2 me-0 text-white"
               href="/admin-dashboard"
             >
-              Admin Satuan Pendidikan
+              {user?.name}
             </a>
 
             <button
@@ -50,7 +83,9 @@ const Layout = ({ children }) => {
                   </button>
                 ))}
 
-                <button className="btn btn-danger">Logout</button>
+                <button className="btn btn-danger" onClick={logutHandler}>
+                  Logout
+                </button>
               </div>
             </div>
           </div>
