@@ -174,7 +174,7 @@ router.get(
 router.get("/data-admin", authorize("admin"), async (req, res) => {
   try {
     const teachers = await client.query(
-      `SELECT * FROM user_teacher WHERE homebase_id = $1`,
+      `SELECT * FROM user_teacher WHERE $1 = ANY(homebase_id)`,
       [req.user.homebase_id]
     );
     const students = await client.query(
@@ -186,6 +186,7 @@ router.get("/data-admin", authorize("admin"), async (req, res) => {
       .status(200)
       .json({ teachers: teachers.rowCount, students: students.rowCount });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ error: error.message });
   }
 });

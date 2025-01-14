@@ -8,50 +8,88 @@ const router = express.Router();
 // Mendaftarkan guru
 router.post("/create", authorize("admin"), async (req, res) => {
   try {
-    const { nip, name, subjectCodes, homeIds, classCode, homeroom } = req.body;
+    const { nip, name, subjectCodes, homeIds, classCode, homeroom, id } =
+      req.body;
 
     const password = "12345678";
     const role = "teacher";
 
-    const userChecking = await client.query(
-      "SELECT * FROM user_teacher WHERE nip = $1",
-      [nip]
-    );
-
-    if (userChecking.rowCount > 0)
-      return res.status(500).json({ message: "NIP sudah digunakan" });
-
-    bcrypt.hash(password, 10, async (err, hash) => {
-      if (err) {
-        return res.status(500).json({ message: err.message });
-      }
-
-      const insertionQuery =
-        "INSERT INTO user_teacher " +
-        "(nip, homebase_id, name, subject_code, homeroom, class_code, password, role) " +
-        "VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *";
-
-      const insertionValues = [
-        nip,
-        homeIds,
-        name,
-        subjectCodes,
-        homeroom,
-        classCode,
-        hash,
-        role,
-      ];
-
+    if (id) {
+      // Jika ID ada, lakukan update pada user_teacher
       try {
-        const process = await client.query(insertionQuery, insertionValues);
-        const user = process.rows[0];
+        const updateQuery = `UPDATE user_teacher SET nip = $1, homebase_id = $2, 
+          name = $3, subject_code = $4, homeroom = $5, 
+          class_code = $6 WHERE id = $7 RETURNING *`;
 
-        return res.status(200).json({ message: "Berhasil ditambahkan" });
+        const updateValues = [
+          nip,
+          homeIds,
+          name,
+          subjectCodes,
+          homeroom,
+          classCode || null,
+          id,
+        ];
+
+        const updateResult = await client.query(updateQuery, updateValues);
+
+        if (updateResult.rowCount === 0) {
+          return res.status(404).json({ message: "Data tidak ditemukan" });
+        }
+
+        return res.status(200).json({
+          message: "Data berhasil diperbarui",
+          data: updateResult.rows[0],
+        });
       } catch (error) {
         console.log(error);
         return res.status(500).json({ message: error.message });
       }
-    });
+    } else {
+      // Jika ID tidak ada, lakukan insert baru
+      const userChecking = await client.query(
+        "SELECT * FROM user_teacher WHERE nip = $1",
+        [nip]
+      );
+
+      if (userChecking.rowCount > 0) {
+        return res.status(500).json({ message: "NIP sudah digunakan" });
+      }
+
+      bcrypt.hash(password, 10, async (err, hash) => {
+        if (err) {
+          return res.status(500).json({ message: err.message });
+        }
+
+        const insertionQuery =
+          "INSERT INTO user_teacher " +
+          "(nip, homebase_id, name, subject_code, homeroom, class_code, password, role) " +
+          "VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *";
+
+        const insertionValues = [
+          nip,
+          homeIds,
+          name,
+          subjectCodes,
+          homeroom,
+          classCode || null,
+          hash,
+          role,
+        ];
+
+        try {
+          const process = await client.query(insertionQuery, insertionValues);
+          const user = process.rows[0];
+
+          return res
+            .status(200)
+            .json({ message: "Berhasil ditambahkan", data: user });
+        } catch (error) {
+          console.log(error);
+          return res.status(500).json({ message: error.message });
+        }
+      });
+    }
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: error.message });
@@ -87,10 +125,17 @@ router.post("/upload", authorize("admin"), async (req, res) => {
             });
           }
           client.query(
-            "INSERT INTO teachers " +
+            "INSERT INTO user_teacher " +
               "(nip, name, subject_code, password, role, homebase_id) " +
               "VALUES ($1, $2, $3, $4, $5, $6)",
-            [teacher[0], teacher[1], `{${teacher[2]}}`, hash, role, homebase],
+            [
+              teacher[0],
+              teacher[1],
+              `{${teacher[2]}}`,
+              hash,
+              role,
+              `{${homebase}}`,
+            ],
             (err, result) => {
               if (err) {
                 console.error(err);
@@ -120,9 +165,8 @@ router.post("/upload", authorize("admin"), async (req, res) => {
 router.get("/get", authorize("admin", "super-admin"), async (req, res) => {
   try {
     const { role, homebase_id } = req.user;
-    const { page = 1, limit = 10, search = "" } = req.query; // Default values for page and limit
+    const { page = 1, limit = 10, search = "" } = req.query;
 
-    // Validate and parse page and limit
     const offset = (parseInt(page) - 1) * parseInt(limit);
     const queryLimit = parseInt(limit);
 
@@ -141,13 +185,13 @@ router.get("/get", authorize("admin", "super-admin"), async (req, res) => {
           classes.name AS class, 
           COALESCE(
             ARRAY_AGG(
-              json_build_object('id', subjects.code, 'code', subjects.code, 'subject', subjects.name)
+              json_build_object('id', subjects.id, 'code', subjects.code, 'subject', subjects.name)
             ) FILTER (WHERE subjects.code IS NOT NULL), 
             '{}'::json[]
           ) AS subjects 
         FROM user_teacher 
         LEFT JOIN unnest(user_teacher.subject_code) AS teacher_subject_code ON true
-        LEFT JOIN subjects ON subjects.code = teacher_subject_code 
+        LEFT JOIN subjects ON subjects.code = teacher_subject_code
         INNER JOIN homebase ON homebase.id = ANY(user_teacher.homebase_id) 
         LEFT JOIN classes ON classes.code = user_teacher.class_code 
         WHERE user_teacher.name ILIKE $3
@@ -160,7 +204,7 @@ router.get("/get", authorize("admin", "super-admin"), async (req, res) => {
           user_teacher.homeroom, 
           classes.name 
         ORDER BY user_teacher.name ASC
-        LIMIT $1 OFFSET $2
+        LIMIT $1 OFFSET $2;
       `;
       queryParams.push(`%${search}%`);
     } else {
@@ -174,13 +218,13 @@ router.get("/get", authorize("admin", "super-admin"), async (req, res) => {
           classes.name AS class, 
           COALESCE(
             ARRAY_AGG(
-              json_build_object('id', subjects.code, 'code', subjects.code, 'subject', subjects.name)
+              json_build_object('id', subjects.id, 'code', subjects.code, 'subject', subjects.name)
             ) FILTER (WHERE subjects.code IS NOT NULL), 
             '{}'::json[]
           ) AS subjects 
         FROM user_teacher 
         LEFT JOIN unnest(user_teacher.subject_code) AS teacher_subject_code ON true
-        LEFT JOIN subjects ON subjects.code = teacher_subject_code 
+        LEFT JOIN subjects ON subjects.code = teacher_subject_code
         INNER JOIN homebase ON homebase.id = ANY(user_teacher.homebase_id) 
         LEFT JOIN classes ON classes.code = user_teacher.class_code 
         WHERE $3 = ANY(user_teacher.homebase_id) AND user_teacher.name ILIKE $4
@@ -192,15 +236,13 @@ router.get("/get", authorize("admin", "super-admin"), async (req, res) => {
           user_teacher.homeroom, 
           classes.name 
         ORDER BY user_teacher.name ASC
-        LIMIT $1 OFFSET $2
+        LIMIT $1 OFFSET $2;
       `;
       queryParams.push(homebase_id, `%${search}%`);
     }
 
-    // Execute the query
     const data = await client.query(query, queryParams);
 
-    // Get total count for pagination metadata
     const countQuery =
       role === "super-admin"
         ? `SELECT COUNT(*) FROM user_teacher WHERE name ILIKE $1`
@@ -225,28 +267,29 @@ router.get("/detail/:id", authorize("admin"), async (req, res) => {
   try {
     const data = await client.query(
       `SELECT 
-          teachers.id, 
-          teachers.nip, 
-          teachers.name, 
-          teachers.email, 
-          teachers.subject_code, 
+          user_teacher.id, 
+          user_teacher.nip, 
+          user_teacher.name, 
+          user_teacher.email, 
+          user_teacher.subject_code,
+          user_teacher.homebase_id, 
           homebase.name AS homebase, 
-          teachers.homeroom, 
+          user_teacher.homeroom, 
           classes.name AS class, 
-          teachers.class_code, 
+          user_teacher.class_code, 
           array_agg(subjects.name) AS subjects
         FROM 
-          teachers 
+          user_teacher 
+        INNER JOIN homebase ON homebase.id = ANY(user_teacher.homebase_id)
         LEFT JOIN 
-          homebase ON homebase.id = teachers.homebase_id 
+          classes ON classes.code = user_teacher.class_code 
         LEFT JOIN 
-          classes ON classes.code = teachers.class_code 
-        LEFT JOIN 
-          subjects ON subjects.code = ANY(teachers.subject_code) 
+          subjects ON subjects.code = ANY(user_teacher.subject_code) 
         WHERE 
-          teachers.id = $1 
+          user_teacher.id = $1 
         GROUP BY 
-          teachers.id, teachers.nip, teachers.name, teachers.email, homebase.name, teachers.homeroom, classes.name, teachers.class_code`,
+          user_teacher.id, user_teacher.nip, user_teacher.name, user_teacher.email, 
+          homebase.name, user_teacher.homeroom, classes.name, user_teacher.class_code`,
       [req.params.id]
     );
 
@@ -294,16 +337,16 @@ router.delete(
       const id = req.params.id;
 
       const data = await client.query(
-        "DELETE FROM teachers WHERE id = $1 RETURNING *",
+        "DELETE FROM user_teacher WHERE id = $1 RETURNING *",
         [id]
       );
 
       if (data.rowCount === 0) {
-        return res.status(404).json({ message: "Teacher not found" });
+        return res.status(404).json({ message: "Guru tidak ditemukan" });
       }
 
       res.status(200).json({
-        message: "Teacher is successfully deleted",
+        message: "Berhasil dihapus",
         deletedTeacher: data.rows[0],
       });
     } catch (error) {
@@ -316,11 +359,11 @@ router.delete(
 router.delete("/clear-data", authorize("admin"), async (req, res) => {
   try {
     const homebase = req.user.homebase_id;
-    await client.query("DELETE FROM teachers WHERE homebase_id = $1", [
+    await client.query("DELETE FROM user_teacher WHERE homebase_id = $1", [
       homebase,
     ]);
 
-    res.status(200).json({ message: "Teachers are successfully deleted" });
+    res.status(200).json({ message: "Berhasil dihapus" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
