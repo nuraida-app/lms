@@ -63,47 +63,51 @@ const TableContainer = ({
         </div>
       </div>
 
-      <div className="table-responsive my-2">{children}</div>
+      <div className="table-responsive my-2">
+        {children}
 
-      <nav className="d-flex justify-content-between align-items-center">
-        <ul className="pagination pagination-sm justify-content-center m-0">
-          <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
-            <button
-              className="page-link"
-              onClick={() => handlePageChange(page - 1)}
-              disabled={page === 1}
-            >
-              <Md.MdKeyboardDoubleArrowLeft />
-            </button>
-          </li>
-          {[...Array(totalPages).keys()].map((_, index) => (
+        <nav className="d-flex justify-content-between align-items-center">
+          <ul className="pagination pagination-sm justify-content-center m-0">
+            <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
+              <button
+                className="page-link"
+                onClick={() => handlePageChange(page - 1)}
+                disabled={page === 1}
+              >
+                <Md.MdKeyboardDoubleArrowLeft />
+              </button>
+            </li>
+            {[...Array(totalPages).keys()].map((_, index) => (
+              <li
+                key={index + 1}
+                className={`page-item ${page === index + 1 ? "active" : ""}`}
+              >
+                <button
+                  className="page-link"
+                  onClick={() => handlePageChange(index + 1)}
+                >
+                  {index + 1}
+                </button>
+              </li>
+            ))}
             <li
-              key={index + 1}
-              className={`page-item ${page === index + 1 ? "active" : ""}`}
+              className={`page-item ${page === totalPages ? "disabled" : ""}`}
             >
               <button
                 className="page-link"
-                onClick={() => handlePageChange(index + 1)}
+                onClick={() => handlePageChange(page + 1)}
+                disabled={page >= totalPages}
               >
-                {index + 1}
+                <Md.MdKeyboardDoubleArrowRight />
               </button>
             </li>
-          ))}
-          <li className={`page-item ${page === totalPages ? "disabled" : ""}`}>
-            <button
-              className="page-link"
-              onClick={() => handlePageChange(page + 1)}
-              disabled={page >= totalPages}
-            >
-              <Md.MdKeyboardDoubleArrowRight />
-            </button>
-          </li>
-        </ul>
+          </ul>
 
-        <div>
-          Halaman {page} dari {totalPages}
-        </div>
-      </nav>
+          <div>
+            Halaman {page} dari {totalPages}
+          </div>
+        </nav>
+      </div>
     </div>
   );
 };

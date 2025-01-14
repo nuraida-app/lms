@@ -6,9 +6,15 @@ export const quizApi = createApi({
     baseUrl: `${import.meta.env.VITE_BASE}/quiz`,
     credentials: "include",
   }),
+  tagTypes: ["Quiz"],
   endpoints: (builder) => ({
     getQuizes: builder.query({
-      query: () => "/get",
+      query: ({ page, limit, search }) => ({
+        url: "/get",
+        params: { page, limit, search },
+        method: "GET",
+      }),
+      providesTags: ["Quiz"],
     }),
     getQuiz: builder.mutation({
       query: (id) => ({
@@ -22,15 +28,7 @@ export const quizApi = createApi({
         method: "POST",
         body,
       }),
-      async onQueryStarted(queryArg, { dispatch, queryFulfilled }) {
-        await queryFulfilled;
-
-        dispatch(
-          quizApi.endpoints.getQuizes.initiate(undefined, {
-            forceRefetch: true,
-          })
-        );
-      },
+      invalidatesTags: ["Quiz"],
     }),
     updateQuiz: builder.mutation({
       query: ({ id, body }) => ({
@@ -38,15 +36,7 @@ export const quizApi = createApi({
         method: "PUT",
         body,
       }),
-      async onQueryStarted(queryArg, { dispatch, queryFulfilled }) {
-        await queryFulfilled;
-
-        dispatch(
-          quizApi.endpoints.getQuizes.initiate(undefined, {
-            forceRefetch: true,
-          })
-        );
-      },
+      invalidatesTags: ["Quiz"],
     }),
     uploadQuizes: builder.mutation({
       query: ({ id, body }) => ({
@@ -60,30 +50,14 @@ export const quizApi = createApi({
         url: `/delete/${id}`,
         method: "DELETE",
       }),
-      async onQueryStarted(queryArg, { dispatch, queryFulfilled }) {
-        await queryFulfilled;
-
-        dispatch(
-          quizApi.endpoints.getQuizes.initiate(undefined, {
-            forceRefetch: true,
-          })
-        );
-      },
+      invalidatesTags: ["Quiz"],
     }),
     clearData: builder.mutation({
       query: () => ({
         url: `/clear-data`,
         method: "DELETE",
       }),
-      async onQueryStarted(queryArg, { dispatch, queryFulfilled }) {
-        await queryFulfilled;
-
-        dispatch(
-          quizApi.endpoints.getQuizes.initiate(undefined, {
-            forceRefetch: true,
-          })
-        );
-      },
+      invalidatesTags: ["Quiz"],
     }),
   }),
 });

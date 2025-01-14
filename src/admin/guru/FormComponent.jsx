@@ -1,15 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { useGetSubjectsQuery } from "../../control/api/subjectApi";
 import { useGetHomebasesQuery } from "../../control/api/homebaseApi";
-import { useCreateTeacherMutation } from "../../control/api/teacherApi";
+import {
+  useCreateTeacherMutation,
+  useUploadTeachersMutation,
+} from "../../control/api/teacherApi";
 import { useGetClassesQuery } from "../../control/api/classApi";
 import { toast } from "react-toastify";
 import BtnLoader from "../../components/loader/BtnLoader";
+import * as XLSX from "xlsx";
 
-const FormComponent = () => {
+const FormComponent = ({ detail, id }) => {
   const page = "";
   const limit = "";
   const search = "";
+  const [file, setFile] = useState(null);
 
   const { data: homebase } = useGetHomebasesQuery();
   const { data: rowData1 = {} } = useGetClassesQuery({ page, limit, search });
@@ -18,6 +23,16 @@ const FormComponent = () => {
   const { subjects = [] } = rowData;
   const [createTeacher, { data, isSuccess, isLoading, error, reset }] =
     useCreateTeacherMutation();
+  const [
+    uploadTeachers,
+    {
+      data: msg,
+      isSuccess: uSuccess,
+      isLoading: uLoading,
+      error: uError,
+      reset: uReset,
+    },
+  ] = useUploadTeachersMutation();
 
   const [nip, setNip] = useState("");
   const [name, setName] = useState("");
@@ -40,18 +55,66 @@ const FormComponent = () => {
     );
   };
 
+  const handleHomeroom = (value) => {
+    const valid = parseInt(value);
+    setHomeroom(valid);
+    if (value === "2") {
+      setClassCode("");
+    }
+  };
+
   const submitHandler = (e) => {
     e.preventDefault();
 
-    const data = { nip, name, subjectCodes, homeIds, homeroom, classCode };
+    const data = { id, nip, name, subjectCodes, homeIds, homeroom, classCode };
 
     createTeacher(data);
+  };
+
+  const download = () => {
+    window.open("/temp/guru_template.xlsx", "_blank");
+  };
+
+  const handleFile = (e) => {
+    setFile(e.target.files[0]);
+  };
+
+  const uploadData = () => {
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: "array" });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(sheet, {
+          header: 1,
+          range: 1,
+        });
+
+        const filteredData = jsonData.filter((row) => row.length > 0);
+
+        const result = { data: filteredData };
+
+        uploadTeachers(result);
+      };
+
+      reader.readAsArrayBuffer(file);
+    }
   };
 
   useEffect(() => {
     if (isSuccess) {
       toast.success(data.message);
       reset();
+      setNip("");
+      setName("");
+      setHomeroom("");
+      setClassCode("");
+      setSubjectCodes([]);
+      setHomeIds([]);
+
+      window.location.reload();
     }
 
     if (error) {
@@ -59,6 +122,30 @@ const FormComponent = () => {
       reset();
     }
   }, [data, isSuccess, error]);
+
+  useEffect(() => {
+    if (uSuccess) {
+      toast.success(msg.message);
+      uReset();
+      setFile(null);
+    }
+
+    if (uError) {
+      toast.error(uError.data.message);
+      uReset();
+    }
+  }, [msg, uSuccess, uError]);
+
+  useEffect(() => {
+    if (detail) {
+      setNip(detail?.nip || "");
+      setName(detail?.name || "");
+      setHomeroom(detail?.homeroom || "");
+      setClassCode(detail?.class_code || "");
+      setSubjectCodes(detail?.subject_code.map(String) || []);
+      setHomeIds(detail?.homebase_id || []);
+    }
+  }, [detail, id]);
 
   return (
     <div className="mt-2 p-2 shadow rounded d-flex flex-column gap-2">
@@ -90,7 +177,7 @@ const FormComponent = () => {
           id=""
           className="form-control"
           value={homeroom}
-          onChange={(e) => setHomeroom(e.target.value)}
+          onChange={(e) => handleHomeroom(e.target.value)}
           required
         >
           <option value="" disabled hidden>
@@ -100,7 +187,7 @@ const FormComponent = () => {
           <option value="2">Tidak</option>
         </select>
 
-        {homeroom === "1" && (
+        {homeroom === 1 && (
           <div
             style={{ height: 200 }}
             className="p-2 rounded border border-sm overflow-auto"
@@ -205,13 +292,21 @@ const FormComponent = () => {
               ></button>
             </div>
             <div className="modal-body d-flex flex-column align-items-end gap-2">
-              <input type="file" name="file" className="form-control" />
-
-              <button type="button" className="btn btn-warning">
-                Template
-              </button>
+              <input
+                type="file"
+                name="file"
+                className="form-control"
+                onChange={handleFile}
+              />
             </div>
             <div className="modal-footer">
+              <button
+                type="button"
+                className="btn btn-warning"
+                onClick={download}
+              >
+                Template
+              </button>
               <button
                 type="button"
                 className="btn btn-danger"
@@ -219,9 +314,17 @@ const FormComponent = () => {
               >
                 Tutup
               </button>
-              <button type="button" className="btn btn-primary">
-                Unggah
-              </button>
+              {uLoading ? (
+                <BtnLoader />
+              ) : (
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={uploadData}
+                >
+                  Unggah
+                </button>
+              )}
             </div>
           </div>
         </div>

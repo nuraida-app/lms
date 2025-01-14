@@ -1,21 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "../components/layout/Layout";
 import FormComponent from "./FormComponent";
 import TableContainer from "../../components/tabel/TabelContainer";
-import { useGetTeachersQuery } from "../../control/api/teacherApi";
-
-const usersData = [
-  { id: 1, first: "Mark", last: "Otto", handle: "@mdo" },
-  { id: 2, first: "Jacob", last: "Thornton", handle: "@fat" },
-  { id: 3, first: "Larry", last: "Bird", handle: "@twitter" },
-  { id: 4, first: "John", last: "Doe", handle: "@jdoe" },
-  { id: 5, first: "Jane", last: "Smith", handle: "@jsmith" },
-  { id: 6, first: "Chris", last: "Evans", handle: "@cevans" },
-  { id: 7, first: "Emily", last: "Clark", handle: "@eclark" },
-  { id: 8, first: "Michael", last: "Scott", handle: "@mscott" },
-  { id: 9, first: "Pam", last: "Beesly", handle: "@pbeesly" },
-  { id: 10, first: "Dwight", last: "Schrute", handle: "@dschrute" },
-];
+import {
+  useDeleteTeacherMutation,
+  useGetTeacherQuery,
+  useGetTeachersQuery,
+} from "../../control/api/teacherApi";
+import BtnLoader from "../../components/loader/BtnLoader";
+import { toast } from "react-toastify";
 
 const colums = [
   { label: "No" },
@@ -31,15 +24,33 @@ const CenterTeacher = () => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState("");
+  const [id, setId] = useState("");
 
+  const { data: detail } = useGetTeacherQuery(id, { skip: !id });
   const { data: rowData = {} } = useGetTeachersQuery({ page, limit, search });
   const { teachers = [], totalPages, total } = rowData;
+  const [deleteTeacher, { data, isSuccess, isLoading, error, reset }] =
+    useDeleteTeacherMutation();
+
+  const deleteHandler = (id) => deleteTeacher(id);
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success(data.message);
+      reset();
+    }
+
+    if (error) {
+      toast.error(error.data.message);
+      reset();
+    }
+  }, [data, isSuccess, error]);
 
   return (
     <Layout title={"Daftar Guru"}>
       <div className="row" style={{ height: "100%" }}>
         <div className="col-lg-3 col-12">
-          <FormComponent />
+          <FormComponent detail={detail} id={id} />
         </div>
         <div className="col-lg-9 col-12">
           <TableContainer
@@ -75,9 +86,13 @@ const CenterTeacher = () => {
                     <td className="align-middle text-center">{teacher.nip}</td>
                     <td className="align-middle">{teacher.name}</td>
                     <td className="align-middle">
-                      {teacher.subjects.map((subject, index) => (
-                        <p key={index} className="m-0">
-                          {subject.subject}
+                      {[
+                        ...new Set(
+                          teacher.subjects.map((subject) => subject.subject)
+                        ),
+                      ]?.map((subjectName, index) => (
+                        <p key={`${teacher.id}-${index}`} className="m-0">
+                          {subjectName}
                         </p>
                       ))}
                     </td>
@@ -95,8 +110,22 @@ const CenterTeacher = () => {
                     </td>
                     <td className="align-middle">
                       <div className="d-flex align-items-center justify-content-center gap-2">
-                        <button className="btn btn-warning">Edit</button>
-                        <button className="btn btn-danger">Hapus</button>
+                        <button
+                          className="btn btn-warning"
+                          onClick={() => setId(teacher.id)}
+                        >
+                          Edit
+                        </button>
+                        {isLoading ? (
+                          <BtnLoader />
+                        ) : (
+                          <button
+                            className="btn btn-danger"
+                            onClick={() => deleteHandler(teacher.id)}
+                          >
+                            Hapus
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

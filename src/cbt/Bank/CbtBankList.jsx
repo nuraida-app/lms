@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Layout from "../components/Layout";
 import TableContainer from "../../components/tabel/TabelContainer";
 import Addbank from "./forms/Addbank";
@@ -30,6 +30,10 @@ const columns = [
 
 const CbtBankList = () => {
   const navigate = useNavigate();
+
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [search, setSearch] = useState("");
 
   const goToLink = (id) => navigate(`/cbt-bank-soal/${id}/soal`);
   return (
@@ -66,12 +70,12 @@ const CbtBankList = () => {
                     <td>{user.last}</td>
 
                     <td>
-                      <div className="d-flex flex-column justify-content-center gap-2">
+                      <div className="d-flex align-items-center justify-content-center gap-2">
                         <button
                           className="btn btn-success"
                           onClick={() => goToLink(index)}
                         >
-                          + Tambah Soal
+                          + Soal
                         </button>
                         <button className="btn btn-warning">Edit</button>
                         <button className="btn btn-danger">Hapus</button>

@@ -18,7 +18,7 @@ export const teacherApi = createApi({
       providesTags: ["teachers"],
     }),
     // Menampilkan guru
-    getTeacher: builder.mutation({
+    getTeacher: builder.query({
       query: (id) => ({
         url: `/detail/${id}`,
         method: "GET",
@@ -39,16 +39,6 @@ export const teacherApi = createApi({
       query: (body) => ({
         url: "/upload",
         method: "POST",
-        body,
-      }),
-      invalidatesTags: ["teachers"],
-    }),
-
-    // Mengedit guru
-    updateTeacher: builder.mutation({
-      query: ({ id, body }) => ({
-        url: `/update/${id}`,
-        method: "PUT",
         body,
       }),
       invalidatesTags: ["teachers"],
@@ -82,10 +72,9 @@ export const teacherApi = createApi({
 
 export const {
   useGetTeachersQuery,
-  useGetTeacherMutation,
+  useGetTeacherQuery,
   useCreateTeacherMutation,
   useUploadTeachersMutation,
-  useUpdateTeacherMutation,
   useDeleteTeacherMutation,
   useClearDataMutation,
   useAddAssignClassMutation,

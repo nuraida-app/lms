@@ -9,6 +9,7 @@ import { useDispatch } from "react-redux";
 import { useLoadMutation } from "./control/api/authApi";
 import MetaData from "./components/meta/MetaData";
 import { setLogin } from "./control/slice/authSlice";
+import Loader from "./components/loader/Loader";
 
 const CbtBankList = lazy(() => import("./cbt/Bank/CbtBankList"));
 const AddQuestion = lazy(() => import("./cbt/Bank/forms/AddQuestion"));
@@ -65,15 +66,7 @@ function App() {
           "LMS mempermudah pembelajaran online dengan fitur interaktif. Solusi ideal untuk pengajar dan pelajar modern."
         }
       />
-      <Suspense
-        fallback={
-          <div className="h-100 d-flex align-items-center justify-content-center">
-            <div className="spinner-border text-primary" role="status">
-              <span className="visually-hidden">Loading...</span>
-            </div>
-          </div>
-        }
-      >
+      <Suspense fallback={<Loader />}>
         <Routes>
           <Route path="/" element={<SignIn />} />
 

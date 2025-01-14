@@ -1,13 +1,16 @@
 import React, { Fragment } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { AdminMenus } from "../../admin/components/layout/Menus";
 import { TeacherMenus } from "../../guru/components/layout/Menus";
 
 const Layout = ({ children }) => {
   const navigate = useNavigate();
 
-  const role = "teacher";
-  const name = "Muajaddid Al Magribi";
+  const { user } = useSelector((state) => state.auth);
+
+  const role = user?.role;
+  const name = user?.name;
 
   const goToLink = (link) => {
     navigate(link);

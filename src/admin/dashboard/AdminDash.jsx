@@ -29,7 +29,7 @@ const AdminDash = () => {
   const { data } = useAdminDashboardQuery();
 
   return (
-    <Layout>
+    <Layout title={"Admin Dashboard"}>
       <div className="row" style={{ height: "100%" }}>
         <div className="col-lg-2 col-12">
           <Data1 data={data} />
