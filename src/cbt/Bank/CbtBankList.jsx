@@ -1,21 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import TableContainer from "../../components/tabel/TabelContainer";
 import Addbank from "./forms/Addbank";
 import { useNavigate } from "react-router-dom";
-
-const usersData = [
-  { id: 1, first: "Mark", last: "Otto", handle: "@mdo" },
-  { id: 2, first: "Jacob", last: "Thornton", handle: "@fat" },
-  { id: 3, first: "Larry", last: "Bird", handle: "@twitter" },
-  { id: 4, first: "John", last: "Doe", handle: "@jdoe" },
-  { id: 5, first: "Jane", last: "Smith", handle: "@jsmith" },
-  { id: 6, first: "Chris", last: "Evans", handle: "@cevans" },
-  { id: 7, first: "Emily", last: "Clark", handle: "@eclark" },
-  { id: 8, first: "Michael", last: "Scott", handle: "@mscott" },
-  { id: 9, first: "Pam", last: "Beesly", handle: "@pbeesly" },
-  { id: 10, first: "Dwight", last: "Schrute", handle: "@dschrute" },
-];
+import {
+  useDeleteQuizMutation,
+  useGetQuizesQuery,
+  useGetQuizQuery,
+} from "../../control/api/quizApi";
+import { toast } from "react-toastify";
+import BtnLoader from "../../components/loader/BtnLoader";
 
 const columns = [
   { label: "No" },
@@ -24,7 +18,6 @@ const columns = [
   { label: "Tingkat" },
   { label: "PG" },
   { label: "Essay" },
-
   { label: "Aksi" },
 ];
 
@@ -34,19 +27,46 @@ const CbtBankList = () => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState("");
+  const [id, setId] = useState("");
+
+  const { data: rowData = {} } = useGetQuizesQuery({ page, limit, search });
+  const { quizes = [], totalPages, total } = rowData;
+  const { data: detail } = useGetQuizQuery(id, { skip: !id });
+  const [deleteQuiz, { data, isSuccess, isLoading, error, reset }] =
+    useDeleteQuizMutation();
+
+  const handleDelete = (id) => deleteQuiz(id);
 
   const goToLink = (id) => navigate(`/cbt-bank-soal/${id}/soal`);
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success(data.message);
+      reset();
+    }
+
+    if (error) {
+      toast.error(error.data.message);
+      reset();
+    }
+  }, [data, isSuccess, error]);
   return (
     <Layout>
       <div className="row" style={{ height: "100%" }}>
         <div className="col-lg-3 col-12">
-          <Addbank />
+          <Addbank detail={detail} id={id} />
         </div>
         <div
           className="col-lg-9 cool-12"
           style={{ maxHeight: "calc(100vh - 70px)", overflow: "auto" }}
         >
-          <TableContainer>
+          <TableContainer
+            page={page}
+            setPage={(e) => setPage(e)}
+            setLimit={(e) => setLimit(e)}
+            onValue={(e) => setSearch(e)}
+            totalPages={totalPages}
+          >
             <table className="table table-striped table-hover mt-2">
               <thead>
                 <tr>
@@ -58,27 +78,41 @@ const CbtBankList = () => {
                 </tr>
               </thead>
               <tbody>
-                {usersData.map((user, index) => (
-                  <tr key={user.id}>
-                    <th scope="row" className="text-center">
-                      {index + 1}
+                {quizes.map((item, index) => (
+                  <tr key={item.id}>
+                    <th scope="row" className="align-middle text-center">
+                      {(page - 1) * limit + index + 1}
                     </th>
-                    <td>{user.first}</td>
-                    <td>{user.last}</td>
-                    <td>{user.last}</td>
-                    <td>{user.last}</td>
-                    <td>{user.last}</td>
+                    <td className="align-middle">{item.teacher}</td>
+                    <td className="align-middle">{item.quiz_name}</td>
+                    <td className="align-middle text-center">{item.grade}</td>
+                    <td className="align-middle text-center">{item.mc}</td>
+                    <td className="align-middle text-center">{item.essay}</td>
 
                     <td>
                       <div className="d-flex align-items-center justify-content-center gap-2">
                         <button
                           className="btn btn-success"
-                          onClick={() => goToLink(index)}
+                          onClick={() => goToLink(item.id)}
                         >
-                          + Soal
+                          Soal
                         </button>
-                        <button className="btn btn-warning">Edit</button>
-                        <button className="btn btn-danger">Hapus</button>
+                        <button
+                          className="btn btn-warning"
+                          onClick={() => setId(item.id)}
+                        >
+                          Edit
+                        </button>
+                        {isLoading ? (
+                          <BtnLoader />
+                        ) : (
+                          <button
+                            className="btn btn-danger"
+                            onClick={() => handleDelete(item.id)}
+                          >
+                            Hapus
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

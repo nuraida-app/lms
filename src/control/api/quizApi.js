@@ -16,7 +16,7 @@ export const quizApi = createApi({
       }),
       providesTags: ["Quiz"],
     }),
-    getQuiz: builder.mutation({
+    getQuiz: builder.query({
       query: (id) => ({
         url: `/detail/${id}`,
         method: "GET",
@@ -64,7 +64,7 @@ export const quizApi = createApi({
 
 export const {
   useGetQuizesQuery,
-  useGetQuizMutation,
+  useGetQuizQuery,
   useCreateQuizMutation,
   useUpdateQuizMutation,
   useUploadQuizesMutation,
