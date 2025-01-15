@@ -165,98 +165,173 @@ router.post("/upload", authorize("admin"), async (req, res) => {
 router.get("/get", authorize("admin", "super-admin"), async (req, res) => {
   try {
     const { role, homebase_id } = req.user;
-    const { page = 1, limit = 10, search = "" } = req.query;
-
-    const offset = (parseInt(page) - 1) * parseInt(limit);
-    const queryLimit = parseInt(limit);
+    const { page, limit, search } = req.query;
 
     let query;
-    let queryParams = [queryLimit, offset];
+    let queryParams = [];
 
-    if (role === "super-admin") {
-      query = `
-        SELECT 
-          user_teacher.id, 
-          user_teacher.nip, 
-          user_teacher.name, 
-          user_teacher.email, 
-          homebase.name AS homebase_name, 
-          user_teacher.homeroom, 
-          classes.name AS class, 
-          COALESCE(
-            ARRAY_AGG(
-              json_build_object('id', subjects.id, 'code', subjects.code, 'subject', subjects.name)
-            ) FILTER (WHERE subjects.code IS NOT NULL), 
-            '{}'::json[]
-          ) AS subjects 
-        FROM user_teacher 
-        LEFT JOIN unnest(user_teacher.subject_code) AS teacher_subject_code ON true
-        LEFT JOIN subjects ON subjects.code = teacher_subject_code
-        INNER JOIN homebase ON homebase.id = ANY(user_teacher.homebase_id) 
-        LEFT JOIN classes ON classes.code = user_teacher.class_code 
-        WHERE user_teacher.name ILIKE $3
-        GROUP BY 
-          user_teacher.id, 
-          user_teacher.nip, 
-          user_teacher.name, 
-          user_teacher.email, 
-          homebase.name, 
-          user_teacher.homeroom, 
-          classes.name 
-        ORDER BY user_teacher.name ASC
-        LIMIT $1 OFFSET $2;
-      `;
-      queryParams.push(`%${search}%`);
+    if (!page && !limit && !search) {
+      // Jika page, limit, dan search tidak ada, tampilkan semua guru berdasarkan homebase_id
+      if (role === "super-admin") {
+        query = `
+          SELECT 
+            user_teacher.id, 
+            user_teacher.nip, 
+            user_teacher.name, 
+            user_teacher.email, 
+            homebase.name AS homebase_name, 
+            user_teacher.homeroom, 
+            classes.name AS class, 
+            COALESCE(
+              ARRAY_AGG(
+                json_build_object('id', subjects.id, 'code', subjects.code, 'subject', subjects.name)
+              ) FILTER (WHERE subjects.code IS NOT NULL), 
+              '{}'::json[]
+            ) AS subjects 
+          FROM user_teacher 
+          LEFT JOIN unnest(user_teacher.subject_code) AS teacher_subject_code ON true
+          LEFT JOIN subjects ON subjects.code = teacher_subject_code
+          INNER JOIN homebase ON homebase.id = ANY(user_teacher.homebase_id) 
+          LEFT JOIN classes ON classes.code = user_teacher.class_code 
+          GROUP BY 
+            user_teacher.id, 
+            user_teacher.nip, 
+            user_teacher.name, 
+            user_teacher.email, 
+            homebase.name, 
+            user_teacher.homeroom, 
+            classes.name 
+          ORDER BY user_teacher.name ASC;
+        `;
+      } else {
+        query = `
+          SELECT 
+            user_teacher.id, 
+            user_teacher.nip, 
+            user_teacher.name, 
+            user_teacher.email, 
+            user_teacher.homeroom, 
+            classes.name AS class, 
+            COALESCE(
+              ARRAY_AGG(
+                json_build_object('id', subjects.id, 'code', subjects.code, 'subject', subjects.name)
+              ) FILTER (WHERE subjects.code IS NOT NULL), 
+              '{}'::json[]
+            ) AS subjects 
+          FROM user_teacher 
+          LEFT JOIN unnest(user_teacher.subject_code) AS teacher_subject_code ON true
+          LEFT JOIN subjects ON subjects.code = teacher_subject_code
+          INNER JOIN homebase ON homebase.id = ANY(user_teacher.homebase_id) 
+          LEFT JOIN classes ON classes.code = user_teacher.class_code 
+          WHERE $1 = ANY(user_teacher.homebase_id)
+          GROUP BY 
+            user_teacher.id, 
+            user_teacher.nip, 
+            user_teacher.name, 
+            user_teacher.email, 
+            user_teacher.homeroom, 
+            classes.name 
+          ORDER BY user_teacher.name ASC;
+        `;
+        queryParams.push(homebase_id);
+      }
     } else {
-      query = `
-        SELECT 
-          user_teacher.id, 
-          user_teacher.nip, 
-          user_teacher.name, 
-          user_teacher.email, 
-          user_teacher.homeroom, 
-          classes.name AS class, 
-          COALESCE(
-            ARRAY_AGG(
-              json_build_object('id', subjects.id, 'code', subjects.code, 'subject', subjects.name)
-            ) FILTER (WHERE subjects.code IS NOT NULL), 
-            '{}'::json[]
-          ) AS subjects 
-        FROM user_teacher 
-        LEFT JOIN unnest(user_teacher.subject_code) AS teacher_subject_code ON true
-        LEFT JOIN subjects ON subjects.code = teacher_subject_code
-        INNER JOIN homebase ON homebase.id = ANY(user_teacher.homebase_id) 
-        LEFT JOIN classes ON classes.code = user_teacher.class_code 
-        WHERE $3 = ANY(user_teacher.homebase_id) AND user_teacher.name ILIKE $4
-        GROUP BY 
-          user_teacher.id, 
-          user_teacher.nip, 
-          user_teacher.name, 
-          user_teacher.email, 
-          user_teacher.homeroom, 
-          classes.name 
-        ORDER BY user_teacher.name ASC
-        LIMIT $1 OFFSET $2;
-      `;
-      queryParams.push(homebase_id, `%${search}%`);
+      // Jika page, limit, atau search ada, gunakan logika sebelumnya
+      const offset = (parseInt(page) - 1) * parseInt(limit);
+      const queryLimit = parseInt(limit);
+
+      if (role === "super-admin") {
+        query = `
+          SELECT 
+            user_teacher.id, 
+            user_teacher.nip, 
+            user_teacher.name, 
+            user_teacher.email, 
+            homebase.name AS homebase_name, 
+            user_teacher.homeroom, 
+            classes.name AS class, 
+            COALESCE(
+              ARRAY_AGG(
+                json_build_object('id', subjects.id, 'code', subjects.code, 'subject', subjects.name)
+              ) FILTER (WHERE subjects.code IS NOT NULL), 
+              '{}'::json[]
+            ) AS subjects 
+          FROM user_teacher 
+          LEFT JOIN unnest(user_teacher.subject_code) AS teacher_subject_code ON true
+          LEFT JOIN subjects ON subjects.code = teacher_subject_code
+          INNER JOIN homebase ON homebase.id = ANY(user_teacher.homebase_id) 
+          LEFT JOIN classes ON classes.code = user_teacher.class_code 
+          WHERE user_teacher.name ILIKE $3
+          GROUP BY 
+            user_teacher.id, 
+            user_teacher.nip, 
+            user_teacher.name, 
+            user_teacher.email, 
+            homebase.name, 
+            user_teacher.homeroom, 
+            classes.name 
+          ORDER BY user_teacher.name ASC
+          LIMIT $1 OFFSET $2;
+        `;
+        queryParams.push(queryLimit, offset, `%${search}%`);
+      } else {
+        query = `
+          SELECT 
+            user_teacher.id, 
+            user_teacher.nip, 
+            user_teacher.name, 
+            user_teacher.email, 
+            user_teacher.homeroom, 
+            classes.name AS class, 
+            COALESCE(
+              ARRAY_AGG(
+                json_build_object('id', subjects.id, 'code', subjects.code, 'subject', subjects.name)
+              ) FILTER (WHERE subjects.code IS NOT NULL), 
+              '{}'::json[]
+            ) AS subjects 
+          FROM user_teacher 
+          LEFT JOIN unnest(user_teacher.subject_code) AS teacher_subject_code ON true
+          LEFT JOIN subjects ON subjects.code = teacher_subject_code
+          INNER JOIN homebase ON homebase.id = ANY(user_teacher.homebase_id) 
+          LEFT JOIN classes ON classes.code = user_teacher.class_code 
+          WHERE $3 = ANY(user_teacher.homebase_id) AND user_teacher.name ILIKE $4
+          GROUP BY 
+            user_teacher.id, 
+            user_teacher.nip, 
+            user_teacher.name, 
+            user_teacher.email, 
+            user_teacher.homeroom, 
+            classes.name 
+          ORDER BY user_teacher.name ASC
+          LIMIT $1 OFFSET $2;
+        `;
+        queryParams.push(queryLimit, offset, homebase_id, `%${search}%`);
+      }
     }
 
     const data = await client.query(query, queryParams);
 
-    const countQuery =
-      role === "super-admin"
-        ? `SELECT COUNT(*) FROM user_teacher WHERE name ILIKE $1`
-        : `SELECT COUNT(*) FROM user_teacher WHERE $1 = ANY(homebase_id) AND name ILIKE $2`;
-    const countParams =
-      role === "super-admin" ? [`%${search}%`] : [homebase_id, `%${search}%`];
-    const countResult = await client.query(countQuery, countParams);
-    const totalCount = parseInt(countResult.rows[0].count);
+    if (!page && !limit && !search) {
+      // Jika tidak ada pagination, tidak perlu menghitung total
+      res.status(200).json({
+        teachers: data.rows,
+      });
+    } else {
+      const countQuery =
+        role === "super-admin"
+          ? `SELECT COUNT(*) FROM user_teacher WHERE name ILIKE $1`
+          : `SELECT COUNT(*) FROM user_teacher WHERE $1 = ANY(homebase_id) AND name ILIKE $2`;
+      const countParams =
+        role === "super-admin" ? [`%${search}%`] : [homebase_id, `%${search}%`];
+      const countResult = await client.query(countQuery, countParams);
+      const totalCount = parseInt(countResult.rows[0].count);
 
-    res.status(200).json({
-      teachers: data.rows,
-      total: totalCount,
-      totalPages: Math.ceil(totalCount / queryLimit),
-    });
+      res.status(200).json({
+        teachers: data.rows,
+        total: totalCount,
+        totalPages: Math.ceil(totalCount / (limit ? parseInt(limit) : 1)),
+      });
+    }
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

@@ -1,138 +1,143 @@
 import express from "express";
 import { client } from "../../connection/connection.js";
-import {
-  authenticatedUser,
-  authorizeRoles,
-} from "../../middleware/authenticate.js";
+import { authorize } from "../../middleware/authenticate.js";
 
 const router = express.Router();
 
 // Menambahkan bank soal
-router.post(
-  "/create",
-  authenticatedUser,
-  authorizeRoles("admin", "teacher"),
-  async (req, res) => {
-    try {
-      const { teacherId, gradeId, quizName, shuffle, mc, essay } = req.body;
+router.post("/create", authorize("admin", "teacher"), async (req, res) => {
+  try {
+    const { id, teacherId, gradeId, quizName, shuffle, mc, essay, homeId } =
+      req.body;
 
-      // Normalisasi nama bank soal dengan menghilangkan spasi dan mengubah menjadi huruf kecil
-      const normalized_name = quizName.toLowerCase().replace(/\s+/g, "");
+    // Normalisasi nama bank soal dengan menghilangkan spasi dan mengubah menjadi huruf kecil
+    const normalized_name = quizName.toLowerCase().replace(/\s+/g, "");
 
-      // Pencarian bank soal dengan nama yang sudah dinormalisasi
+    // Jika `id` ada, lakukan update
+    if (id) {
+      // Periksa apakah nama bank soal sudah digunakan oleh quiz lain
       const checking = await client.query(
-        "SELECT * FROM quizzes WHERE REPLACE(LOWER(quiz_name), ' ', '') = $1",
-        [normalized_name]
+        "SELECT * FROM quizzes WHERE REPLACE(LOWER(quiz_name), ' ', '') = $1 AND id != $2",
+        [normalized_name, id]
       );
 
       if (checking.rowCount > 0) {
-        return res.status(500).json({ message: "Quiz Name has been used" });
-      } else {
-        const data = await client.query(
-          "INSERT INTO quizzes (teacher_id, grade_id, quiz_name, shuffle, mc_weight, essay_weight, homebase_id) " +
-            "VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
-          [
-            teacherId,
-            gradeId,
-            quizName,
-            shuffle,
-            mc,
-            essay,
-            req.user.homebase_id,
-          ]
-        );
-
-        const exam = data.rows[0];
-
-        res.status(200).json({ message: "Quiz is successfully added", exam });
+        return res
+          .status(500)
+          .json({ message: "Nama Bank soal sudah digunakan" });
       }
-    } catch (error) {
-      return res.status(500).json({ message: error.message });
-    }
-  }
-);
 
-// Memperbarui bank soal
-router.put(
-  `/update/:id`,
-  authenticatedUser,
-  authorizeRoles("admin", "teacher"),
-  async (req, res) => {
-    try {
-      const { teacherId, gradeId, quizName, shuffle, mc, essay } = req.body;
-
-      const process = await client.query(
-        "UPDATE quizzes SET teacher_id = $1, grade_id = $2, " +
-          "quiz_name = $3, shuffle = $4, " +
-          "mc_weight = $5, essay_weight = $6 " +
-          "WHERE id = $7 RETURNING *",
-        [teacherId, gradeId, quizName, shuffle, mc, essay, req.params.id]
-      );
-
+      // Update data jika id ditemukan
       await client.query(
-        "UPDATE schedules SET teacher_id = $1, grade_id = $2 WHERE quiz_id = $3",
-        [teacherId, gradeId, req.params.id]
+        `UPDATE quizzes 
+         SET teacher_id = $1, grade_id = $2, quiz_name = $3, 
+             shuffle = $4, mc_weight = $5, essay_weight = $6, homebase_id = $7 
+         WHERE id = $8 RETURNING *`,
+        [teacherId, gradeId, quizName, shuffle, mc, essay, homeId, id]
       );
 
-      if (process.rowCount > 0) {
-        res.status(200).json({ message: "Quiz is successfully updated" });
-      } else {
-        res.status(404).json({ message: "Quiz not found" });
-      }
-    } catch (error) {
-      return res.status(500).json({ message: error.message });
+      return res.status(200).json({ message: "Berhasil diperbarui" });
     }
+
+    // Jika `id` tidak ada, lakukan insert data baru
+    const checking = await client.query(
+      "SELECT * FROM quizzes WHERE REPLACE(LOWER(quiz_name), ' ', '') = $1",
+      [normalized_name]
+    );
+
+    if (checking.rowCount > 0) {
+      return res
+        .status(500)
+        .json({ message: "Nama bank soal sudah digunakan" });
+    } else {
+      await client.query(
+        `INSERT INTO quizzes (teacher_id, grade_id, quiz_name, 
+          shuffle, mc_weight, essay_weight, homebase_id) 
+          VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+        [teacherId, gradeId, quizName, shuffle, mc, essay, homeId]
+      );
+
+      return res.status(200).json({ message: "Berhasil ditambahkan" });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: error.message });
   }
-);
+});
 
 // Menampilkan bank soal
-router.get(
-  "/get",
-  authenticatedUser,
-  authorizeRoles("admin", "teacher"),
-  async (req, res) => {
-    try {
-      const teacher = req.user.role === "teacher";
-      const admin = req.user.role === "admin";
+router.get("/get", authorize("admin", "teacher"), async (req, res) => {
+  try {
+    const teacher = req.user.role === "teacher";
+    const admin = req.user.role === "admin";
 
-      let query =
-        "SELECT quizzes.id, quizzes.quiz_name, quizzes.teacher_id, teachers.name AS teacher, " +
-        "grades.grade, " +
-        "(SELECT COUNT(*) FROM questions WHERE questions.quiz_id = quizzes.id AND questions.type = 1) AS mc, " +
-        "(SELECT COUNT(*) FROM questions WHERE questions.quiz_id = quizzes.id AND questions.type = 2) AS essay " +
-        "FROM quizzes " +
-        "INNER JOIN teachers ON quizzes.teacher_id = teachers.id " +
-        "INNER JOIN grades ON quizzes.grade_id = grades.id ";
+    let query = `SELECT quizzes.id, quizzes.quiz_name, quizzes.teacher_id, user_teacher.name AS teacher, 
+      quizzes.shuffle, quizzes.grade_id, quizzes.homebase_id, grades.grade, 
+      (SELECT COUNT(*) FROM questions WHERE questions.quiz_id = quizzes.id AND questions.type = 1) AS mc, 
+      (SELECT COUNT(*) FROM questions WHERE questions.quiz_id = quizzes.id AND questions.type = 2) AS essay
+      FROM quizzes
+      INNER JOIN user_teacher ON quizzes.teacher_id = user_teacher.id 
+      INNER JOIN grades ON quizzes.grade_id = grades.id `;
 
-      let queryParams = [];
+    let queryParams = [];
 
-      if (teacher) {
-        query += "WHERE quizzes.teacher_id = $1 ";
-        queryParams.push(req.user.id);
-      }
-
-      if (admin) {
-        query += "WHERE quizzes.homebase_id = $1 ";
-        queryParams.push(req.user.homebase_id);
-      }
-
-      query += "ORDER BY CAST(quizzes.grade_id AS INTEGER) ASC";
-
-      const data = await client.query(query, queryParams);
-
-      res.status(200).json(data.rows);
-    } catch (error) {
-      console.log(error);
-      return res.status(500).json({ message: error.message });
+    // Filtering by role
+    if (teacher) {
+      query += "WHERE quizzes.teacher_id = $1 ";
+      queryParams.push(req.user.id);
     }
+
+    if (admin) {
+      query += "WHERE quizzes.homebase_id = $1 ";
+      queryParams.push(req.user.homebase_id);
+    }
+
+    // Adding search filter
+    const { page = 1, limit = 10, search = "" } = req.query;
+    const offset = (page - 1) * limit;
+
+    if (search) {
+      const searchCondition = `${
+        queryParams.length > 0 ? "AND" : "WHERE"
+      } (quizzes.quiz_name ILIKE $${
+        queryParams.length + 1
+      } OR user_teacher.name ILIKE $${queryParams.length + 1})`;
+      query += searchCondition;
+      queryParams.push(`%${search}%`);
+    }
+
+    // Count total records for pagination
+    const countQuery = `SELECT COUNT(*) AS total FROM (${query}) AS subquery`;
+    const countResult = await client.query(countQuery, queryParams);
+    const total = parseInt(countResult.rows[0].total);
+    const totalPages = Math.ceil(total / limit);
+
+    // Adding ordering and pagination
+    query +=
+      " ORDER BY user_teacher.name ASC LIMIT $" +
+      (queryParams.length + 1) +
+      " OFFSET $" +
+      (queryParams.length + 2);
+    queryParams.push(parseInt(limit));
+    queryParams.push(parseInt(offset));
+
+    const data = await client.query(query, queryParams);
+
+    res.status(200).json({
+      quizes: data.rows,
+      total,
+      totalPages,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: error.message });
   }
-);
+});
 
 // Menampilkan bank soal berdasarkan guru
 router.get(
   "/get-by-teacher/:teacherId",
-  authenticatedUser,
-  authorizeRoles("teachers"),
+  authorize("teachers"),
   async (req, res) => {
     try {
       const { teacherId } = req.params;
@@ -159,8 +164,7 @@ router.get(
 // Menampilkan ujian berdasarkan tingkat
 router.get(
   "/get-by-grade/:grade",
-  authenticatedUser,
-  authorizeRoles("admin", "student"),
+  authorize("admin", "student"),
   async (req, res) => {
     try {
       const data = await client.query(
@@ -183,75 +187,64 @@ router.get(
 );
 
 // Menampilkan bank soal berikut pertanyaanya
-router.get(
-  "/:id",
-  authenticatedUser,
-  authorizeRoles("admin", "teachers"),
-  async (req, res) => {
-    try {
-      const data = await client.query(
-        "SELECT quizzes.quiz_name, bank.pg, bank.uraian, " +
-          "pertanyaan.id, pertanyaan.bank_id, pertanyaan.jenis, pertanyaan.soal, " +
-          "pertanyaan.a, pertanyaan.b, pertanyaan.c, pertanyaan.d, pertanyaan.e, pertanyaan.kunci, pertanyaan.poin " +
-          "FROM bank LEFT JOIN pertanyaan ON bank.id = pertanyaan.bank_id WHERE bank.id = $1",
-        [req.params.id]
-      );
+router.get("/:id", authorize("admin", "teachers"), async (req, res) => {
+  try {
+    const data = await client.query(
+      "SELECT quizzes.quiz_name, bank.pg, bank.uraian, " +
+        "pertanyaan.id, pertanyaan.bank_id, pertanyaan.jenis, pertanyaan.soal, " +
+        "pertanyaan.a, pertanyaan.b, pertanyaan.c, pertanyaan.d, pertanyaan.e, pertanyaan.kunci, pertanyaan.poin " +
+        "FROM bank LEFT JOIN pertanyaan ON bank.id = pertanyaan.bank_id WHERE bank.id = $1",
+      [req.params.id]
+    );
 
-      const exam = {
-        exam_name: data.rows[0].nama,
-        time: data.rows[0].durasi,
-        pg: data.rows[0].pg,
-        essay: data.rows[0].uraian,
-        questions: data.rows.map((row) => ({
-          _id: row.id,
-          exam_id: row.bank_id,
-          quiz_type: row.jenis,
-          quiz: row.soal,
-          answer_1: row.a,
-          answer_2: row.b,
-          answer_3: row.c,
-          answer_4: row.d,
-          answer_5: row.e,
-          key: row.kunci,
-          poin: row.poin,
-        })),
-      };
+    const exam = {
+      exam_name: data.rows[0].nama,
+      time: data.rows[0].durasi,
+      pg: data.rows[0].pg,
+      essay: data.rows[0].uraian,
+      questions: data.rows.map((row) => ({
+        _id: row.id,
+        exam_id: row.bank_id,
+        quiz_type: row.jenis,
+        quiz: row.soal,
+        answer_1: row.a,
+        answer_2: row.b,
+        answer_3: row.c,
+        answer_4: row.d,
+        answer_5: row.e,
+        key: row.kunci,
+        poin: row.poin,
+      })),
+    };
 
-      res.status(200).json(exam);
-    } catch (error) {
-      return res.status(500).json({ error: error.message });
-    }
+    res.status(200).json(exam);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
-);
+});
 
 // Menampilkan detail bank soal
-router.get(
-  "/detail/:id",
-  authenticatedUser,
-  authorizeRoles("admin", "teacher"),
-  async (req, res) => {
-    try {
-      const data = await client.query("SELECT * FROM quizzes where id = $1", [
-        req.params.id,
-      ]);
+router.get("/detail/:id", authorize("admin", "teacher"), async (req, res) => {
+  try {
+    const data = await client.query("SELECT * FROM quizzes where id = $1", [
+      req.params.id,
+    ]);
 
-      if (data.rowCount === 0) {
-        return res.status(404).json({ message: "Quizzes not found" });
-      }
-
-      res.status(200).json(data.rows[0]);
-    } catch (error) {
-      console.log(error);
-      return res.status(500).json({ message: error.message });
+    if (data.rowCount === 0) {
+      return res.status(404).json({ message: "Quizzes not found" });
     }
+
+    res.status(200).json(data.rows[0]);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: error.message });
   }
-);
+});
 
 // Menghapus bank soal
 router.delete(
   "/delete/:id",
-  authenticatedUser,
-  authorizeRoles("admin", "teacher"),
+  authorize("admin", "teacher"),
   async (req, res) => {
     try {
       const data = await client.query(
@@ -267,19 +260,23 @@ router.delete(
         req.params.id,
       ]);
 
+      await client.query("DELETE FROM log WHERE quiz_id = $1", [req.params.id]);
+
       const delQuestion = await client.query(
         "DELETE FROM questions WHERE quiz_id = $1 RETURNING *",
         [req.params.id]
       );
 
       if (data.rowCount === 0) {
-        return res.status(404).json({ message: "Quiz not found" });
+        return res.status(404).json({ message: "Data tidak ditemukan" });
       }
 
       res.status(200).json({
-        message: `Quiz and ${delQuestion.rowCount} questions are successfully deleted`,
+        message: `Bank soal and ${delQuestion.rowCount} pertanyaan berhasil dihapus`,
       });
     } catch (error) {
+      clg;
+
       return res.status(500).json({ message: error.message });
     }
   }
@@ -288,8 +285,7 @@ router.delete(
 // Clear data
 router.delete(
   "/clear-data",
-  authenticatedUser,
-  authorizeRoles("admin", "teacher"),
+  authorize("admin", "teacher"),
   async (req, res) => {
     const role = req.user.role;
     const id = req.user.id;
