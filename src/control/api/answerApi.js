@@ -6,39 +6,28 @@ export const answerApi = createApi({
     baseUrl: `${import.meta.env.VITE_BASE}/answer`,
     credentials: "include",
   }),
+  tagTypes: ["Answers"],
   endpoints: (builder) => ({
     getMyAnswers: builder.query({
       query: (quizId) => ({
         url: `/get-my-answer/${quizId}`,
       }),
-      providesTags: (result, error, quizId) => [
-        { type: "Answers", id: quizId },
-      ],
+      providesTags: ["Answers"],
     }),
     getStudentsAnswer: builder.query({
-      query: ({ quizId, gradeId }) => ({
-        url: `/get-students-answer/${quizId}/${gradeId}`,
+      query: ({ quizId, gradeId, page, limit, search, code }) => ({
+        url: `/get-students-answer`,
+        params: { quizId, gradeId, page, limit, search, code },
+        method: "GET",
       }),
     }),
-
     createAnswer: builder.mutation({
       query: (body) => ({
         url: `/create`,
         method: "POST",
         body,
       }),
-      async onQueryStarted({ quizId }, { queryFulfilled, dispatch }) {
-        try {
-          await queryFulfilled;
-
-          // Invalidate the tag to refetch the correct data
-          dispatch(
-            answerApi.util.invalidateTags([{ type: "Answers", id: quizId }])
-          );
-        } catch (error) {
-          console.error("Error updating answers after createAnswer", error);
-        }
-      },
+      invalidatesTags: ["Answers"],
     }),
     doubtAnswer: builder.mutation({
       query: (body) => ({
@@ -46,18 +35,7 @@ export const answerApi = createApi({
         method: "PUT",
         body,
       }),
-      async onQueryStarted({ quizId }, { queryFulfilled, dispatch }) {
-        try {
-          await queryFulfilled;
-
-          // Invalidate the tag to refetch the correct data
-          dispatch(
-            answerApi.util.invalidateTags([{ type: "Answers", id: quizId }])
-          );
-        } catch (error) {
-          console.error("Error updating answers after createAnswer", error);
-        }
-      },
+      invalidatesTags: ["Answers"],
     }),
     giveScore: builder.mutation({
       query: ({ id, body }) => ({
@@ -65,32 +43,14 @@ export const answerApi = createApi({
         method: "PUT",
         body,
       }),
-      async onQueryStarted({ body }, { queryFulfilled, dispatch }) {
-        const { quizId, gradeId } = body;
-        try {
-          await queryFulfilled;
-          dispatch(
-            answerApi.util.invalidateTags([{ type: "Answers", id: quizId }])
-          );
-          dispatch(
-            answerApi.endpoints.getStudentsAnswer.initiate(
-              { quizId, gradeId },
-              {
-                forceRefetch: true,
-              }
-            )
-          );
-        } catch (error) {
-          console.error("Error updating answers after giveScore", error);
-        }
-      },
+      invalidatesTags: ["Answers"],
     }),
-
     reset: builder.mutation({
       query: ({ id, quizId }) => ({
         url: `/reset/${id}/${quizId}`,
         method: "PUT",
       }),
+      invalidatesTags: ["Answers"],
     }),
   }),
 });

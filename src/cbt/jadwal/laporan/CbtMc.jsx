@@ -1,6 +1,9 @@
-import React, { useRef } from "react";
+import React, { Fragment, useRef, useState } from "react";
 import Layout from "../../components/Layout";
 import TableContainer from "../../../components/tabel/TabelContainer";
+import { useParams } from "react-router-dom";
+import { useGetStudentsAnswerQuery } from "../../../control/api/answerApi";
+import { useGetQuestionsQuery } from "../../../control/api/questionApi";
 
 const usersData = [
   { id: 1, first: "Mark", last: "Otto", handle: "@mdo" },
@@ -15,38 +18,136 @@ const usersData = [
   { id: 10, first: "Dwight", last: "Schrute", handle: "@dschrute" },
 ];
 
-const columns = [
+const columns1 = [
+  { label: "No" },
   { label: "NIS" },
   { label: "Nama Siswa" },
   { label: "Kelas" },
-  { label: "Benar" },
-  { label: "Salah" },
-  { label: "Nilai" },
 ];
 
+const columns2 = [{ label: "Benar" }, { label: "Salah" }, { label: "Nilai" }];
+
 const CbtMc = ({ tableRef }) => {
+  const params = useParams();
+
+  const quizId = params.bankid;
+  const gradeId = params.gradeid;
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [search, setSearch] = useState("");
+  const [code, setCode] = useState("");
+
+  const { data: rawData = {} } = useGetStudentsAnswerQuery({
+    quizId,
+    gradeId,
+    page,
+    limit,
+    search,
+    code,
+  });
+  const { results = [], totalPages, totalData } = rawData;
+  const { data: questions } = useGetQuestionsQuery(quizId, { skip: !quizId });
+
+  console.log(results);
+
   return (
-    <TableContainer>
+    <TableContainer
+      page={page}
+      setPage={(e) => setPage(e)}
+      setLimit={(e) => setLimit(e)}
+      onValue={(e) => setSearch(e)}
+      totalPages={totalPages}
+    >
       <table ref={tableRef} className="table table-striped table-hover">
         <thead>
           <tr>
-            {columns.map((column, i) => (
-              <th key={i} scope="col" className="text-center">
+            {columns1.map((column, i) => (
+              <th
+                rowSpan={2}
+                key={i}
+                scope="col"
+                className="align-middle text-center"
+              >
+                {column.label}
+              </th>
+            ))}
+            {questions
+              ?.filter((q) => q.type === 1)
+              ?.map((question, i) => (
+                <th key={i} scope="col" className="text-center">
+                  {i + 1}
+                </th>
+              ))}
+            {columns2.map((column, i) => (
+              <th
+                rowSpan={2}
+                key={i}
+                scope="col"
+                className="align-middle text-center"
+              >
                 {column.label}
               </th>
             ))}
           </tr>
+          <tr>
+            {questions
+              ?.filter((q) => q.type === 1)
+              ?.map((question, i) => (
+                <th key={i} scope="col" className="text-center">
+                  {question.key}
+                </th>
+              ))}
+          </tr>
         </thead>
         <tbody>
-          {usersData.map((user, index) => (
-            <tr key={user.id}>
-              <td>{user.first}</td>
-              <td>{user.first}</td>
-              <td>{user.last}</td>
-              <td>{user.last}</td>
-              <td>{user.last}</td>
-              <td>{user.last}</td>
-            </tr>
+          {results?.map((user, index) => (
+            <Fragment key={index}>
+              <tr key={index}>
+                <td rowSpan={2} className="align-middle text-center">
+                  {(page - 1) * limit + index + 1}
+                </td>
+                <td rowSpan={2} className="align-middle text-center">
+                  {user.nis}
+                </td>
+                <td rowSpan={2} className="align-middle ">
+                  {user.name}
+                </td>
+                <td rowSpan={2} className="align-middle text-center">
+                  {user.class}
+                </td>
+                {questions
+                  ?.filter((q) => q.type === 1)
+                  ?.map((q, i) => {
+                    const answer = user.answers.find(
+                      (a) => a.questionId === q.id
+                    );
+
+                    return (
+                      <td key={i} className="align-middle text-center">
+                        {answer ? answer.mc : "-"}
+                      </td>
+                    );
+                  })}
+                <td rowSpan={2}>{user.correct}</td>
+                <td rowSpan={2}>{user.wrong}</td>
+                <td rowSpan={2}>{user.mcPoin}</td>
+              </tr>
+              <tr>
+                {questions
+                  ?.filter((q) => q.type === 1)
+                  ?.map((q, i) => {
+                    const answer = user.answers.find(
+                      (a) => a.questionId === q.id
+                    );
+
+                    return (
+                      <td key={i} className="align-middle text-center">
+                        {answer ? answer.poin : "-"}
+                      </td>
+                    );
+                  })}
+              </tr>
+            </Fragment>
           ))}
         </tbody>
       </table>
