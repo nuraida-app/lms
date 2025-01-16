@@ -1,46 +1,87 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import TableContainer from "../../components/tabel/TabelContainer";
 import { useNavigate } from "react-router-dom";
-
-const usersData = [
-  { id: 1, first: "Mark", last: "Otto", handle: "@mdo" },
-  { id: 2, first: "Jacob", last: "Thornton", handle: "@fat" },
-  { id: 3, first: "Larry", last: "Bird", handle: "@twitter" },
-  { id: 4, first: "John", last: "Doe", handle: "@jdoe" },
-  { id: 5, first: "Jane", last: "Smith", handle: "@jsmith" },
-  { id: 6, first: "Chris", last: "Evans", handle: "@cevans" },
-  { id: 7, first: "Emily", last: "Clark", handle: "@eclark" },
-  { id: 8, first: "Michael", last: "Scott", handle: "@mscott" },
-  { id: 9, first: "Pam", last: "Beesly", handle: "@pbeesly" },
-  { id: 10, first: "Dwight", last: "Schrute", handle: "@dschrute" },
-];
+import {
+  useDeleteScheduleMutation,
+  useGetScheduleQuery,
+  useGetSchedulesQuery,
+  useUpdateStatusMutation,
+} from "../../control/api/scheduleApi";
+import CbtScheduleAdd from "./CbtScheduleAdd";
+import { toast } from "react-toastify";
+import BtnLoader from "../../components/loader/BtnLoader";
 
 const columns = [
+  { label: "No" },
   { label: "Nama Guru" },
   { label: "Nama Ujian" },
   { label: "Nama Bank Soal" },
   { label: "Tingkat" },
   { label: "Status" },
-  { label: "Keterangan" },
   { label: "Token" },
-  { label: "Jadwal" },
+  { label: "Waktu" },
   { label: "Aksi" },
 ];
 
 const CbtSchedules = () => {
   const navigate = useNavigate();
 
-  const goToLink = (bankName, bankId, gradeId) =>
-    navigate(`/cbt-laporan/${bankName}/${bankId}/${gradeId}`);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [search, setSearch] = useState("");
+  const [id, setId] = useState("");
+
+  const { data: rawData = {} } = useGetSchedulesQuery({ page, limit, search });
+  const { rooms = [], totalPages, totalRecords } = rawData;
+  const [updateStatus, { data, isSuccess, isLoading, error, reset }] =
+    useUpdateStatusMutation();
+  const { data: detail } = useGetScheduleQuery(id, { skip: !id });
+  const [
+    deleteSchedule,
+    {
+      data: msg,
+      isSuccess: dSuccess,
+      isLoading: dLoading,
+      error: dError,
+      reset: dReset,
+    },
+  ] = useDeleteScheduleMutation();
+
+  const goToLink = (bankName, bankId, gradeId) => {
+    const formatted = bankName.replace(/\s+/g, "-");
+    navigate(`/cbt-laporan/${formatted}/${bankId}/${gradeId}`);
+  };
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success(data.message);
+      reset();
+    }
+
+    if (error) {
+      toast.error(error.data.message);
+      reset();
+    }
+  }, [data, isSuccess, error]);
+
+  useEffect(() => {
+    if (dSuccess) {
+      toast.success(msg.data);
+      dReset();
+    }
+
+    if (dError) {
+      toast.error(dError.data.message);
+      dReset();
+    }
+  }, [msg, dSuccess, dError]);
+
   return (
-    <Layout>
+    <Layout title={"Daftar Ujian"}>
       <div className="row" style={{ height: "100%" }}>
         <div className="col-12 d-flex flex-column gap-2">
-          <div className="container-fluid text-end p-2 rounded shadow">
-            <button className="btn btn-success mx-2">+ Tambah</button>
-            <button className="btn btn-danger">- Hapus</button>
-          </div>
+          <CbtScheduleAdd total={totalRecords} detail={detail} id={id} />
 
           <div
             style={{
@@ -49,7 +90,13 @@ const CbtSchedules = () => {
             }}
             className="rounded shadow"
           >
-            <TableContainer>
+            <TableContainer
+              page={page}
+              setPage={(e) => setPage(e)}
+              setLimit={(e) => setLimit(e)}
+              onValue={(e) => setSearch(e)}
+              totalPages={totalPages}
+            >
               <table className="table table-striped table-hover">
                 <thead>
                   <tr>
@@ -61,26 +108,61 @@ const CbtSchedules = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {usersData.map((user, index) => (
-                    <tr key={user.id}>
-                      <td>{user.first}</td>
-                      <td>{user.first}</td>
-                      <td>{user.last}</td>
-                      <td>{user.last}</td>
-                      <td>{user.last}</td>
-                      <td>{user.last}</td>
-                      <td>{user.last}</td>
-                      <td>{user.last}</td>
+                  {rooms.map((room, index) => (
+                    <tr key={room.id}>
+                      <th scope="col" className="text-center align-middle">
+                        {(page - 1) * limit + index + 1}
+                      </th>
+                      <td className=" align-middle">{room.teacher}</td>
+                      <td className="align-middle">{room.name}</td>
+                      <td className="align-middle">{room.quiz}</td>
+                      <td className="text-center align-middle">{room.grade}</td>
+                      <td className="text-center align-middle">
+                        <div
+                          className="form-check form-switch pointer d-flex justify-content-center"
+                          onClick={() => updateStatus(room.id)}
+                        >
+                          <input
+                            className="form-check-input"
+                            type="checkbox"
+                            id="flexSwitchCheckChecked"
+                            checked={room.status ? true : false}
+                            readOnly
+                          />
+                        </div>
+                      </td>
+                      <td className="text-center align-middle">{room.token}</td>
+                      <td className="text-center align-middle">{`${room.time} Menit`}</td>
                       <td>
                         <div className="d-flex justify-content-center gap-2">
                           <button
                             className="btn btn-primary"
-                            onClick={() => goToLink("Contoh bank soal", 50, 25)}
+                            onClick={() =>
+                              goToLink(room.quiz, room.quiz_id, room.grade_id)
+                            }
                           >
                             Detail
                           </button>
-                          <button className="btn btn-warning">Edit</button>
-                          <button className="btn btn-danger">Hapus</button>
+                          <button
+                            className="btn btn-warning"
+                            type="button"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modal-add"
+                            onClick={() => setId(room.id)}
+                          >
+                            Edit
+                          </button>
+
+                          {dLoading ? (
+                            <BtnLoader />
+                          ) : (
+                            <button
+                              className="btn btn-danger"
+                              onClick={() => deleteSchedule(room.id)}
+                            >
+                              Hapus
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>

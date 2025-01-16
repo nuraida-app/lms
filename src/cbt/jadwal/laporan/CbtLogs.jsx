@@ -1,20 +1,16 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useState, useEffect } from "react";
 import TableContainer from "../../../components/tabel/TabelContainer";
-
-const usersData = [
-  { id: 1, first: "Mark", last: "Otto", handle: "@mdo" },
-  { id: 2, first: "Jacob", last: "Thornton", handle: "@fat" },
-  { id: 3, first: "Larry", last: "Bird", handle: "@twitter" },
-  { id: 4, first: "John", last: "Doe", handle: "@jdoe" },
-  { id: 5, first: "Jane", last: "Smith", handle: "@jsmith" },
-  { id: 6, first: "Chris", last: "Evans", handle: "@cevans" },
-  { id: 7, first: "Emily", last: "Clark", handle: "@eclark" },
-  { id: 8, first: "Michael", last: "Scott", handle: "@mscott" },
-  { id: 9, first: "Pam", last: "Beesly", handle: "@pbeesly" },
-  { id: 10, first: "Dwight", last: "Schrute", handle: "@dschrute" },
-];
+import {
+  useGetLogsQuery,
+  useClearLogAnswersMutation,
+  useResetLogMutation,
+} from "../../../control/api/logApi";
+import { useParams } from "react-router-dom";
+import { useGetClassByGradeQuery } from "../../../control/api/classApi";
+import { toast } from "react-toastify";
 
 const columns = [
+  { label: "No" },
   { label: "NIS" },
   { label: "Nama Siswa" },
   { label: "Kelas" },
@@ -26,8 +22,114 @@ const columns = [
 ];
 
 const CbtLogs = ({ tableRef }) => {
+  const params = useParams();
+  const quizId = params.bankid;
+  const gradeId = params.gradeid;
+
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [search, setSearch] = useState("");
+  const [class_code, setClasCode] = useState();
+
+  const { data: rawData = {} } = useGetLogsQuery({
+    page,
+    limit,
+    search,
+    class_code,
+    quizId,
+  });
+  const { logs = [], totalPages, total } = rawData;
+  const { data: classes } = useGetClassByGradeQuery({ gradeId });
+  const [resetLog, { data: message, isSuccess, isLoading, error }] =
+    useResetLogMutation();
+  const [
+    clearLogAnswer,
+    {
+      data: clearMsg,
+      isSuccess: isClear,
+      error: clearError,
+      isLoading: clearLoading,
+    },
+  ] = useClearLogAnswersMutation();
+
+  const resetHandler = (nis, logId, name) => {
+    const data = {
+      nis: parseInt(nis),
+      logId: parseInt(logId),
+      quizId: parseInt(quizId),
+    };
+
+    const confirm = window.confirm(`Apa ${name} akan mengulang ujian?`);
+
+    if (confirm) {
+      resetLog(data);
+    }
+  };
+
+  const rejoin = (nis, logId, name) => {
+    const data = {
+      nis: parseInt(nis),
+      logId: parseInt(logId),
+      quizId: parseInt(quizId),
+    };
+
+    const confirm = window.confirm(
+      `Apa anda yakin akan menghapus seluruh jawaban ${name} pada ujian ini?`
+    );
+
+    if (confirm) {
+      clearLogAnswer(data);
+    }
+  };
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success(message.message);
+    }
+
+    if (error) {
+      toast.error(error.data.message);
+    }
+  }, [message, isSuccess, error]);
+
+  useEffect(() => {
+    if (isClear) {
+      toast.success(clearMsg.message);
+    }
+
+    if (clearError) {
+      toast.error(clearError.data.message);
+    }
+  }, [clearMsg, isClear, clearError]);
+
   return (
-    <TableContainer>
+    <TableContainer
+      page={page}
+      setPage={(e) => setPage(e)}
+      setLimit={(e) => setLimit(e)}
+      onValue={(e) => setSearch(e)}
+      totalPages={totalPages}
+    >
+      <div className="d-flex align-items-center justify-content-between">
+        <p className="m-0 h6">
+          Jumlah Siswa: <span>{total}</span>
+        </p>
+
+        <div className="d-flex align-items-center justify-content-end flex-wrap gap-1">
+          <button className="btn btn-secondary" onClick={() => setClasCode("")}>
+            Reset
+          </button>
+          {classes?.map((item) => (
+            <button
+              key={item.id}
+              className="btn btn-secondary"
+              onClick={() => setClasCode(item.code)}
+            >
+              {item.name}
+            </button>
+          ))}
+        </div>
+      </div>
       <table ref={tableRef} className="table table-striped table-hover">
         <thead>
           <tr>
@@ -39,20 +141,47 @@ const CbtLogs = ({ tableRef }) => {
           </tr>
         </thead>
         <tbody>
-          {usersData.map((user, index) => (
-            <tr key={user.id}>
-              <td>{user.first}</td>
-              <td>{user.first}</td>
-              <td>{user.last}</td>
-              <td>{user.last}</td>
-              <td>{user.last}</td>
-              <td>{user.last}</td>
-              <td>{user.last}</td>
+          {logs.map((log, index) => (
+            <tr key={log.id}>
+              <td className="text-center align-middle">
+                {(page - 1) * limit + index + 1}
+              </td>
+              <td className="text-center align-middle">{log.nis}</td>
+              <td className="align-middle">{log.name}</td>
+              <td className="text-center align-middle">{log.class_name}</td>
+              <td className="text-center align-middle">
+                {new Date(log.log_in).toLocaleDateString("id-ID", {
+                  hour: "numeric",
+                  minute: "numeric",
+                  second: "numeric",
+                })}
+              </td>
+              <td className="text-center align-middle">{log.ip}</td>
+              <td className="text-center align-middle">{log.browser}</td>
+              <td className="text-center align-middle">
+                {log.isDone ? (
+                  <p className="m-0 text-danger fw-bold">Selesai</p>
+                ) : (
+                  <p className="m-0 text-success fw-bold">Mengerjakan</p>
+                )}
+              </td>
 
               <td>
                 <div className="d-flex justify-content-center gap-2">
-                  <button className="btn btn-warning">Edit</button>
-                  <button className="btn btn-danger">Hapus</button>
+                  <button
+                    className="btn btn-warning"
+                    onClick={() => rejoin(log.nis, log.id, log.name)}
+                    disabled={log.isDone ? false : true}
+                  >
+                    Ulang
+                  </button>
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => resetHandler(log.nis, log.id, log.name)}
+                    disabled={log.isActive ? false : true}
+                  >
+                    Reset
+                  </button>
                 </div>
               </td>
             </tr>

@@ -25,6 +25,13 @@ export const classApi = createApi({
       }),
       providesTags: ["classes"],
     }),
+    getClassByGrade: builder.query({
+      query: ({ gradeId }) => ({
+        url: `/get-by-grade`,
+        params: { gradeId },
+        method: "GET",
+      }),
+    }),
     getClass: builder.mutation({
       query: (id) => `/detail/${id}`,
       providesTags: ["class"],
@@ -57,6 +64,7 @@ export const classApi = createApi({
 export const {
   useCreateClassMutation,
   useGetClassesQuery,
+  useGetClassByGradeQuery,
   useGetClassMutation,
   useUpdateClassMutation,
   useDeleteClassMutation,

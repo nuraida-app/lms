@@ -9,9 +9,9 @@ import * as XLSX from "xlsx";
 
 const CbtReport = () => {
   const params = useParams();
-  const [component, setComponent] = useState("log");
-
   const tableRef = useRef(null);
+
+  const [component, setComponent] = useState("log");
 
   const convertToExcel = () => {
     if (tableRef.current) {
@@ -42,12 +42,11 @@ const CbtReport = () => {
   };
 
   return (
-    <Layout>
+    <Layout title={`Laporan Ujian ${params.name}`}>
       <div className="row" style={{ height: "100%" }}>
         <div className="col-12">
           <div className="d-flex flex-wrap align-items-center justify-content-end gap-2 p-2 rounded shadow mb-2">
             <button className="btn btn-warning">Perbarui Data</button>
-            <button className="btn btn-secondary">9A</button>
             <button
               className="btn btn-info"
               onClick={() => setComponent("log")}

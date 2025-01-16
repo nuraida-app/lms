@@ -9,9 +9,9 @@ export const quizApi = createApi({
   tagTypes: ["Quiz"],
   endpoints: (builder) => ({
     getQuizes: builder.query({
-      query: ({ page, limit, search }) => ({
+      query: ({ page, limit, search, teacherId }) => ({
         url: "/get",
-        params: { page, limit, search },
+        params: { page, limit, search, teacherId },
         method: "GET",
       }),
       providesTags: ["Quiz"],

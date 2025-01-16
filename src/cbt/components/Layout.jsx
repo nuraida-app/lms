@@ -3,8 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { AdminMenus } from "../../admin/components/layout/Menus";
 import { TeacherMenus } from "../../guru/components/layout/Menus";
+import MetaData from "../../components/meta/MetaData";
+import Protected from "../../components/otentikasi/Protected";
 
-const Layout = ({ children }) => {
+const Layout = ({ children, title }) => {
   const navigate = useNavigate();
 
   const { user } = useSelector((state) => state.auth);
@@ -17,6 +19,8 @@ const Layout = ({ children }) => {
   };
   return (
     <Fragment>
+      <Protected roles={["admin", "teacher"]} />
+      <MetaData title={title} />
       <div className="container-fluid fixed-top bg-info">
         <nav
           className="navbar navbar-expand-lg"

@@ -6,9 +6,15 @@ export const scheduleApi = createApi({
     baseUrl: `${import.meta.env.VITE_BASE}/schedule`,
     credentials: "include",
   }),
+  tagTypes: ["schedules"],
   endpoints: (builder) => ({
     getSchedules: builder.query({
-      query: () => "/get",
+      query: ({ page, limit, search }) => ({
+        url: "/get",
+        params: { page, limit, search },
+        method: "GET",
+      }),
+      providesTags: ["schedules"],
     }),
     getSchedulesByGrade: builder.query({
       query: (grade) => `/get-by-grade/${grade}`,
@@ -24,15 +30,7 @@ export const scheduleApi = createApi({
         method: "POST",
         body,
       }),
-      async onQueryStarted(queryArg, { dispatch, queryFulfilled }) {
-        await queryFulfilled;
-
-        await dispatch(
-          scheduleApi.endpoints.getSchedules.initiate(undefined, {
-            forceRefetch: true,
-          })
-        );
-      },
+      invalidatesTags: ["schedules"],
     }),
     updateSchedule: builder.mutation({
       query: ({ id, body }) => ({
@@ -40,45 +38,21 @@ export const scheduleApi = createApi({
         method: "PUT",
         body,
       }),
-      async onQueryStarted(queryArg, { dispatch, queryFulfilled }) {
-        await queryFulfilled;
-
-        await dispatch(
-          scheduleApi.endpoints.getSchedules.initiate(undefined, {
-            forceRefetch: true,
-          })
-        );
-      },
+      invalidatesTags: ["schedules"],
     }),
     updateStatus: builder.mutation({
       query: (id) => ({
         url: `/update-status/${id}`,
         method: "PUT",
       }),
-      async onQueryStarted(queryArg, { dispatch, queryFulfilled }) {
-        await queryFulfilled;
-
-        await dispatch(
-          scheduleApi.endpoints.getSchedules.initiate(undefined, {
-            forceRefetch: true,
-          })
-        );
-      },
+      invalidatesTags: ["schedules"],
     }),
     deleteSchedule: builder.mutation({
       query: (id) => ({
         url: `/delete/${id}`,
         method: "DELETE",
       }),
-      async onQueryStarted(queryArg, { dispatch, queryFulfilled }) {
-        await queryFulfilled;
-
-        await dispatch(
-          scheduleApi.endpoints.getSchedules.initiate(undefined, {
-            forceRefetch: true,
-          })
-        );
-      },
+      invalidatesTags: ["schedules"],
     }),
     clearData: builder.mutation({
       query: (body) => ({
@@ -86,15 +60,7 @@ export const scheduleApi = createApi({
         method: "DELETE",
         body,
       }),
-      async onQueryStarted(queryArg, { dispatch, queryFulfilled }) {
-        await queryFulfilled;
-
-        await dispatch(
-          scheduleApi.endpoints.getSchedules.initiate(undefined, {
-            forceRefetch: true,
-          })
-        );
-      },
+      invalidatesTags: ["schedules"],
     }),
   }),
 });

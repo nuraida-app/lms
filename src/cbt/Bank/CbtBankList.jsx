@@ -51,7 +51,7 @@ const CbtBankList = () => {
     }
   }, [data, isSuccess, error]);
   return (
-    <Layout>
+    <Layout title={"Bank Soal"}>
       <div className="row" style={{ height: "100%" }}>
         <div className="col-lg-3 col-12">
           <Addbank detail={detail} id={id} />

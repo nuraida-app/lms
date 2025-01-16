@@ -9,8 +9,10 @@ export const logApi = createApi({
   tagTypes: ["logs", "log"],
   endpoints: (builder) => ({
     getLogs: builder.query({
-      query: (id) => ({
-        url: `/get/${id}`,
+      query: ({ page, limit, search, class_code, quizId }) => ({
+        url: `/get`,
+        params: { page, limit, search, class_code, quizId },
+        method: "GET",
       }),
       providesTags: ["logs"],
     }),

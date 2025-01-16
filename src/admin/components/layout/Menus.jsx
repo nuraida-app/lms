@@ -5,4 +5,5 @@ export const AdminMenus = [
   { label: "Guru", link: "/admin-guru" },
   { label: "Siswa", link: "/admin-siswa" },
   { label: "Bank Soal", link: "/cbt-bank-soal" },
+  { label: "Ujian", link: "/cbt-ujian" },
 ];

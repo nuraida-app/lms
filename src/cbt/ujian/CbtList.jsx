@@ -1,8 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const CbtList = () => {
   const navigate = useNavigate();
+
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [search, setSearch] = useState("");
 
   const goToLink = (name, bankId, start, end) => {
     navigate(`/cbt-halaman/${name}/${bankId}/${start}/${end}`);
