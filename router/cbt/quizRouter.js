@@ -71,6 +71,9 @@ router.get("/get", authorize("admin", "teacher"), async (req, res) => {
     const teacher = req.user.role === "teacher";
     const admin = req.user.role === "admin";
 
+    // Adding search filter and pagination
+    const { page, limit, search, teacherId } = req.query;
+
     let query = `SELECT quizzes.id, quizzes.quiz_name, quizzes.teacher_id, user_teacher.name AS teacher, 
       quizzes.shuffle, quizzes.grade_id, quizzes.homebase_id, grades.grade, 
       (SELECT COUNT(*) FROM questions WHERE questions.quiz_id = quizzes.id AND questions.type = 1) AS mc, 
@@ -85,16 +88,13 @@ router.get("/get", authorize("admin", "teacher"), async (req, res) => {
     if (teacher) {
       query += "WHERE quizzes.teacher_id = $1 ";
       queryParams.push(req.user.id);
-    }
-
-    if (admin) {
+    } else if (admin && teacherId) {
+      query += "WHERE quizzes.homebase_id = $1 AND teacher_id = $2";
+      queryParams.push(req.user.homebase_id, teacherId);
+    } else if (admin) {
       query += "WHERE quizzes.homebase_id = $1 ";
       queryParams.push(req.user.homebase_id);
     }
-
-    // Adding search filter
-    const { page = 1, limit = 10, search = "" } = req.query;
-    const offset = (page - 1) * limit;
 
     if (search) {
       const searchCondition = `${
@@ -106,28 +106,42 @@ router.get("/get", authorize("admin", "teacher"), async (req, res) => {
       queryParams.push(`%${search}%`);
     }
 
-    // Count total records for pagination
-    const countQuery = `SELECT COUNT(*) AS total FROM (${query}) AS subquery`;
-    const countResult = await client.query(countQuery, queryParams);
-    const total = parseInt(countResult.rows[0].total);
-    const totalPages = Math.ceil(total / limit);
+    if (page && limit) {
+      const offset = (page - 1) * limit;
 
-    // Adding ordering and pagination
-    query +=
-      " ORDER BY user_teacher.name ASC LIMIT $" +
-      (queryParams.length + 1) +
-      " OFFSET $" +
-      (queryParams.length + 2);
-    queryParams.push(parseInt(limit));
-    queryParams.push(parseInt(offset));
+      // Count total records for pagination
+      const countQuery = `SELECT COUNT(*) AS total FROM (${query}) AS subquery`;
+      const countResult = await client.query(countQuery, queryParams);
+      const total = parseInt(countResult.rows[0].total);
+      const totalPages = Math.ceil(total / limit);
 
-    const data = await client.query(query, queryParams);
+      // Adding ordering and pagination
+      query +=
+        " ORDER BY user_teacher.name ASC LIMIT $" +
+        (queryParams.length + 1) +
+        " OFFSET $" +
+        (queryParams.length + 2);
+      queryParams.push(parseInt(limit));
+      queryParams.push(parseInt(offset));
 
-    res.status(200).json({
-      quizes: data.rows,
-      total,
-      totalPages,
-    });
+      const data = await client.query(query, queryParams);
+
+      return res.status(200).json({
+        quizes: data.rows,
+        total,
+        totalPages,
+      });
+    } else {
+      // If no page, limit, and search, return all quizzes based on role
+      query += " ORDER BY user_teacher.name ASC";
+      const data = await client.query(query, queryParams);
+
+      return res.status(200).json({
+        quizes: data.rows,
+        total: data.rows.length,
+        totalPages: 1,
+      });
+    }
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: error.message });

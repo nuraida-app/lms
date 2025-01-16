@@ -116,6 +116,24 @@ router.get("/get", authorize("admin", "teacher"), async (req, res) => {
   }
 });
 
+// Kelas bedasarkan tingkat
+router.get("/get-by-grade", authorize("admin", "teacher"), async (req, res) => {
+  try {
+    const gradeId = req.query.gradeId;
+    const data = await client.query(
+      `SELECT * FROM classes WHERE grade_id = $1`,
+      [gradeId]
+    );
+
+    const classes = data.rows;
+
+    res.status(200).json(classes);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: error.message });
+  }
+});
+
 // detail kelas
 router.get("/detail/:id", authorize("admin"), async (req, res) => {
   try {

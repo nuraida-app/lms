@@ -1,144 +1,196 @@
 import express from "express";
 import { client } from "../../connection/connection.js";
-import {
-  authenticatedUser,
-  authorizeRoles,
-} from "../../middleware/authenticate.js";
+import { authorize } from "../../middleware/authenticate.js";
 
 const router = express.Router();
 
 // Membuat log siswa
-router.post(
-  "/create",
-  authenticatedUser,
-  authorizeRoles("student"),
-  async (req, res) => {
-    try {
-      const { nis, quizId } = req.body;
-      const date = new Date().toISOString();
-      let ipAddress = req.socket.remoteAddress;
-      const browser = req.useragent.browser + " " + req.useragent.version;
+router.post("/create", authorize("student"), async (req, res) => {
+  try {
+    const { nis, quizId } = req.body;
+    const date = new Date().toISOString();
+    let ipAddress = req.socket.remoteAddress;
+    const browser = req.useragent.browser + " " + req.useragent.version;
 
-      // Jika alamat IP adalah IPv6, potong bagian IPv6 dan simpan hanya IPv4
-      if (ipAddress.includes("::ffff:")) {
-        ipAddress = ipAddress.split("::ffff:")[1];
-      }
-
-      // Periksa apakah ada nis dan bank_id yang sama dalam log
-      const existingLog = await client.query(
-        "SELECT * FROM log WHERE nis = $1 AND quiz_id = $2",
-        [nis, quizId]
-      );
-
-      if (existingLog.rowCount > 0) {
-        // Jika ada nis yang sama, hapus entri log yang terkait
-        await client.query("DELETE FROM log WHERE nis = $1 AND quiz_id = $2", [
-          nis,
-          quizId,
-        ]);
-      }
-
-      // Simpan data log baru
-      await client.query(
-        "INSERT INTO log (log_in, ip, browser, nis, quiz_id) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-        [date, ipAddress, browser, nis, quizId]
-      );
-
-      res.status(200).json({ message: "Joining Exam" });
-    } catch (error) {
-      return res.status(500).json({ message: error.message });
+    // Jika alamat IP adalah IPv6, potong bagian IPv6 dan simpan hanya IPv4
+    if (ipAddress.includes("::ffff:")) {
+      ipAddress = ipAddress.split("::ffff:")[1];
     }
+
+    // Periksa apakah ada nis dan bank_id yang sama dalam log
+    const existingLog = await client.query(
+      "SELECT * FROM log WHERE nis = $1 AND quiz_id = $2",
+      [nis, quizId]
+    );
+
+    if (existingLog.rowCount > 0) {
+      // Jika ada nis yang sama, hapus entri log yang terkait
+      await client.query("DELETE FROM log WHERE nis = $1 AND quiz_id = $2", [
+        nis,
+        quizId,
+      ]);
+    }
+
+    // Simpan data log baru
+    await client.query(
+      "INSERT INTO log (log_in, ip, browser, nis, quiz_id) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+      [date, ipAddress, browser, nis, quizId]
+    );
+
+    res.status(200).json({ message: "Joining Exam" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
   }
-);
+});
 
 // Menampilkan log siswa berdasarkan bank soal
-router.get(
-  "/get/:quizId",
-  authenticatedUser,
-  authorizeRoles("admin", "teacher"),
-  async (req, res) => {
-    try {
-      const data = await client.query("SELECT * FROM log WHERE quiz_id = $1", [
-        req.params.quizId,
-      ]);
+router.get("/get", authorize("admin", "teacher"), async (req, res) => {
+  try {
+    const { page = 1, limit = 10, search = "", class_code, quizId } = req.query;
+    const offset = (page - 1) * limit;
 
-      res.status(200).json(data.rows);
-    } catch (error) {
-      return res.status(500).json({ message: error.message });
+    // Prepare base query
+    let query = `
+        SELECT 
+          log.*, 
+          students_class.class_code, 
+          user_student.name, 
+          classes.name AS class_name
+        FROM 
+          log
+        LEFT JOIN 
+          students_class ON log.nis = students_class.nis
+        LEFT JOIN 
+          user_student ON log.nis = user_student.nis
+        LEFT JOIN 
+          classes ON students_class.class_code = classes.code
+        WHERE 
+          log.quiz_id = $1
+      `;
+
+    // Add filters for search and class_code
+    const filters = [];
+    const queryParams = [quizId];
+
+    if (search) {
+      // Separate filtering for bigint (nis) and text (name)
+      filters.push(
+        `(CAST(log.nis AS TEXT) ILIKE $${
+          queryParams.length + 1
+        } OR user_student.name ILIKE $${queryParams.length + 1})`
+      );
+      queryParams.push(`%${search}%`);
     }
+
+    if (class_code) {
+      filters.push(`students_class.class_code = $${queryParams.length + 1}`);
+      queryParams.push(class_code);
+    }
+
+    // Append filters to query
+    if (filters.length > 0) {
+      query += " AND " + filters.join(" AND ");
+    }
+
+    // Add sorting and pagination
+    query += ` ORDER BY classes.name, user_student.name LIMIT $${
+      queryParams.length + 1
+    } OFFSET $${queryParams.length + 2}`;
+    queryParams.push(limit, offset);
+
+    // Execute query
+    const data = await client.query(query, queryParams);
+
+    // Count total rows for pagination
+    const countQuery =
+      `
+        SELECT COUNT(*) FROM log
+        LEFT JOIN students_class ON log.nis = students_class.nis
+        LEFT JOIN user_student ON log.nis = user_student.nis
+        LEFT JOIN classes ON students_class.class_code = classes.code
+        WHERE log.quiz_id = $1
+      ` + (filters.length > 0 ? " AND " + filters.join(" AND ") : "");
+
+    const countParams = [quizId];
+    if (search) {
+      countParams.push(`%${search}%`);
+    }
+    if (class_code) {
+      countParams.push(class_code);
+    }
+
+    const totalCount = await client.query(countQuery, countParams);
+    const total = parseInt(totalCount.rows[0].count, 10);
+
+    res.status(200).json({
+      logs: data.rows,
+      total,
+      totalPages: Math.ceil(total / limit),
+      currentPage: parseInt(page, 10),
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: error.message });
   }
-);
+});
 
 // Menampilkan log berdasarkan nis
-router.get(
-  "/detail/:nis",
-  authenticatedUser,
-  authorizeRoles("student"),
-  async (req, res) => {
-    try {
-      const { nis } = req.params;
+router.get("/detail/:nis", authorize("student"), async (req, res) => {
+  try {
+    const { nis } = req.params;
 
-      const data = await client.query("SELECT * FROM log WHERE nis = $1", [
-        nis,
-      ]);
+    const data = await client.query("SELECT * FROM log WHERE nis = $1", [nis]);
 
-      res.status(200).json(data.rows[0]);
-    } catch (error) {
-      return res.status(500).json({ message: error.message });
-    }
+    res.status(200).json(data.rows[0]);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
   }
-);
+});
 
 // Selesaikan ujian
-router.put(
-  "/finished/:quizId",
-  authenticatedUser,
-  authorizeRoles("student"),
-  async (req, res) => {
-    try {
-      const quizId = req.params.quizId;
+router.put("/finished/:quizId", authorize("student"), async (req, res) => {
+  try {
+    const quizId = req.params.quizId;
 
-      const isActive = false;
-      const isDone = true;
+    const isActive = false;
+    const isDone = true;
 
-      const questions = await client.query(
-        "SELECT * FROM questions WHERE quiz_id = $1",
-        [quizId]
-      );
+    const questions = await client.query(
+      "SELECT * FROM questions WHERE quiz_id = $1",
+      [quizId]
+    );
 
-      const myAnswersResult = await client.query(
-        `SELECT DISTINCT ON (quiz_id, question_id, nis) *
+    const myAnswersResult = await client.query(
+      `SELECT DISTINCT ON (quiz_id, question_id, nis) *
          FROM answers 
          WHERE quiz_id = $1 AND nis = $2
          ORDER BY quiz_id, question_id, nis, createdAt DESC`,
-        [quizId, req.user.nis]
+      [quizId, req.user.nis]
+    );
+
+    const left = questions.rowCount - myAnswersResult.rowCount;
+
+    if (left === 0) {
+      await client.query(
+        `UPDATE log SET "isActive" = $1, "isDone" = $2 WHERE quiz_id = $3 AND nis = $4 `,
+        [isActive, isDone, quizId, req.user.nis]
       );
 
-      const left = questions.rowCount - myAnswersResult.rowCount;
-
-      if (left === 0) {
-        await client.query(
-          `UPDATE log SET "isActive" = $1, "isDone" = $2 WHERE quiz_id = $3 AND nis = $4 `,
-          [isActive, isDone, quizId, req.user.nis]
-        );
-
-        res.status(200).json({ message: "Your answers successfully saved" });
-      } else {
-        return res
-          .status(500)
-          .json({ message: `You didn't answer ${left} questions` });
-      }
-    } catch (error) {
-      return res.status(500).json({ message: error.message });
+      res.status(200).json({ message: "Your answers successfully saved" });
+    } else {
+      return res
+        .status(500)
+        .json({ message: `You didn't answer ${left} questions` });
     }
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
   }
-);
+});
 
 // Reset status
 router.put(
   "/change-status-log",
-  authenticatedUser,
-  authorizeRoles("admin", "teacher"),
+  authorize("admin", "teacher"),
   async (req, res) => {
     try {
       const { nis, quizId, logId } = req.body;
@@ -169,8 +221,7 @@ router.put(
 // Mengulang ujian siswa
 router.delete(
   "/clear-log-answers",
-  authenticatedUser,
-  authorizeRoles("admin", "teacher"),
+  authorize("admin", "teacher"),
   async (req, res) => {
     try {
       const { nis, quizId, logId } = req.body;
@@ -235,8 +286,7 @@ router.put("/unlock/:nis", async (req, res) => {
 // Menghapus pelanggaran
 router.delete(
   "/remove/:nis/:exam",
-  authenticatedUser,
-  authorizeRoles("admin", "guru"),
+  authorize("admin", "guru"),
   async (req, res) => {
     try {
       const data = await client.query(
