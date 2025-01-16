@@ -1,9 +1,6 @@
 import express from "express";
 import { client } from "../../connection/connection.js";
-import {
-  authenticatedUser,
-  authorizeRoles,
-} from "../../middleware/authenticate.js";
+import { authorize } from "../../middleware/authenticate.js";
 import multer from "multer";
 import path from "path";
 
@@ -31,8 +28,7 @@ const uploadAudio = multer({ storage: audioStorage });
 // Membuat pertanyaan
 router.post(
   "/create",
-  authenticatedUser,
-  authorizeRoles("admin", "teacher"),
+  authorize("admin", "teacher"),
   uploadAudio.single("audio"),
   async (req, res) => {
     try {
@@ -61,69 +57,63 @@ router.post(
 );
 
 // Upload pertanyaan dari excel
-router.post(
-  "/upload/:id",
-  authenticatedUser,
-  authorizeRoles("admin", "teacher"),
-  async (req, res) => {
-    try {
-      const { id } = req.params;
+router.post("/upload/:id", authorize("admin", "teacher"), async (req, res) => {
+  try {
+    const { id } = req.params;
 
-      const { data } = req.body;
+    const { data } = req.body;
 
-      // Filter out items with null quiz value
-      const validData = data.filter(
-        (item) => item[0] !== null && item[0] !== undefined
-      );
+    // Filter out items with null quiz value
+    const validData = data.filter(
+      (item) => item[0] !== null && item[0] !== undefined
+    );
 
-      const pgQuestions = validData.filter((item) => item[1] === 1);
+    const pgQuestions = validData.filter((item) => item[1] === 1);
 
-      // Calculate the total score
-      const totalScore = pgQuestions?.reduce((sum, item) => sum + item[8], 0);
+    // Calculate the total score
+    const totalScore = pgQuestions?.reduce((sum, item) => sum + item[8], 0);
 
-      // Validate the total score
-      if (totalScore !== 100) {
-        return res.status(400).json({
-          error: `Grand score for all questions is 100, your grand total is ${totalScore}`,
-        });
-      }
-
-      // Use Promise.all to ensure all database operations are completed before sending response
-      await Promise.all(
-        validData.map(async (item) => {
-          await client.query(
-            "INSERT INTO questions (quiz_id, question, type, a, b, c, d, e, key, score)" +
-              "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
-            [
-              id,
-              item[0],
-              item[1],
-              item[2],
-              item[3],
-              item[4],
-              item[5],
-              item[6],
-              item[7],
-              item[8],
-            ]
-          );
-        })
-      );
-
-      res.status(200).json({
-        message: `${validData.length} questions added successfully`,
+    // Validate the total score
+    if (totalScore !== 100) {
+      return res.status(400).json({
+        error: `Grand score for all questions is 100, your grand total is ${totalScore}`,
       });
-    } catch (error) {
-      return res.status(500).json({ message: error.message });
     }
+
+    // Use Promise.all to ensure all database operations are completed before sending response
+    await Promise.all(
+      validData.map(async (item) => {
+        await client.query(
+          "INSERT INTO questions (quiz_id, question, type, a, b, c, d, e, key, score)" +
+            "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+          [
+            id,
+            item[0],
+            item[1],
+            item[2],
+            item[3],
+            item[4],
+            item[5],
+            item[6],
+            item[7],
+            item[8],
+          ]
+        );
+      })
+    );
+
+    res.status(200).json({
+      message: `${validData.length} questions added successfully`,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
   }
-);
+});
 
 // Menampilkan pertanyaan berdasarkan bank soal
 router.get(
   "/get-by-exam/:id",
-  authenticatedUser,
-  authorizeRoles("admin", "teacher", "student"),
+  authorize("admin", "teacher", "student"),
   async (req, res) => {
     try {
       const role = req.user.role;
@@ -134,8 +124,8 @@ router.get(
       );
 
       const note = await client.query(
-        "SELECT teachers.name, quizzes.grade_id, quizzes.shuffle FROM quizzes " +
-          "INNER JOIN teachers ON quizzes.teacher_id = teachers.id WHERE quizzes.id = $1",
+        "SELECT user_teacher.name, quizzes.grade_id, quizzes.shuffle FROM quizzes " +
+          "INNER JOIN user_teacher ON quizzes.teacher_id = user_teacher.id WHERE quizzes.id = $1",
         [req.params.id]
       );
 
@@ -229,30 +219,24 @@ router.get(
 );
 
 // Detail pertnyaaan
-router.get(
-  "/detail/:id",
-  authenticatedUser,
-  authorizeRoles("admin", "teacher"),
-  async (req, res) => {
-    try {
-      const data = await client.query("SELECT * FROM questions WHERE id = $1", [
-        req.params.id,
-      ]);
+router.get("/detail/:id", authorize("admin", "teacher"), async (req, res) => {
+  try {
+    const data = await client.query("SELECT * FROM questions WHERE id = $1", [
+      req.params.id,
+    ]);
 
-      const question = data.rows[0];
+    const question = data.rows[0];
 
-      res.status(200).json(question);
-    } catch (error) {
-      return res.status(500).json({ error: error.message });
-    }
+    res.status(200).json(question);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
-);
+});
 
 // Memperbarui pertanyaan
 router.put(
   "/update/:id",
-  authenticatedUser,
-  authorizeRoles("admin", "teacher"),
+  authorize("admin", "teacher"),
   uploadAudio.single("audio"),
   async (req, res) => {
     try {
@@ -295,8 +279,7 @@ router.put(
 // Menghapus pertanyaan
 router.delete(
   "/delete/:id",
-  authenticatedUser,
-  authorizeRoles("admin", "teacher"),
+  authorize("admin", "teacher"),
   async (req, res) => {
     try {
       await client.query("DELETE FROM questions WHERE id = $1", [
@@ -316,8 +299,7 @@ router.delete(
 
 router.delete(
   "/clear-data/:quizId",
-  authenticatedUser,
-  authorizeRoles("admin", "teacher"),
+  authorize("admin", "teacher"),
   async (req, res) => {
     try {
       await client.query("DELETE FROM questions WHERE quiz_id = $1", [
