@@ -76,6 +76,12 @@ const CbtScheduleAdd = ({ total, detail, id }) => {
       setQuizId(detail?.quiz_id);
     }
   }, [detail]);
+
+  useEffect(() => {
+    if (user?.role === "teacher") {
+      setTeacherId(user?.id);
+    }
+  }, [user]);
   return (
     <div className="container-fluid d-flex align-items-center justify-content-between p-2 rounded shadow">
       <p className="m-0 h6">

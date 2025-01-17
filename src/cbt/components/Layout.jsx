@@ -1,21 +1,37 @@
 import React, { Fragment } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { AdminMenus } from "../../admin/components/layout/Menus";
 import { TeacherMenus } from "../../guru/components/layout/Menus";
 import MetaData from "../../components/meta/MetaData";
 import Protected from "../../components/otentikasi/Protected";
+import { setLogout } from "../../control/slice/authSlice";
+import { useLogoutMutation } from "../../control/api/authApi";
 
 const Layout = ({ children, title }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const { user } = useSelector((state) => state.auth);
+  const [logout, { isloading, error }] = useLogoutMutation();
 
   const role = user?.role;
   const name = user?.name;
 
   const goToLink = (link) => {
     navigate(link);
+  };
+
+  const logutHandler = async () => {
+    try {
+      await logout().unwrap();
+
+      dispatch(setLogout());
+
+      navigate("/");
+    } catch (error) {
+      console.log(error.data.message);
+    }
   };
   return (
     <Fragment>
@@ -63,7 +79,13 @@ const Layout = ({ children, title }) => {
                   )
                 )}
 
-                <button className="btn btn-danger">Logout</button>
+                {isloading ? (
+                  <BtnLoader />
+                ) : (
+                  <button className="btn btn-danger" onClick={logutHandler}>
+                    Logout
+                  </button>
+                )}
               </div>
             </div>
           </div>

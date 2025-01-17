@@ -1,8 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
 import Layout from "../../components/Layout";
 import Editor from "../../components/Editor";
+import { useNavigate, useParams } from "react-router-dom";
+import { useCreateQuestionMutation } from "../../../control/api/questionApi";
+import { toast } from "react-toastify";
+import BtnLoader from "../../../components/loader/BtnLoader";
 
 const AddQuestion = () => {
+  const navigate = useNavigate();
+  const params = useParams();
+  const { name, bankid } = params;
+
   const [type, setType] = useState(1);
   const [value, setValue] = useState("");
   const [choices, setChoices] = useState({
@@ -17,6 +25,9 @@ const AddQuestion = () => {
   const [audio, setAudio] = useState(null);
   const [audioUrl, setAudioUrl] = useState("");
 
+  const [createQuestion, { data, isSuccess, isLoading, error, reset }] =
+    useCreateQuestionMutation();
+
   const handleChoiceChange = (choice) => (content) => {
     setChoices((prevChoices) => ({
       ...prevChoices,
@@ -24,8 +35,66 @@ const AddQuestion = () => {
     }));
   };
 
+  const addhandler = () => {
+    if (!value) {
+      toast.error("Please give question");
+      return;
+    }
+
+    if (type === 1 && !key) {
+      toast.error("Please give answer key");
+      return;
+    }
+
+    if (type === 1 && !score) {
+      toast.error("Please give score");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("type", type);
+    formData.append("quiz_id", bankid);
+    formData.append("question", value);
+    formData.append("a", choices.choiceA || "");
+    formData.append("b", choices.choiceB || "");
+    formData.append("c", choices.choiceC || "");
+    formData.append("d", choices.choiceD || "");
+    formData.append("e", choices.choiceE || "");
+    formData.append("key", key || "");
+    formData.append("score", score || 0);
+
+    if (audio) {
+      formData.append("audio", audio);
+    }
+
+    createQuestion(formData);
+  };
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success(data.message);
+      setType(1);
+      setValue("");
+      setChoices({
+        choiceA: "",
+        choiceB: "",
+        choiceC: "",
+        choiceD: "",
+        choiceE: "",
+      });
+      setScore("");
+      reset();
+      window.location.href = `/cbt-bank-soal/${name}/${bankid}`;
+    }
+
+    if (error) {
+      toast.error(error.data.message);
+      reset();
+    }
+  }, [data, isSuccess, name, bankid]);
+
   return (
-    <Layout>
+    <Layout title={"Buat Pertanyaan"}>
       <div
         className="row"
         style={{ maxHeight: "calc(100vh - 75px)", overflow: "auto" }}
@@ -68,14 +137,20 @@ const AddQuestion = () => {
               <input
                 type="number"
                 className="form-control"
-                placeholder="Skor soal"
+                placeholder="Skor Soal"
                 value={score}
                 onChange={(e) => setScore(e.target.value)}
               />
             </div>
 
             <div className="text-end col-lg-6 col-12">
-              <button className="btn btn-light">Simpan</button>
+              {isLoading ? (
+                <BtnLoader />
+              ) : (
+                <button className="btn btn-light" onClick={addhandler}>
+                  Simpan
+                </button>
+              )}
             </div>
           </div>
 
@@ -97,14 +172,15 @@ const AddQuestion = () => {
               </label>
             </div>
 
-            {Object.keys(choices).map((choice, index) => (
-              <Editor
-                key={index}
-                placeholder={`Jawaban ${choice.charAt(choice.length - 1)}`}
-                value={choices[choice]}
-                onChange={handleChoiceChange(choice)}
-              />
-            ))}
+            {type === 1 &&
+              Object.keys(choices).map((choice, index) => (
+                <Editor
+                  key={index}
+                  placeholder={`Jawaban ${choice.charAt(choice.length - 1)}`}
+                  value={choices[choice]}
+                  onChange={handleChoiceChange(choice)}
+                />
+              ))}
           </div>
         </div>
       </div>

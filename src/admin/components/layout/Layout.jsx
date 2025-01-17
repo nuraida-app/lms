@@ -6,12 +6,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { setLogout } from "../../../control/slice/authSlice";
 import { useLogoutMutation } from "../../../control/api/authApi";
 import Protected from "../../../components/otentikasi/Protected";
+import BtnLoader from "../../../components/loader/BtnLoader";
 
 const Layout = ({ children, title }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
-  const [logout, { isloading, error }] = useLogoutMutation();
+  const [logout, { isLoading, error }] = useLogoutMutation();
 
   const goToLink = (link) => {
     navigate(link);
@@ -83,9 +84,13 @@ const Layout = ({ children, title }) => {
                   </button>
                 ))}
 
-                <button className="btn btn-danger" onClick={logutHandler}>
-                  Logout
-                </button>
+                {isLoading ? (
+                  <BtnLoader />
+                ) : (
+                  <button className="btn btn-danger" onClick={logutHandler}>
+                    Logout
+                  </button>
+                )}
               </div>
             </div>
           </div>

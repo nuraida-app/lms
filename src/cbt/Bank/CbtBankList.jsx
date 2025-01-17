@@ -17,7 +17,9 @@ const columns = [
   { label: "Nama Bank Soal" },
   { label: "Tingkat" },
   { label: "PG" },
+  { label: "Bobot PG" },
   { label: "Essay" },
+  { label: "Bobot Essay" },
   { label: "Aksi" },
 ];
 
@@ -37,7 +39,10 @@ const CbtBankList = () => {
 
   const handleDelete = (id) => deleteQuiz(id);
 
-  const goToLink = (id) => navigate(`/cbt-bank-soal/${id}/soal`);
+  const goToLink = (name, id) => {
+    const formatted = name.replace(/\s+/g, "-");
+    navigate(`/cbt-bank-soal/${formatted}/${id}`);
+  };
 
   useEffect(() => {
     if (isSuccess) {
@@ -50,6 +55,7 @@ const CbtBankList = () => {
       reset();
     }
   }, [data, isSuccess, error]);
+
   return (
     <Layout title={"Bank Soal"}>
       <div className="row" style={{ height: "100%" }}>
@@ -87,13 +93,19 @@ const CbtBankList = () => {
                     <td className="align-middle">{item.quiz_name}</td>
                     <td className="align-middle text-center">{item.grade}</td>
                     <td className="align-middle text-center">{item.mc}</td>
+                    <td className="align-middle text-center">
+                      {`${item.mc_weight} %`}
+                    </td>
                     <td className="align-middle text-center">{item.essay}</td>
+                    <td className="align-middle text-center">
+                      {`${item.essay_weight} %`}
+                    </td>
 
                     <td>
                       <div className="d-flex align-items-center justify-content-center gap-2">
                         <button
                           className="btn btn-success"
-                          onClick={() => goToLink(item.id)}
+                          onClick={() => goToLink(item.quiz_name, item.id)}
                         >
                           Soal
                         </button>

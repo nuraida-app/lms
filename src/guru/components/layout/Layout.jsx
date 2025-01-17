@@ -1,15 +1,39 @@
 import React, { Fragment } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { TeacherMenus } from "./Menus";
+import MetaData from "../../../components/meta/MetaData";
+import { useLogoutMutation } from "../../../control/api/authApi";
+import { setLogout } from "../../../control/slice/authSlice";
+import Protected from "../../../components/otentikasi/Protected";
+import BtnLoader from "../../../components/loader/BtnLoader";
 
-const Layout = ({ children }) => {
+const Layout = ({ children, title }) => {
   const navigate = useNavigate();
+
+  const { user } = useSelector((state) => state.auth);
+  const [logout, { isLoading }] = useLogoutMutation();
 
   const goToLink = (link) => {
     navigate(link);
   };
+
+  const logutHandler = async () => {
+    try {
+      await logout().unwrap();
+
+      dispatch(setLogout());
+
+      navigate("/");
+    } catch (error) {
+      console.log(error.data.message);
+    }
+  };
+
   return (
     <Fragment>
+      <MetaData title={title} />
+      <Protected roles={["teacher"]} />
       <div className="container-fluid fixed-top bg-info">
         <nav
           className="navbar navbar-expand-lg"
@@ -20,7 +44,7 @@ const Layout = ({ children }) => {
               className="navbar-brand col-lg-2 me-0 text-white"
               href="/guru-dashboard"
             >
-              Halaman Guru
+              {user?.name}
             </a>
 
             <button
@@ -50,7 +74,13 @@ const Layout = ({ children }) => {
                   </button>
                 ))}
 
-                <button className="btn btn-danger">Logout</button>
+                {isLoading ? (
+                  <BtnLoader />
+                ) : (
+                  <button className="btn btn-danger" onClick={logutHandler}>
+                    Logout
+                  </button>
+                )}
               </div>
             </div>
           </div>

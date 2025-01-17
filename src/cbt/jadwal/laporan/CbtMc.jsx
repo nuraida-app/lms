@@ -4,19 +4,7 @@ import TableContainer from "../../../components/tabel/TabelContainer";
 import { useParams } from "react-router-dom";
 import { useGetStudentsAnswerQuery } from "../../../control/api/answerApi";
 import { useGetQuestionsQuery } from "../../../control/api/questionApi";
-
-const usersData = [
-  { id: 1, first: "Mark", last: "Otto", handle: "@mdo" },
-  { id: 2, first: "Jacob", last: "Thornton", handle: "@fat" },
-  { id: 3, first: "Larry", last: "Bird", handle: "@twitter" },
-  { id: 4, first: "John", last: "Doe", handle: "@jdoe" },
-  { id: 5, first: "Jane", last: "Smith", handle: "@jsmith" },
-  { id: 6, first: "Chris", last: "Evans", handle: "@cevans" },
-  { id: 7, first: "Emily", last: "Clark", handle: "@eclark" },
-  { id: 8, first: "Michael", last: "Scott", handle: "@mscott" },
-  { id: 9, first: "Pam", last: "Beesly", handle: "@pbeesly" },
-  { id: 10, first: "Dwight", last: "Schrute", handle: "@dschrute" },
-];
+import { useGetClassByGradeQuery } from "../../../control/api/classApi";
 
 const columns1 = [
   { label: "No" },
@@ -47,8 +35,7 @@ const CbtMc = ({ tableRef }) => {
   });
   const { results = [], totalPages, totalData } = rawData;
   const { data: questions } = useGetQuestionsQuery(quizId, { skip: !quizId });
-
-  console.log(results);
+  const { data: classes } = useGetClassByGradeQuery({ gradeId });
 
   return (
     <TableContainer
@@ -58,6 +45,27 @@ const CbtMc = ({ tableRef }) => {
       onValue={(e) => setSearch(e)}
       totalPages={totalPages}
     >
+      <div className="d-flex align-items-center justify-content-between">
+        <p className="m-0 h6">
+          Jumlah Siswa: <span>{totalData}</span>
+        </p>
+
+        <div className="d-flex align-items-center justify-content-end flex-wrap gap-1">
+          <button className="btn btn-secondary" onClick={() => setCode("")}>
+            Reset
+          </button>
+          {classes?.map((item) => (
+            <button
+              key={item.id}
+              className="btn btn-secondary"
+              onClick={() => setCode(item.code)}
+            >
+              {item.name}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <table ref={tableRef} className="table table-striped table-hover">
         <thead>
           <tr>
@@ -128,9 +136,15 @@ const CbtMc = ({ tableRef }) => {
                       </td>
                     );
                   })}
-                <td rowSpan={2}>{user.correct}</td>
-                <td rowSpan={2}>{user.wrong}</td>
-                <td rowSpan={2}>{user.mcPoin}</td>
+                <td rowSpan={2} className="align-middle text-center">
+                  {user.correct}
+                </td>
+                <td rowSpan={2} className="align-middle text-center">
+                  {user.wrong}
+                </td>
+                <td rowSpan={2} className="align-middle text-center">
+                  {user.mcPoin}
+                </td>
               </tr>
               <tr>
                 {questions
@@ -141,7 +155,12 @@ const CbtMc = ({ tableRef }) => {
                     );
 
                     return (
-                      <td key={i} className="align-middle text-center">
+                      <td
+                        key={i}
+                        className={`align-middle text-center ${
+                          answer?.poin == 0 ? "text-danger" : "text-success "
+                        } fw-bold`}
+                      >
                         {answer ? answer.poin : "-"}
                       </td>
                     );

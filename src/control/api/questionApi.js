@@ -7,11 +7,13 @@ export const questionApi = createApi({
     baseUrl: `${import.meta.env.VITE_BASE}/question`,
     credentials: "include",
   }),
+  tagTypes: ["questions"],
   endpoints: (builder) => ({
     getQuestions: builder.query({
       query: (id) => ({
         url: `/get-by-exam/${id}`,
       }),
+      providesTags: ["questions"],
     }),
     getQuestion: builder.query({
       query: (id) => ({
@@ -19,29 +21,12 @@ export const questionApi = createApi({
       }),
     }),
     createQuestion: builder.mutation({
-      query: ({ quizId, body }) => ({
+      query: (body) => ({
         url: "/create",
         method: "POST",
         body,
       }),
-      async onQueryStarted({ quizId }, { queryFulfilled, dispatch }) {
-        try {
-          await queryFulfilled;
-          dispatch(
-            questionApi.endpoints.getQuestions.initiate(quizId, {
-              forceRefetch: true,
-            })
-          );
-
-          dispatch(
-            quizApi.endpoints.getQuizes.initiate(undefined, {
-              forceRefetch: true,
-            })
-          );
-        } catch (error) {
-          console.error("Error creating question:", error);
-        }
-      },
+      providesTags: ["questions"],
     }),
     updateQuestion: builder.mutation({
       query: ({ id, body, quizId }) => ({
@@ -49,14 +34,7 @@ export const questionApi = createApi({
         method: "PUT",
         body,
       }),
-      async onQueryStarted({ quizId }, { queryFulfilled, dispatch }) {
-        await queryFulfilled;
-        dispatch(
-          questionApi.endpoints.getQuestions.initiate(quizId, {
-            forceRefetch: true,
-          })
-        );
-      },
+      providesTags: ["questions"],
     }),
     uploadQuestions: builder.mutation({
       query: ({ id, body }) => ({
@@ -64,56 +42,21 @@ export const questionApi = createApi({
         method: "POST",
         body,
       }),
-      async onQueryStarted({ id }, { queryFulfilled, dispatch }) {
-        try {
-          await queryFulfilled;
-          dispatch(
-            questionApi.endpoints.getQuestions.initiate(id, {
-              forceRefetch: true,
-            })
-          );
-
-          dispatch(
-            quizApi.endpoints.getQuizes.initiate(undefined, {
-              forceRefetch: true,
-            })
-          );
-        } catch (error) {
-          console.error("Error creating question:", error);
-        }
-      },
+      providesTags: ["questions"],
     }),
     deleteQuestion: builder.mutation({
-      query: ({ id, quizId }) => ({
+      query: (id) => ({
         url: `/delete/${id}`,
         method: "DELETE",
       }),
-      async onQueryStarted({ id, quizId }, { queryFulfilled, dispatch }) {
-        await queryFulfilled;
-        dispatch(
-          questionApi.endpoints.getQuestions.initiate(quizId, {
-            forceRefetch: true,
-          })
-        );
-      },
+      providesTags: ["questions"],
     }),
     clearData: builder.mutation({
       query: (id) => ({
         url: `/clear-data/${id}`,
         method: "DELETE",
       }),
-      async onQueryStarted(id, { queryFulfilled, dispatch }) {
-        try {
-          await queryFulfilled;
-          dispatch(
-            questionApi.endpoints.getQuestions.initiate(id, {
-              forceRefetch: true,
-            })
-          );
-        } catch (error) {
-          console.error("Error creating question:", error);
-        }
-      },
+      providesTags: ["questions"],
     }),
   }),
 });

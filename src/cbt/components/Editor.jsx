@@ -1,7 +1,11 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import ReactQuill from "react-quill-new";
+import ReactQuill, { Quill } from "react-quill-new";
+import QuillResizeImage from "quill-resize-image";
 import "react-quill-new/dist/quill.snow.css";
+
+// Register the resize module
+Quill.register("modules/resize", QuillResizeImage);
 
 class Editor extends Component {
   constructor(props) {
@@ -63,6 +67,10 @@ Editor.modules = () => ({
   },
   clipboard: {
     matchVisual: false,
+  },
+  // Add resize module
+  resize: {
+    modules: ["Resize"],
   },
 });
 

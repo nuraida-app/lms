@@ -73,6 +73,12 @@ const Addbank = ({ detail, id }) => {
     }
   }, [detail]);
 
+  useEffect(() => {
+    if (user?.role === "teacher") {
+      setTeacherId(user.id);
+    }
+  }, [user]);
+
   return (
     <div className="rounded shadow d-flex flex-column gap-2 mt-2 p-2">
       <p className="h5 m-0">Buat Bank Soal Baru</p>

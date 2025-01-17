@@ -12,6 +12,7 @@ import { setLogin } from "./control/slice/authSlice";
 import Loader from "./components/loader/Loader";
 
 const CbtBankList = lazy(() => import("./cbt/Bank/CbtBankList"));
+const ListQuestions = lazy(() => import("./cbt/Bank/forms/ListQuestions"));
 const AddQuestion = lazy(() => import("./cbt/Bank/forms/AddQuestion"));
 const CbtSchedules = lazy(() => import("./cbt/jadwal/CbtSchedules"));
 const CbtReport = lazy(() => import("./cbt/jadwal/laporan/CbtReport"));
@@ -34,6 +35,7 @@ const AdminSubjects = lazy(() => import("./admin/mapel/AdminSubjects"));
 const AdminTeacher = lazy(() => import("./admin/guru/AdminTeacher"));
 const AdminStudents = lazy(() => import("./admin/siswa/AdminStudents"));
 
+const TeacherDash = lazy(() => import("./guru/dahsboard/TeacherDash"));
 const TeacherProfile = lazy(() => import("./guru/profil/TeacherProfile"));
 const TeacherSubjects = lazy(() => import("./guru/mapel/TeacherSubjects"));
 
@@ -75,7 +77,15 @@ function App() {
           {/* CBT */}
           <Route path="/cbt-bank-soal" element={<CbtBankList />} />
 
-          <Route path="/cbt-bank-soal/:id/soal" element={<AddQuestion />} />
+          <Route
+            path="/cbt-bank-soal/:name/:bankid"
+            element={<ListQuestions />}
+          />
+
+          <Route
+            path="/cbt-bank-soal/:name/tambah-soal/:bankid"
+            element={<AddQuestion />}
+          />
 
           <Route path="/cbt-ujian" element={<CbtSchedules />} />
 
@@ -121,6 +131,8 @@ function App() {
           <Route path="/admin-siswa" element={<AdminStudents />} />
 
           {/* Guru */}
+          <Route path="/guru-dashboard" element={<TeacherDash />} />
+
           <Route path="/guru-profil" element={<TeacherProfile />} />
 
           <Route path="/guru-mapel" element={<TeacherSubjects />} />
