@@ -2,11 +2,7 @@ import express from "express";
 import { client } from "../../connection/connection.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import {
-  authenticatedUser,
-  authorize,
-  authorizeRoles,
-} from "../../middleware/authenticate.js";
+import { authorize } from "../../middleware/authenticate.js";
 
 const router = express.Router();
 
@@ -200,13 +196,13 @@ router.get(
           SELECT 
             user_teacher.id, user_teacher.role, user_teacher.nip, 
             user_teacher.name, user_teacher.email, user_teacher.subject_code, 
-            homebase.name AS homebase, user_teacher.homeroom, 
-            classes.name AS class, user_teacher.class_code, 
+            json_agg(json_build_object('id', homebase.id, 'name', homebase.name)) AS homebase, 
+            user_teacher.homeroom, classes.name AS class, user_teacher.class_code, 
             user_teacher.subject_classes, array_agg(subjects.name) AS subjects
           FROM 
             user_teacher 
           LEFT JOIN 
-            homebase ON homebase.id = user_teacher.homebase_id 
+            homebase ON homebase.id = ANY(user_teacher.homebase_id) 
           LEFT JOIN 
             classes ON classes.code = user_teacher.class_code 
           LEFT JOIN 
@@ -215,7 +211,7 @@ router.get(
             user_teacher.id = $1 
           GROUP BY 
             user_teacher.id, user_teacher.nip, user_teacher.name, 
-            user_teacher.email, homebase.name, user_teacher.homeroom, 
+            user_teacher.email, user_teacher.homeroom, 
             classes.name, user_teacher.class_code
         `;
         const teacherResult = await client.query(teacherQuery, [id]);

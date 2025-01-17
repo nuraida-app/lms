@@ -40,9 +40,10 @@ router.get(
   authorize("admin", "teacher", "super-admin"),
   async (req, res) => {
     try {
-      const homebase = req.user.homebase_id;
+      const homebaseIds = req.user.homebase_id;
 
-      if (req.user.id === 158) {
+      if (req.user.role === "super-admin") {
+        // Jika user adalah super-admin, tampilkan semua grade
         const data = await client.query(
           "SELECT grades.id, grades.grade, homebase.name AS homebase FROM grades " +
             "INNER JOIN homebase ON grades.homebase_id = homebase.id " +
@@ -52,13 +53,31 @@ router.get(
         const grades = data.rows;
 
         res.status(200).json(grades);
+      } else if (
+        req.user.role === "teacher" &&
+        Array.isArray(homebaseIds) &&
+        homebaseIds.length > 0
+      ) {
+        // Jika user adalah teacher dan homebase_id adalah array, gunakan klausa IN
+        const data = await client.query(
+          "SELECT grades.id, grades.grade, homebase.name AS homebase FROM grades " +
+            "INNER JOIN homebase ON grades.homebase_id = homebase.id " +
+            "WHERE homebase_id = ANY($1::int[]) " +
+            "ORDER BY CAST(grades.grade AS INTEGER) ASC",
+          [homebaseIds]
+        );
+
+        const grades = data.rows;
+
+        res.status(200).json(grades);
       } else {
+        // Untuk selain teacher atau homebase_id tunggal
         const data = await client.query(
           "SELECT grades.id, grades.grade, homebase.name AS homebase FROM grades " +
             "INNER JOIN homebase ON grades.homebase_id = homebase.id " +
             "WHERE homebase_id = $1 " +
             "ORDER BY CAST(grades.grade AS INTEGER) ASC",
-          [homebase]
+          [Array.isArray(homebaseIds) ? homebaseIds[0] : homebaseIds]
         );
 
         const grades = data.rows;

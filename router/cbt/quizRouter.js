@@ -74,7 +74,8 @@ router.get("/get", authorize("admin", "teacher"), async (req, res) => {
     // Adding search filter and pagination
     const { page, limit, search, teacherId } = req.query;
 
-    let query = `SELECT quizzes.id, quizzes.quiz_name, quizzes.teacher_id, user_teacher.name AS teacher, 
+    let query = `SELECT quizzes.id, quizzes.quiz_name, quizzes.teacher_id, user_teacher.name AS teacher,
+      quizzes.mc_weight, quizzes.essay_weight, 
       quizzes.shuffle, quizzes.grade_id, quizzes.homebase_id, grades.grade, 
       (SELECT COUNT(*) FROM questions WHERE questions.quiz_id = quizzes.id AND questions.type = 1) AS mc, 
       (SELECT COUNT(*) FROM questions WHERE questions.quiz_id = quizzes.id AND questions.type = 2) AS essay

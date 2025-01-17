@@ -48,7 +48,7 @@ router.post(
         : [quiz_id, type, question, a, b, c, d, e, key, score];
 
       await client.query(queryText, queryParams);
-      res.status(200).json({ message: "Question is successfully added" });
+      res.status(200).json({ message: "Berhasil ditambahkan" });
     } catch (error) {
       console.log(error);
       res.status(500).json({ message: error.message });
@@ -76,7 +76,7 @@ router.post("/upload/:id", authorize("admin", "teacher"), async (req, res) => {
     // Validate the total score
     if (totalScore !== 100) {
       return res.status(400).json({
-        error: `Grand score for all questions is 100, your grand total is ${totalScore}`,
+        error: `Total nilai PG harus 100, nalai anda saat ini ${totalScore}`,
       });
     }
 
@@ -103,7 +103,7 @@ router.post("/upload/:id", authorize("admin", "teacher"), async (req, res) => {
     );
 
     res.status(200).json({
-      message: `${validData.length} questions added successfully`,
+      message: `${validData.length} pertanyaan berhasil ditambahkan`,
     });
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -266,9 +266,7 @@ router.put(
 
       await client.query(queryText, queryParams);
 
-      return res
-        .status(200)
-        .json({ message: "Question is successfully updated" });
+      return res.status(200).json({ message: "Berhasil diperbarui" });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ message: error.message });
@@ -290,7 +288,7 @@ router.delete(
         req.params.id,
       ]);
 
-      res.status(200).json({ message: "Questions is successully deleted" });
+      res.status(200).json({ message: "Berhasil dihapus" });
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }
@@ -310,7 +308,7 @@ router.delete(
         req.params.quizId,
       ]);
 
-      res.status(200).json({ message: "Questions are successfully deleted" });
+      res.status(200).json({ message: "Seluruh pertanyaan berhasil dihapus" });
     } catch (error) {
       return res.status(500).json({ error: error.message });
     }

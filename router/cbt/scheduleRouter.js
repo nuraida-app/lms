@@ -138,7 +138,7 @@ router.get("/get", authorize("admin", "teacher"), async (req, res) => {
       const totalPages = Math.ceil(totalRecords / limit);
 
       const data = await client.query(
-        "SELECT schedules.id, schedules.name, schedules.quiz_id, schedules.description, schedules.token, grades.grade, schedules.time " +
+        "SELECT schedules.id, schedules.name, schedules.quiz_id, schedules.description, schedules.token, grades.grade, schedules.time, " +
           "schedules.homebase_id, " +
           "user_teacher.name AS teacher, quizzes.quiz_name AS quiz, " +
           "schedules.status, schedules.start, schedules.end, schedules.grade_id " +
