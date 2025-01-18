@@ -93,7 +93,7 @@ const Layout = ({ children, title }) => {
       </div>
 
       <div
-        className="container-fluid bg-white"
+        className="container-fluid bg-light"
         style={{
           marginTop: "65px",
           height: "calc(100vh - 65px)",

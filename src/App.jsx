@@ -18,6 +18,7 @@ const CbtSchedules = lazy(() => import("./cbt/jadwal/CbtSchedules"));
 const CbtReport = lazy(() => import("./cbt/jadwal/laporan/CbtReport"));
 
 const LmsMapel = lazy(() => import("./lms/LmsMapel"));
+const LmsMapelDetail = lazy(() => import("./lms/mapel/LmsMapelDetail"));
 
 const CenterDash = lazy(() => import("./center/dashboard/CenterDash"));
 const CenterAdmin = lazy(() => import("./center/admin/CenterAdmin"));
@@ -87,6 +88,11 @@ function App() {
             element={<AddQuestion />}
           />
 
+          <Route
+            path="/cbt-bank-soal/:name/tambah-soal/:bankid/:questionid"
+            element={<AddQuestion />}
+          />
+
           <Route path="/cbt-ujian" element={<CbtSchedules />} />
 
           <Route
@@ -96,6 +102,11 @@ function App() {
 
           {/* LMS */}
           <Route path="/lms-mapel" element={<LmsMapel />} />
+
+          <Route
+            path="/lms-mapel/:id/:name/:code"
+            element={<LmsMapelDetail />}
+          />
 
           {/* Center */}
           <Route path="/center-dashboard" element={<CenterDash />} />

@@ -26,7 +26,7 @@ export const classApi = createApi({
       providesTags: ["classes"],
     }),
     getClassByGrade: builder.query({
-      query: ({ gradeId }) => ({
+      query: (gradeId) => ({
         url: `/get-by-grade`,
         params: { gradeId },
         method: "GET",

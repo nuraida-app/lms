@@ -151,7 +151,7 @@ const Addbank = ({ detail, id }) => {
           required
         >
           <option value="" disabled hidden>
-            Acak
+            Acak Soal
           </option>
           <option value={true}>Ya</option>
           <option value={false}>Tidak</option>

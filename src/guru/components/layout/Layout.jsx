@@ -1,6 +1,6 @@
 import React, { Fragment } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { TeacherMenus } from "./Menus";
 import MetaData from "../../../components/meta/MetaData";
 import { useLogoutMutation } from "../../../control/api/authApi";
@@ -10,6 +10,7 @@ import BtnLoader from "../../../components/loader/BtnLoader";
 
 const Layout = ({ children, title }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const { user } = useSelector((state) => state.auth);
   const [logout, { isLoading }] = useLogoutMutation();
@@ -26,7 +27,7 @@ const Layout = ({ children, title }) => {
 
       navigate("/");
     } catch (error) {
-      console.log(error.data.message);
+      console.log(error);
     }
   };
 

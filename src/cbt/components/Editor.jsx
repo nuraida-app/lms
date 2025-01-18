@@ -15,7 +15,6 @@ class Editor extends Component {
   }
 
   handleChange = (html) => {
-    // Debug log
     this.setState({ editorHtml: html });
     this.props.onChange(html);
   };
@@ -25,6 +24,40 @@ class Editor extends Component {
       this.setState({ editorHtml: this.props.value });
     }
   }
+
+  handleImageUpload = () => {
+    const input = document.createElement("input");
+    input.setAttribute("type", "file");
+    input.setAttribute("accept", "image/*");
+    input.click();
+
+    input.onchange = async () => {
+      const file = input.files[0];
+      if (file) {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+          const response = await fetch(
+            `${import.meta.env.VITE_BASE}/upload/images`,
+            {
+              method: "POST",
+              body: formData,
+            }
+          );
+          const data = await response.json();
+
+          const range = this.reactQuillRef.getEditor().getSelection();
+          this.reactQuillRef
+            .getEditor()
+            .insertEmbed(range.index, "image", data.url);
+        } catch (error) {
+          console.error("Error uploading image:", error);
+          alert(error.message);
+        }
+      }
+    };
+  };
 
   render() {
     const { placeholder } = this.props;
@@ -38,7 +71,7 @@ class Editor extends Component {
           theme="snow"
           value={this.state.editorHtml}
           onChange={this.handleChange}
-          modules={Editor.modules()}
+          modules={Editor.modules(this.handleImageUpload)}
           formats={Editor.formats}
           placeholder={placeholder}
           style={{ width: "100%" }}
@@ -49,7 +82,7 @@ class Editor extends Component {
   }
 }
 
-Editor.modules = () => ({
+Editor.modules = (handleImageUpload) => ({
   toolbar: {
     container: [
       [{ header: "1" }, { header: "2" }, { font: [] }],
@@ -64,11 +97,13 @@ Editor.modules = () => ({
       ["link", "image", "video"],
       ["clean"],
     ],
+    handlers: {
+      image: handleImageUpload,
+    },
   },
   clipboard: {
     matchVisual: false,
   },
-  // Add resize module
   resize: {
     modules: ["Resize"],
   },

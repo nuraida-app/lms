@@ -47,7 +47,7 @@ const AdminClass = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      toast.success(data.message);
+      toast.success(msg.message);
       reset();
     }
 

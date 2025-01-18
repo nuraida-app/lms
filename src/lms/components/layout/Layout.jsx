@@ -2,18 +2,42 @@ import React, { Fragment } from "react";
 import { useNavigate } from "react-router-dom";
 import { AdminMenus } from "../../../admin/components/layout/Menus";
 import { TeacherMenus } from "../../../guru/components/layout/Menus";
+import MetaData from "../../../components/meta/MetaData";
+import Protected from "../../../components/otentikasi/Protected";
+import { useDispatch, useSelector } from "react-redux";
+import { useLogoutMutation } from "../../../control/api/authApi";
+import { setLogout } from "../../../control/slice/authSlice";
+import BtnLoader from "../../../components/loader/BtnLoader";
 
-const Layout = ({ children }) => {
+const Layout = ({ children, title }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const role = "teacher";
-  const name = "Muajaddid Al Magribi";
+  const { user } = useSelector((state) => state.auth);
+  const [logout, { isLoading, error }] = useLogoutMutation();
+
+  const role = user?.role;
+  const name = user?.name;
 
   const goToLink = (link) => {
     navigate(link);
   };
+
+  const logutHandler = async () => {
+    try {
+      await logout().unwrap();
+
+      dispatch(setLogout());
+
+      navigate("/");
+    } catch (error) {
+      console.log(error.data.message);
+    }
+  };
   return (
     <Fragment>
+      <MetaData title={title} />
+      <Protected roles={["teacher"]} />
       <div className="container-fluid fixed-top bg-info">
         <nav
           className="navbar navbar-expand-lg"
@@ -56,7 +80,13 @@ const Layout = ({ children }) => {
                   )
                 )}
 
-                <button className="btn btn-danger">Logout</button>
+                {isLoading ? (
+                  <BtnLoader />
+                ) : (
+                  <button className="btn btn-danger" onClick={logutHandler}>
+                    Logout
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -64,7 +94,7 @@ const Layout = ({ children }) => {
       </div>
 
       <div
-        className="container-fluid bg-white"
+        className="container-fluid bg-light"
         style={{
           marginTop: "65px",
           minHeight: "calc(100vh - 65px)",

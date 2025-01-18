@@ -2,11 +2,14 @@ import React, { useEffect } from "react";
 import Layout from "../../components/Layout";
 import { useNavigate, useParams } from "react-router-dom";
 import {
+  useClearDataMutation,
   useDeleteQuestionMutation,
   useGetQuestionsQuery,
 } from "../../../control/api/questionApi";
 import BtnLoader from "../../../components/loader/BtnLoader";
 import { toast } from "react-toastify";
+import ReactAudioPlayer from "react-audio-player";
+import Upload from "./Upload";
 
 const createMarkup = (html) => {
   return { __html: html };
@@ -20,12 +23,37 @@ const ListQuestions = () => {
   const { data } = useGetQuestionsQuery(bankid, { skip: !bankid });
   const [deleteQuestion, { data: msg, isSuccess, isLoading, error, reset }] =
     useDeleteQuestionMutation();
+  const [
+    clearData,
+    {
+      data: clear,
+      isSuccess: isClear,
+      isLoading: clearLoaading,
+      error: clearError,
+      reset: clearReset,
+    },
+  ] = useClearDataMutation();
 
   const mc = data?.filter((d) => d.type === 1);
   const essay = data?.filter((d) => d.type === 2);
 
   const goToLink = () =>
     navigate(`/cbt-bank-soal/${name}/tambah-soal/${bankid}`);
+
+  const editLink = (id) =>
+    navigate(`/cbt-bank-soal/${name}/tambah-soal/${bankid}/${id}`);
+
+  const download = () => window.open("/temp/soal_template.xlsx", "_blank");
+
+  const remove = () => {
+    const confirm = window.confirm(
+      "Apakah anda yakin akan mengahpus semua pertanyaan?"
+    );
+
+    if (confirm) {
+      clearData(bankid);
+    }
+  };
 
   useEffect(() => {
     if (isSuccess) {
@@ -40,13 +68,26 @@ const ListQuestions = () => {
     }
   }, [msg, isSuccess, error]);
 
+  useEffect(() => {
+    if (isClear) {
+      toast.success(clear.message);
+      reset();
+      window.location.reload();
+    }
+
+    if (clearError) {
+      toast.error(clearError.data.message);
+      reset();
+    }
+  }, [clear, isClear, clearError]);
+
   return (
     <Layout title={"Daftar Soal"}>
       <div
         className="container-fluid bg-light d-flex flex-column gap-4"
         style={{ maxHeight: "calc(100vh - 70px)", overflow: "auto" }}
       >
-        <div className="d-flex flex-wrap align-items-center justify-content-lg-between justify-content-center">
+        <div className="d-flex flex-wrap align-items-center justify-content-lg-between justify-content-center rounded bg-white shadow p-2">
           <div>
             <p className="m-0 text-center text-sm-start">
               Bank Soal : <span>{name.replaceAll("-", " ")}</span>
@@ -58,22 +99,34 @@ const ListQuestions = () => {
           </div>
 
           <div className="d-flex gap-2">
-            <button className="btn btn-info">Template</button>
-            <button className="btn btn-primary">Upload</button>
+            <button className="btn btn-info" onClick={download}>
+              Template
+            </button>
+            <Upload />
             <button className="btn btn-success" onClick={goToLink}>
               Tambah
             </button>
-            <button className="btn btn-danger">Kosongkan</button>
+            {clearLoaading ? (
+              <BtnLoader />
+            ) : (
+              <button className="btn btn-danger" onClick={remove}>
+                Kosongkan
+              </button>
+            )}
           </div>
         </div>
 
         {mc?.map((item, i) => (
-          <div key={i} className="row g-1 rounded shadow p-2 border border-sm">
+          <div
+            key={i}
+            className="row g-1 rounded shadow p-2 border border-sm bg-white"
+          >
             {/* soal */}
             <div className="col-lg-10 col-12 d-flex flex-column gap-1">
               <div className="d-flex gap-2">
                 <p className="m-0 fw-bold">{`${i + 1}.`}</p>
                 <div dangerouslySetInnerHTML={createMarkup(item.question)} />
+                {item.audio && <ReactAudioPlayer src={item.audio} controls />}
               </div>
 
               {item.choices.map(
@@ -102,7 +155,12 @@ const ListQuestions = () => {
             {/* Buttons */}
             <div className="col-lg-2 col-12">
               <div className="d-flex flex-column gap-2">
-                <button className="btn btn-warning">Edit</button>
+                <button
+                  className="btn btn-warning"
+                  onClick={() => editLink(item.id)}
+                >
+                  Edit
+                </button>
                 {isLoading ? (
                   <BtnLoader />
                 ) : (
@@ -119,16 +177,27 @@ const ListQuestions = () => {
         ))}
 
         {essay?.map((item, i) => (
-          <div key={i} className="row g-1 rounded shadow p-2 border border-sm">
+          <div
+            key={i}
+            className="row g-1 rounded shadow p-2 border border-sm bg-white"
+          >
             <div className="col-lg-10 col-12">
-              <div className="d-flex gap-2">
-                <p className="m-0 fw-bold">{`${mc?.length + i + 1}.`}</p>
-                <div dangerouslySetInnerHTML={createMarkup(item.question)} />
+              <div className="d-flex flex-column gap-2">
+                <div className="d-flex gap-2">
+                  <p className="m-0 fw-bold">{`${mc?.length + i + 1}.`}</p>
+                  <div dangerouslySetInnerHTML={createMarkup(item.question)} />
+                </div>
+                <p className="m-0 ms-4 text-primary fw-bold">{`Nilai : ${item.score}`}</p>
               </div>
             </div>
             <div className="col-lg-2 col-12">
               <div className="d-flex flex-column gap-2">
-                <button className="btn btn-warning">Edit</button>
+                <button
+                  className="btn btn-warning"
+                  onClick={() => editLink(item.id)}
+                >
+                  Edit
+                </button>
                 {isLoading ? (
                   <BtnLoader />
                 ) : (

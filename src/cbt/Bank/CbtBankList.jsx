@@ -77,7 +77,11 @@ const CbtBankList = () => {
               <thead>
                 <tr>
                   {columns.map((column, i) => (
-                    <th key={i} scope="col" className="text-center">
+                    <th
+                      key={i}
+                      scope="col"
+                      className="align-middle text-center"
+                    >
                       {column.label}
                     </th>
                   ))}
