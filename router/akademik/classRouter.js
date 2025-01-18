@@ -42,12 +42,16 @@ router.post("/create", authorize("admin"), async (req, res) => {
 // Menampilkan kelas
 router.get("/get", authorize("admin", "teacher"), async (req, res) => {
   try {
-    const homebase = req.user.homebase_id;
+    let homebase = req.user.homebase_id; // Expecting an array, e.g., ["2", "1"]
     const { page, limit, search } = req.query;
 
     let classes = [];
     let totalCount = 0;
     let totalPages = 0;
+
+    if (!Array.isArray(homebase)) {
+      homebase = [homebase];
+    }
 
     if (page && limit && search) {
       const offset = (page - 1) * limit;
@@ -58,7 +62,7 @@ router.get("/get", authorize("admin", "teacher"), async (req, res) => {
         `SELECT COUNT(*) AS total
          FROM classes 
          INNER JOIN homebase ON homebase.id = classes.homebase_id 
-         WHERE classes.homebase_id = $1 AND classes.name ILIKE $2`,
+         WHERE classes.homebase_id = ANY($1) AND classes.name ILIKE $2`,
         [homebase, querySearch]
       );
       totalCount = parseInt(totalCountResult.rows[0].total, 10);
@@ -71,7 +75,7 @@ router.get("/get", authorize("admin", "teacher"), async (req, res) => {
            FROM classes 
            INNER JOIN homebase ON homebase.id = classes.homebase_id 
            INNER JOIN grades ON grades.id = classes.grade_id 
-           WHERE classes.homebase_id = $1 AND classes.name ILIKE $2 
+           WHERE classes.homebase_id = ANY($1) AND classes.name ILIKE $2 
            ORDER BY classes.createdat ASC 
            LIMIT $3 OFFSET $4`,
         [homebase, querySearch, limit, offset]
@@ -86,14 +90,14 @@ router.get("/get", authorize("admin", "teacher"), async (req, res) => {
            FROM classes 
            INNER JOIN homebase ON homebase.id = classes.homebase_id 
            INNER JOIN grades ON grades.id = classes.grade_id 
-           WHERE classes.homebase_id = $1 
+           WHERE classes.homebase_id = ANY($1) 
            ORDER BY classes.createdat ASC`,
         [homebase]
       );
 
       classes = data.rows;
       totalCount = classes.length;
-      totalPages = 1;
+      totalPages = Math.ceil(totalCount / (limit || classes.length));
     }
 
     // Fetch students count for each class based on class_code
@@ -112,6 +116,7 @@ router.get("/get", authorize("admin", "teacher"), async (req, res) => {
       totalPages,
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ message: error.message });
   }
 });

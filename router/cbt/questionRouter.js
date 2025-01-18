@@ -32,23 +32,39 @@ router.post(
   uploadAudio.single("audio"),
   async (req, res) => {
     try {
-      const { quiz_id, type, question, a, b, c, d, e, key, score } = req.body;
+      const { quiz_id, type, question, a, b, c, d, e, key, score, id } =
+        req.body;
       const audio = req.file
         ? process.env.SERVER_2 + "/upload/audios/" + req.file.filename
         : null;
 
-      const queryText = audio
-        ? `INSERT INTO questions(quiz_id, type, question, a, b, c, d, e, key, score, audio) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`
-        : `INSERT INTO questions(quiz_id, type, question, a, b, c, d, e, key, score) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`;
+      if (id) {
+        const updateQueryText = audio
+          ? `UPDATE questions SET quiz_id = $1, type = $2, question = $3, a = $4, b = $5, 
+          c = $6, d = $7, e = $8, key = $9, score = $10, audio = $11 WHERE id = $12 RETURNING *`
+          : `UPDATE questions SET quiz_id = $1, type = $2, question = $3, a = $4, 
+          b = $5, c = $6, d = $7, e = $8, key = $9, score = $10 WHERE id = $11 RETURNING *`;
 
-      const queryParams = audio
-        ? [quiz_id, type, question, a, b, c, d, e, key, score, audio]
-        : [quiz_id, type, question, a, b, c, d, e, key, score];
+        const updateQueryParams = audio
+          ? [quiz_id, type, question, a, b, c, d, e, key, score, audio, id]
+          : [quiz_id, type, question, a, b, c, d, e, key, score, id];
 
-      await client.query(queryText, queryParams);
-      res.status(200).json({ message: "Berhasil ditambahkan" });
+        await client.query(updateQueryText, updateQueryParams);
+        res.status(200).json({ message: "Berhasil diperbarui" });
+      } else {
+        const insertQueryText = audio
+          ? `INSERT INTO questions(quiz_id, type, question, a, b, c, d, e, key, score, audio) 
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`
+          : `INSERT INTO questions(quiz_id, type, question, a, b, c, d, e, key, score) 
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`;
+
+        const insertQueryParams = audio
+          ? [quiz_id, type, question, a, b, c, d, e, key, score, audio]
+          : [quiz_id, type, question, a, b, c, d, e, key, score];
+
+        await client.query(insertQueryText, insertQueryParams);
+        res.status(200).json({ message: "Berhasil ditambahkan" });
+      }
     } catch (error) {
       console.log(error);
       res.status(500).json({ message: error.message });
@@ -69,14 +85,16 @@ router.post("/upload/:id", authorize("admin", "teacher"), async (req, res) => {
     );
 
     const pgQuestions = validData.filter((item) => item[1] === 1);
+    const essayQuestions = validData.filter((item) => item[1] === 2);
 
     // Calculate the total score
-    const totalScore = pgQuestions?.reduce((sum, item) => sum + item[8], 0);
+    const pgScore = pgQuestions?.reduce((sum, item) => sum + item[8], 0);
+    const essayScore = essayQuestions?.reduce((sum, item) => sum + item[8], 0);
 
     // Validate the total score
-    if (totalScore !== 100) {
+    if (pgScore !== 100 || essayScore !== 100) {
       return res.status(400).json({
-        error: `Total nilai PG harus 100, nalai anda saat ini ${totalScore}`,
+        message: `Total nilai PG dan Essay harus 100, nalai anda saat ini PG ${pgScore} dan Essay ${essayScore}`,
       });
     }
 
@@ -232,47 +250,6 @@ router.get("/detail/:id", authorize("admin", "teacher"), async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 });
-
-// Memperbarui pertanyaan
-router.put(
-  "/update/:id",
-  authorize("admin", "teacher"),
-  uploadAudio.single("audio"),
-  async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { quiz_id, type, question, a, b, c, d, e, key, score } = req.body;
-      const audio = req.file
-        ? process.env.SERVER_2 + "/upload/audios/" + req.file.filename
-        : null;
-
-      // Cek apakah pertanyaan ada di database
-      const existingQuestion = await client.query(
-        "SELECT * FROM questions WHERE id = $1",
-        [id]
-      );
-      if (existingQuestion.rowCount === 0) {
-        return res.status(404).json({ message: "Question not found" });
-      }
-
-      // Update pertanyaan di database
-      const queryText = audio
-        ? "UPDATE questions SET quiz_id = $1, type = $2, question = $3, a = $4, b = $5, c = $6, d = $7, e = $8, key = $9, score = $10, audio = $11 WHERE id = $12"
-        : "UPDATE questions SET quiz_id = $1, type = $2, question = $3, a = $4, b = $5, c = $6, d = $7, e = $8, key = $9, score = $10 WHERE id = $11";
-
-      const queryParams = audio
-        ? [quiz_id, type, question, a, b, c, d, e, key, score, audio, id]
-        : [quiz_id, type, question, a, b, c, d, e, key, score, id];
-
-      await client.query(queryText, queryParams);
-
-      return res.status(200).json({ message: "Berhasil diperbarui" });
-    } catch (error) {
-      console.log(error);
-      return res.status(500).json({ message: error.message });
-    }
-  }
-);
 
 // Menghapus pertanyaan
 router.delete(

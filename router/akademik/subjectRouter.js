@@ -59,19 +59,20 @@ router.get("/get", authorize("admin", "teacher"), async (req, res) => {
         total,
       });
     } else {
-      const data = await client.query(`SELECT * FROM teachers WHERE id = $1`, [
-        req.user.id,
-      ]);
+      const data = await client.query(
+        `SELECT * FROM user_teacher WHERE id = $1`,
+        [req.user.id]
+      );
 
       const teacher = data.rows[0];
       const subjectCodes = teacher.subject_code;
 
       const query = limit
-        ? `SELECT code, name FROM subjects 
+        ? `SELECT code, name, id FROM subjects 
            WHERE code = ANY($1::int[]) AND name ILIKE $2 
            ORDER BY name ASC 
            LIMIT $3 OFFSET $4`
-        : `SELECT code, name FROM subjects 
+        : `SELECT code, name, id FROM subjects 
            WHERE code = ANY($1::int[]) AND name ILIKE $2 
            ORDER BY name ASC`;
 
@@ -117,6 +118,7 @@ router.get("/get", authorize("admin", "teacher"), async (req, res) => {
       });
     }
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ error: error.message });
   }
 });
