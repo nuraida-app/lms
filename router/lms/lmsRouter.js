@@ -79,18 +79,102 @@ router.post("/add-chapter", authorize("teacher"), async (req, res) => {
   }
 });
 
-router.get("/chapters/:code", authorize("teacher"), async (req, res) => {
+router.get("/chapters", authorize("teacher"), async (req, res) => {
   try {
+    const { grade_id, subjectCode } = req.query; // Mendapatkan grade_id dari query params
+
+    // Query untuk mendapatkan data gabungan dari semua tabel
     const data = await client.query(
-      `SELECT * FROM lms_chapters WHERE subject_code = $1
-        ORDER BY created_at ASC`,
-      [req.params.code]
+      `
+      SELECT 
+        c.id AS chapter_id,
+        c.title AS chapter_title,
+        c.goal AS chapter_goal,
+        c.created_at AS chapter_created_at,
+        c.updated_at AS chapter_updated_at,
+        c.grade_id AS chapter_grade_id,
+        t.id AS topic_id,
+        t.title AS topic_title,
+        t.goal AS topic_goal,
+        t.created_at AS topic_created_at,
+        t.updated_at AS topic_updated_at,
+        f.id AS file_id,
+        f.title AS file_title,
+        f.link_file AS file_link,
+        f.video AS file_video,
+        g.grade AS grade_name,
+        cl.name AS class_name
+      FROM lms_chapters c
+      LEFT JOIN lms_topics t ON t.chapter_id = c.id
+      LEFT JOIN lms_files f ON f.topic_id = t.id
+      LEFT JOIN grades g ON g.id = c.grade_id
+      LEFT JOIN classes cl ON cl.grade_id = g.id
+      WHERE c.subject_code = $1
+      ${grade_id ? "AND c.grade_id = $2" : ""}
+      ORDER BY g.grade::int ASC, c.created_at ASC, cl.name ASC
+      `,
+      grade_id ? [subjectCode, grade_id] : [subjectCode]
     );
 
     if (data.rowCount > 0) {
       const chapters = data.rows;
 
-      res.status(200).json(chapters);
+      // Menstrukturkan data agar sesuai dengan kebutuhan frontend
+      const structuredData = chapters.reduce((acc, row) => {
+        let chapter = acc.find((ch) => ch.chapter_id === row.chapter_id);
+        if (!chapter) {
+          chapter = {
+            chapter_id: row.chapter_id,
+            chapter_title: row.chapter_title,
+            chapter_goal: row.chapter_goal,
+            grade_id: row.chapter_grade_id,
+            grade_name: row.grade_name,
+            class_names: new Set(), // Menggunakan Set untuk menghindari duplikasi nama kelas
+            created_at: row.chapter_created_at,
+            updated_at: row.chapter_updated_at,
+            topics: [],
+          };
+          acc.push(chapter);
+        }
+
+        // Tambahkan nama kelas jika ada
+        if (row.class_name) {
+          chapter.class_names.add(row.class_name);
+        }
+
+        if (row.topic_id) {
+          let topic = chapter.topics.find((tp) => tp.topic_id === row.topic_id);
+          if (!topic) {
+            topic = {
+              topic_id: row.topic_id,
+              topic_title: row.topic_title,
+              goal: row.topic_goal,
+              created_at: row.topic_created_at,
+              updated_at: row.topic_updated_at,
+              files: [],
+            };
+            chapter.topics.push(topic);
+          }
+
+          if (row.file_id) {
+            topic.files.push({
+              file_id: row.file_id,
+              title: row.file_title,
+              link_file: row.file_link,
+              video: row.file_video,
+            });
+          }
+        }
+
+        return acc;
+      }, []);
+
+      // Konversi Set class_names menjadi array string
+      structuredData.forEach((chapter) => {
+        chapter.class_names = Array.from(chapter.class_names);
+      });
+
+      res.status(200).json(structuredData);
     } else {
       return res.status(404).json({ message: "Data not found" });
     }
@@ -166,7 +250,7 @@ router.post(
   uploadFiles.array("files", 10), // Allow multiple files with a limit of 10
   async (req, res) => {
     try {
-      const { id, chapter_id, title, goal, subject_code, url_files } = req.body;
+      const { id, chapter_id, title, goal, subject_code } = req.body;
 
       let topicId = id;
 
@@ -185,42 +269,9 @@ router.post(
         );
       }
 
-      // Handle file uploads
-      const username = req.user.name.replace(/\s+/g, "_").toLowerCase();
-      const userFolder = `${username}`;
-
-      if (req.files && req.files.length > 0) {
-        for (const file of req.files) {
-          const fileLink =
-            process.env.SERVER_2 + `/upload/lms/${userFolder}/` + file.filename;
-
-          await client.query(
-            `INSERT INTO lms_files (subject_code, topic_id, type_file, link_file, title) VALUES ($1, $2, $3, $4, $5)
-             ON CONFLICT (link_file) DO UPDATE SET 
-             type_file = EXCLUDED.type_file,
-             title = EXCLUDED.title`,
-            [subject_code, topicId, "file", fileLink, file.originalname]
-          );
-        }
-      }
-
-      // Handle URLs
-      if (url_files) {
-        const urls = Array.isArray(url_files) ? url_files : [url_files];
-        for (const url of urls) {
-          const video = "youtube"; // Assuming URL type is "youtube"
-
-          await client.query(
-            `INSERT INTO lms_files (subject_code, topic_id, type_file, link_file, title) VALUES ($1, $2, $3, $4, $5)
-             ON CONFLICT (link_file) DO UPDATE SET 
-             type_file = EXCLUDED.type_file,
-             title = EXCLUDED.title`,
-            [subject_code, topicId, video, url, "URL"]
-          );
-        }
-      }
-
-      return res.status(200).json({ message: id ? "Updated" : "Saved" });
+      return res
+        .status(200)
+        .json({ message: id ? "Berhasil diperbarui" : "Berhasil disimpan" });
     } catch (error) {
       console.error(error);
       return res.status(500).json({ message: error.message });
