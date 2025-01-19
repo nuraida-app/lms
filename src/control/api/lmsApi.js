@@ -6,19 +6,28 @@ export const lmsApi = createApi({
     baseUrl: `${import.meta.env.VITE_BASE}/lms`,
     credentials: "include",
   }),
-  tagTypes: ["chapters", "chapter", "topic", "topics", "files"],
+  tagTypes: ["chapters", "chapter", "topics", "files"],
   endpoints: (builder) => ({
     getChapters: builder.query({
-      query: (code) => `/chapters/${code}`,
-      providesTags: ["chapters"],
-    }),
-    getChaptesClass: builder.query({
-      query: () => `/get-chapter-for-class`,
-      providesTags: ["chapters"],
+      query: ({ subjectCode, grade_id }) => ({
+        url: `/chapters`,
+        params: { subjectCode, grade_id },
+        method: "GET",
+      }),
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.map(({ chapter_id }) => ({
+                type: "chapters",
+                id: chapter_id,
+              })),
+              { type: "chapters", id: "LIST" },
+            ]
+          : [{ type: "chapters", id: "LIST" }],
     }),
     getChapter: builder.query({
       query: (id) => `/chapter/${id}`,
-      providesTags: ["chapter"],
+      providesTags: (result, error, id) => [{ type: "chapter", id }],
     }),
     addChapter: builder.mutation({
       query: (body) => ({
@@ -26,14 +35,14 @@ export const lmsApi = createApi({
         method: "POST",
         body,
       }),
-      invalidatesTags: ["chapters"],
+      invalidatesTags: [{ type: "chapters", id: "LIST" }],
     }),
     deleteChapter: builder.mutation({
       query: (id) => ({
         url: `/delete-chapter/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["chapters"],
+      invalidatesTags: [{ type: "chapters", id: "LIST" }],
     }),
     addTopic: builder.mutation({
       query: (body) => ({
@@ -41,22 +50,24 @@ export const lmsApi = createApi({
         method: "POST",
         body,
       }),
-      invalidatesTags: ["topics"],
+      invalidatesTags: [{ type: "chapters", id: "LIST" }], // Invalidate chapters cache
     }),
     getTopics: builder.query({
       query: (chapter_id) => `/topics/${chapter_id}`,
-      providesTags: ["topics"],
+      providesTags: (result, error, chapter_id) => [
+        { type: "topics", id: chapter_id },
+      ],
     }),
     getTopic: builder.query({
       query: (id) => `/topic/${id}`,
-      providesTags: ["topic"],
+      providesTags: (result, error, id) => [{ type: "topics", id }],
     }),
     deleteTopic: builder.mutation({
       query: (id) => ({
         url: `/delete-topic/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["topics"],
+      invalidatesTags: [{ type: "chapters", id: "LIST" }], // Invalidate chapters cache
     }),
     uploadFile: builder.mutation({
       query: (body) => ({
@@ -64,25 +75,24 @@ export const lmsApi = createApi({
         method: "POST",
         body,
       }),
-      invalidatesTags: ["files"],
+      invalidatesTags: [{ type: "chapters", id: "LIST" }], // Invalidate chapters cache
     }),
     getFiles: builder.query({
       query: (id) => `/get-files/${id}`,
-      providesTags: ["files"],
+      providesTags: (result, error, id) => [{ type: "files", id }],
     }),
     deleteFile: builder.mutation({
       query: (id) => ({
         url: `/delete-file/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["files"],
+      invalidatesTags: [{ type: "chapters", id: "LIST" }], // Invalidate chapters cache
     }),
   }),
 });
 
 export const {
   useGetChaptersQuery,
-  useGetChaptesClassQuery,
   useGetChapterQuery,
   useAddChapterMutation,
   useDeleteChapterMutation,

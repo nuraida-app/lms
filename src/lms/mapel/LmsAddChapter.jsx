@@ -5,9 +5,8 @@ import { useGetClassByGradeQuery } from "../../control/api/classApi";
 import { useAddChapterMutation } from "../../control/api/lmsApi";
 import { toast } from "react-toastify";
 import BtnLoader from "../../components/loader/BtnLoader";
-import { useGetGradesQuery } from "../../control/api/gradeApi";
 
-const LmsAddChapter = ({ add, id }) => {
+const LmsAddChapter = ({ add, id, grades, gLoad }) => {
   const params = useParams();
   const code = params.code;
 
@@ -16,7 +15,6 @@ const LmsAddChapter = ({ add, id }) => {
   const [classIds, setClasses] = useState([]);
   const [gradeid, setGradeId] = useState("");
 
-  const { data: grades, isLoading: gLoad } = useGetGradesQuery();
   const { data: classes, isLoading: cLoad } = useGetClassByGradeQuery(gradeid, {
     skip: !gradeid,
   });

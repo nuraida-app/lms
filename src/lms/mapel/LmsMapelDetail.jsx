@@ -4,14 +4,20 @@ import { useParams } from "react-router-dom";
 import LmsAddChapter from "./LmsAddChapter";
 import { useGetChaptersQuery } from "../../control/api/lmsApi";
 import LmsChaptersList from "./LmsChaptersList";
+import { useGetGradesQuery } from "../../control/api/gradeApi";
 
 const LmsMapelDetail = () => {
   const params = useParams();
   const { name, id, code } = params;
 
   const [add, setAdd] = useState(false);
+  const [gradeId, setGradeId] = useState("");
 
-  const { data: chapters } = useGetChaptersQuery(code, { skip: !code });
+  const { data: grades, isLoading: gLoad } = useGetGradesQuery();
+  const { data: chapters } = useGetChaptersQuery({
+    grade_id: gradeId,
+    subjectCode: code,
+  });
 
   return (
     <Layout title={name}>
@@ -37,10 +43,21 @@ const LmsMapelDetail = () => {
         </div>
       )}
 
-      {add && <LmsAddChapter add={() => setAdd(false)} />}
+      {add && (
+        <LmsAddChapter
+          add={() => setAdd(false)}
+          grades={grades}
+          gLoad={gLoad}
+        />
+      )}
 
       {chapters && !add && (
-        <LmsChaptersList chapters={chapters} add={() => setAdd(true)} />
+        <LmsChaptersList
+          chapters={chapters}
+          add={() => setAdd(true)}
+          grades={grades}
+          setGrade={(e) => setGradeId(e)}
+        />
       )}
     </Layout>
   );
