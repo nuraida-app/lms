@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import FileCard from "./FileCard";
+import Player from "./Player";
 
 const createMarkup = (html) => ({ __html: html });
 
@@ -12,15 +13,14 @@ const TopicCard = ({
   setChapterId,
   setTopicId,
 }) => {
+  const [name, setName] = useState("");
+  const [url, setUrl] = useState("");
+
   const handleEdit = () => {
     setTopicId(topic.topic_id);
     setTitle(topic.topic_title);
     setChapterId(topic.topic_chapter);
     setGoal(topic.goal);
-  };
-
-  const fileHandler = (link) => {
-    window.open(link, "_blank");
   };
 
   return (
@@ -74,9 +74,11 @@ const TopicCard = ({
             dangerouslySetInnerHTML={createMarkup(topic.goal)}
           />
           {/* FileCard Component Integration */}
-          <FileCard files={topic.files} fileHandler={fileHandler} />
+          <FileCard files={topic.files} />
         </div>
       </div>
+
+      <Player />
     </div>
   );
 };

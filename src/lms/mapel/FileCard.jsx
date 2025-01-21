@@ -1,15 +1,31 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDeleteFileMutation } from "../../control/api/lmsApi";
 import { toast } from "react-toastify";
 import BtnLoader from "../../components/loader/BtnLoader";
+import { useSelector } from "react-redux";
+import Player from "./Player";
 
-const FileCard = ({ files, fileHandler }) => {
+const FileCard = ({ files }) => {
+  const [name, setName] = useState("");
+  const [url, setUrl] = useState("");
+
+  const { user } = useSelector((state) => state.auth);
+
   if (!files || files.length === 0) {
     return <p>Belum ada file yang diupload untuk topik ini.</p>;
   }
 
   const [deleteFile, { data, isSuccess, isLoading, error, reset }] =
     useDeleteFileMutation();
+
+  const fileHandler = (file) => {
+    if (file.link_file) {
+      window.open(file.link_file, "_blank");
+    } else {
+      setName(file.title);
+      setUrl(file.video);
+    }
+  };
 
   useEffect(() => {
     if (isSuccess) {
@@ -32,7 +48,9 @@ const FileCard = ({ files, fileHandler }) => {
         >
           <button
             className={`btn btn-primary d-flex gap-2`}
-            onClick={() => fileHandler(file.link_file || file.video)}
+            onClick={() => fileHandler(file)}
+            data-bs-toggle={file.video ? "modal" : null}
+            data-bs-target={file.video ? "#video" : null}
           >
             <i className="bi bi-youtube"></i>
             {file.title}
@@ -41,15 +59,19 @@ const FileCard = ({ files, fileHandler }) => {
           {isLoading ? (
             <BtnLoader />
           ) : (
-            <button
-              className="btn btn-danger"
-              onClick={() => deleteFile(file.file_id)}
-            >
-              Hapus
-            </button>
+            user?.role === "teacher" && (
+              <button
+                className="btn btn-danger"
+                onClick={() => deleteFile(file.file_id)}
+              >
+                Hapus
+              </button>
+            )
           )}
         </div>
       ))}
+
+      <Player name={name} url={url} />
     </div>
   );
 };
