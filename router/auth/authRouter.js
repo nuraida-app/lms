@@ -152,9 +152,9 @@ router.get(
 
       if (role === "student") {
         const studentQuery = `
-          SELECT user_students.name, user_students.role, user_students.nis 
-          FROM user_students 
-          WHERE user_students.id = $1
+          SELECT user_student.name, user_student.role, user_student.nis 
+          FROM user_student 
+          WHERE user_student.id = $1
         `;
         const studentResult = await client.query(studentQuery, [id]);
         const studentData = studentResult.rows[0];
@@ -196,9 +196,9 @@ router.get(
           SELECT 
             user_teacher.id, user_teacher.role, user_teacher.nip, 
             user_teacher.name, user_teacher.email, user_teacher.subject_code, 
-            json_agg(json_build_object('id', homebase.id, 'name', homebase.name)) AS homebase, 
+            ARRAY_AGG(DISTINCT jsonb_build_object('id', homebase.id, 'name', homebase.name)) AS homebase, 
             user_teacher.homeroom, classes.name AS class, user_teacher.class_code, 
-            user_teacher.subject_classes, array_agg(subjects.name) AS subjects
+            user_teacher.subject_classes, ARRAY_AGG(DISTINCT subjects.name) AS subjects
           FROM 
             user_teacher 
           LEFT JOIN 

@@ -34,12 +34,12 @@ const fileStorage = multer.diskStorage({
   },
 });
 
-const uploadFiles = multer({ storage: fileStorage });
+const uploadFile = multer({ storage: fileStorage });
 
 // Chapters
 router.post("/add-chapter", authorize("teacher"), async (req, res) => {
   try {
-    const { id, code, title, classIds, goal, gradeid } = req.body;
+    const { id, code, title, classIds, goal, gradeid, teacher_id } = req.body;
 
     if (!title || !classIds || !goal || !code || !gradeid) {
       return res.status(400).json({ message: "Data input tidak lengkap" });
@@ -54,9 +54,9 @@ router.post("/add-chapter", authorize("teacher"), async (req, res) => {
 
       if (data.rowCount > 0) {
         await client.query(
-          `UPDATE lms_chapters SET title = $1, class_code = $2, goal = $3, grade_id = $4
-          WHERE id = $5`,
-          [title, classIds, goal, gradeid, id]
+          `UPDATE lms_chapters SET title = $1, class_code = $2, goal = $3, grade_id = $4, teacher_id = $5
+          WHERE id = $6`,
+          [title, classIds, goal, gradeid, teacher_id, id]
         );
 
         return res.status(200).json({ message: "Berhasil diperbarui" });
@@ -66,9 +66,9 @@ router.post("/add-chapter", authorize("teacher"), async (req, res) => {
     } else {
       // Jika id tidak ada, lakukan insert
       await client.query(
-        `INSERT INTO lms_chapters (subject_code, title, class_code, goal, grade_id)
-          VALUES ($1, $2, $3, $4, $5)`,
-        [code, title, classIds, goal, gradeid]
+        `INSERT INTO lms_chapters (subject_code, title, class_code, goal, grade_id, teacher_id)
+          VALUES ($1, $2, $3, $4, $5, $6)`,
+        [code, title, classIds, goal, gradeid, teacher_id]
       );
 
       return res.status(201).json({ message: "Berhasil disimpan" });
@@ -79,13 +79,55 @@ router.post("/add-chapter", authorize("teacher"), async (req, res) => {
   }
 });
 
-router.get("/chapters", authorize("teacher"), async (req, res) => {
-  try {
-    const { grade_id, subjectCode } = req.query; // Mendapatkan grade_id dari query params
+router.get(
+  "/chapters",
+  authorize("teacher", "admin", "super-admin", "student"),
+  async (req, res) => {
+    try {
+      const { grade_id, subjectCode } = req.query;
+      const { id: userId, role, nis } = req.user;
 
-    // Query untuk mendapatkan data gabungan dari semua tabel
-    const data = await client.query(
-      `
+      // Bangun kondisi WHERE tambahan berdasarkan peran pengguna
+      let additionalCondition = "";
+      let queryParams = [subjectCode];
+
+      let studentClassCode = null;
+
+      if (role === "student") {
+        // Ambil class_code berdasarkan nis untuk role student
+        const classCodeResult = await client.query(
+          `
+          SELECT class_code
+          FROM students_class
+          WHERE nis = $1
+          LIMIT 1
+          `,
+          [nis]
+        );
+
+        if (classCodeResult.rowCount > 0) {
+          studentClassCode = classCodeResult.rows[0].class_code;
+        } else {
+          return res
+            .status(404)
+            .json({ message: "Class code not found for the student" });
+        }
+
+        additionalCondition = "AND cl.code = $2";
+        queryParams.push(studentClassCode);
+      } else if (role === "teacher") {
+        additionalCondition = "AND c.teacher_id = $2";
+        queryParams.push(userId);
+      }
+
+      if (grade_id) {
+        additionalCondition += ` AND c.grade_id = $${queryParams.length + 1}`;
+        queryParams.push(grade_id);
+      }
+
+      // Query untuk mendapatkan data gabungan dari semua tabel
+      const data = await client.query(
+        `
       SELECT 
         c.id AS chapter_id,
         c.title AS chapter_title,
@@ -93,9 +135,11 @@ router.get("/chapters", authorize("teacher"), async (req, res) => {
         c.created_at AS chapter_created_at,
         c.updated_at AS chapter_updated_at,
         c.grade_id AS chapter_grade_id,
+        c.teacher_id AS chapter_teacher_id,
         t.id AS topic_id,
         t.title AS topic_title,
         t.goal AS topic_goal,
+        t.chapter_id AS topic_chapter_id,
         t.created_at AS topic_created_at,
         t.updated_at AS topic_updated_at,
         f.id AS file_id,
@@ -103,85 +147,106 @@ router.get("/chapters", authorize("teacher"), async (req, res) => {
         f.link_file AS file_link,
         f.video AS file_video,
         g.grade AS grade_name,
-        cl.name AS class_name
+        cl.name AS class_name,
+        cl.code AS class_code,
+        ut.name AS teacher_name
       FROM lms_chapters c
       LEFT JOIN lms_topics t ON t.chapter_id = c.id
       LEFT JOIN lms_files f ON f.topic_id = t.id
       LEFT JOIN grades g ON g.id = c.grade_id
       LEFT JOIN classes cl ON cl.grade_id = g.id
+      LEFT JOIN user_teacher ut ON ut.id = c.teacher_id
       WHERE c.subject_code = $1
-      ${grade_id ? "AND c.grade_id = $2" : ""}
-      ORDER BY g.grade::int ASC, c.created_at ASC, cl.name ASC
+      ${additionalCondition}
+      ORDER BY g.grade::int ASC, c.created_at ASC, cl.name ASC, t.id ASC, f.id ASC
       `,
-      grade_id ? [subjectCode, grade_id] : [subjectCode]
-    );
+        queryParams
+      );
 
-    if (data.rowCount > 0) {
-      const chapters = data.rows;
+      if (data.rowCount > 0) {
+        const chapters = data.rows;
 
-      // Menstrukturkan data agar sesuai dengan kebutuhan frontend
-      const structuredData = chapters.reduce((acc, row) => {
-        let chapter = acc.find((ch) => ch.chapter_id === row.chapter_id);
-        if (!chapter) {
-          chapter = {
-            chapter_id: row.chapter_id,
-            chapter_title: row.chapter_title,
-            chapter_goal: row.chapter_goal,
-            grade_id: row.chapter_grade_id,
-            grade_name: row.grade_name,
-            class_names: new Set(), // Menggunakan Set untuk menghindari duplikasi nama kelas
-            created_at: row.chapter_created_at,
-            updated_at: row.chapter_updated_at,
-            topics: [],
-          };
-          acc.push(chapter);
-        }
-
-        // Tambahkan nama kelas jika ada
-        if (row.class_name) {
-          chapter.class_names.add(row.class_name);
-        }
-
-        if (row.topic_id) {
-          let topic = chapter.topics.find((tp) => tp.topic_id === row.topic_id);
-          if (!topic) {
-            topic = {
-              topic_id: row.topic_id,
-              topic_title: row.topic_title,
-              goal: row.topic_goal,
-              created_at: row.topic_created_at,
-              updated_at: row.topic_updated_at,
-              files: [],
+        // Menstrukturkan data agar sesuai dengan kebutuhan frontend
+        const structuredData = chapters.reduce((acc, row) => {
+          let chapter = acc.find((ch) => ch.chapter_id === row.chapter_id);
+          if (!chapter) {
+            chapter = {
+              chapter_id: row.chapter_id,
+              chapter_title: row.chapter_title,
+              chapter_goal: row.chapter_goal,
+              grade_id: row.chapter_grade_id,
+              grade_name: row.grade_name,
+              teacher_id: row.chapter_teacher_id,
+              teacher_name: row.teacher_name,
+              class_names: new Set(), // Menggunakan Set untuk menghindari duplikasi nama kelas
+              class_codes: new Set(),
+              created_at: row.chapter_created_at,
+              updated_at: row.chapter_updated_at,
+              topics: [],
             };
-            chapter.topics.push(topic);
+            acc.push(chapter);
           }
 
-          if (row.file_id) {
-            topic.files.push({
-              file_id: row.file_id,
-              title: row.file_title,
-              link_file: row.file_link,
-              video: row.file_video,
-            });
+          // Tambahkan nama kelas jika ada
+          if (row.class_name) {
+            chapter.class_names.add(row.class_name);
           }
-        }
 
-        return acc;
-      }, []);
+          if (row.class_code) {
+            chapter.class_codes.add(row.class_code);
+          }
 
-      // Konversi Set class_names menjadi array string
-      structuredData.forEach((chapter) => {
-        chapter.class_names = Array.from(chapter.class_names);
-      });
+          if (row.topic_id) {
+            let topic = chapter.topics.find(
+              (tp) => tp.topic_id === row.topic_id
+            );
+            if (!topic) {
+              topic = {
+                topic_id: row.topic_id,
+                topic_title: row.topic_title,
+                topic_chapter: row.topic_chapter_id,
+                goal: row.topic_goal,
+                created_at: row.topic_created_at,
+                updated_at: row.topic_updated_at,
+                files: [],
+              };
+              chapter.topics.push(topic);
+            }
 
-      res.status(200).json(structuredData);
-    } else {
-      return res.status(404).json({ message: "Data not found" });
+            if (row.file_id) {
+              const existingFile = topic.files.find(
+                (file) => file.file_id === row.file_id
+              );
+              if (!existingFile) {
+                topic.files.push({
+                  file_id: row.file_id,
+                  title: row.file_title,
+                  link_file: row.file_link,
+                  video: row.file_video,
+                });
+              }
+            }
+          }
+
+          return acc;
+        }, []);
+
+        // Konversi Set class_names menjadi array string
+        structuredData.forEach((chapter) => {
+          chapter.class_names = Array.from(chapter.class_names);
+          chapter.class_codes = Array.from(chapter.class_codes);
+        });
+
+        res.status(200).json(structuredData);
+      } else {
+        return res.status(404).json({ message: "Data not found" });
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: error.message });
     }
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
   }
-});
+);
 
 router.get("/chapter/:id", authorize("teacher"), async (req, res) => {
   try {
@@ -208,7 +273,7 @@ router.delete("/delete-chapter/:id", authorize("teacher"), async (req, res) => {
       req.params.id,
     ]);
 
-    res.status(200).json({ message: "Deleted" });
+    res.status(200).json({ message: "Berhasil dihapus" });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -247,10 +312,12 @@ router.get("/get-chapter-for-class", authorize("student"), async (req, res) => {
 router.post(
   "/add-topic",
   authorize("teacher"),
-  uploadFiles.array("files", 10), // Allow multiple files with a limit of 10
+  // Allow multiple files with a limit of 10
   async (req, res) => {
     try {
       const { id, chapter_id, title, goal, subject_code } = req.body;
+
+      console.log(req.body);
 
       let topicId = id;
 
@@ -320,6 +387,50 @@ router.delete("/delete-topic/:id", authorize("teacher"), async (req, res) => {
 
 // Upload file
 // Multer storage configuration
+router.post(
+  "/upload-file",
+  authorize("teacher"),
+  uploadFile.single("file"),
+  async (req, res) => {
+    try {
+      const { subject_code, topic_id, url, title } = req.body;
+      const username = req.user.name.replace(/\s+/g, "_").toLowerCase();
+      const userFolder = `${username}`;
+
+      // Check if a file was uploaded
+      if (req.file) {
+        const fileLink =
+          process.env.SERVER_2 +
+          `/upload/lms/${userFolder}/` +
+          req.file.filename;
+
+        await client.query(
+          `INSERT INTO lms_files (subject_code, topic_id, link_file, title)
+          VALUES ($1, $2, $3, $4)`,
+          [subject_code, topic_id, fileLink, title]
+        );
+
+        return res.status(200).json({ message: "Berhasil disimpan" });
+      }
+
+      // If only a URL is provided, insert URL
+      if (url) {
+        await client.query(
+          `INSERT INTO lms_files (subject_code, topic_id, video, title)
+          VALUES ($1, $2, $3, $4)`,
+          [subject_code, topic_id, url, title]
+        );
+
+        return res.status(200).json({ message: "Berhasil disimpan" });
+      }
+
+      return res.status(400).json({ message: "No file or URL provided" });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: error.message });
+    }
+  }
+);
 
 router.get(
   "/get-files/:topic_id",

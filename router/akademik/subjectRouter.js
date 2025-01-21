@@ -10,11 +10,10 @@ router.get("/get", authorize("admin", "teacher"), async (req, res) => {
     const role = req.user.role;
     let { page, limit, search } = req.query;
 
-    // Jika tidak ada page, limit, dan search dalam query
     if (!page && !limit && !search) {
       page = 1;
-      limit = null; // Menandakan tidak ada limitasi
-      search = ""; // Kosongkan pencarian
+      limit = null;
+      search = "";
     } else {
       page = parseInt(page) || 1;
       limit = parseInt(limit) || 10;
@@ -23,100 +22,127 @@ router.get("/get", authorize("admin", "teacher"), async (req, res) => {
 
     const offset = limit ? (page - 1) * limit : 0;
 
-    if (role === "admin") {
-      const homebase = req.user.homebase_id;
+    const getClassesFromCode = async (classCodes) => {
+      const { rows: classes } = await client.query(
+        `SELECT name FROM classes WHERE code  = ANY($1::int[])`,
+        [classCodes]
+      );
+      return classes.map((cls) => cls.name);
+    };
 
-      // Query untuk admin dengan logika tanpa limitasi
-      const query = limit
-        ? `SELECT subjects.id, subjects.name, homebase.name AS homebase, subjects.code FROM subjects 
-           INNER JOIN homebase ON subjects.homebase_id = homebase.id 
+    const querySubjects = async () => {
+      if (role === "admin") {
+        // Admin melihat subjects berdasarkan homebase_id
+        const homebaseId = req.user.homebase_id;
+
+        return client.query(
+          `SELECT subjects.id, subjects.code, subjects.name, homebase.name AS homebase_name 
+           FROM subjects 
+           INNER JOIN homebase ON subjects.homebase_id = homebase.id
            WHERE subjects.homebase_id = $1 AND subjects.name ILIKE $2 
            ORDER BY subjects.name ASC 
-           LIMIT $3 OFFSET $4`
-        : `SELECT subjects.id, subjects.name, homebase.name AS homebase, subjects.code FROM subjects 
-           INNER JOIN homebase ON subjects.homebase_id = homebase.id 
-           WHERE subjects.homebase_id = $1 AND subjects.name ILIKE $2 
-           ORDER BY subjects.name ASC`;
+           ${limit ? "LIMIT $3 OFFSET $4" : ""}`,
+          limit
+            ? [homebaseId, `%${search}%`, limit, offset]
+            : [homebaseId, `%${search}%`]
+        );
+      } else {
+        // Teacher melihat subjects berdasarkan subject_code mereka
+        const { rows: teacherData } = await client.query(
+          `SELECT subject_code FROM user_teacher WHERE id = $1`,
+          [req.user.id]
+        );
 
-      const data = await client.query(
-        query,
-        limit
-          ? [homebase, `%${search}%`, limit, offset]
-          : [homebase, `%${search}%`]
-      );
+        const subjectCodes = teacherData[0].subject_code;
 
-      const totalSubjects = await client.query(
-        `SELECT COUNT(*) FROM subjects WHERE homebase_id = $1 AND name ILIKE $2`,
-        [homebase, `%${search}%`]
-      );
-
-      const total = parseInt(totalSubjects.rows[0].count, 10);
-      const totalPages = limit ? Math.ceil(total / limit) : 1;
-
-      res.status(200).json({
-        subjects: data.rows,
-        totalPages,
-        total,
-      });
-    } else {
-      const data = await client.query(
-        `SELECT * FROM user_teacher WHERE id = $1`,
-        [req.user.id]
-      );
-
-      const teacher = data.rows[0];
-      const subjectCodes = teacher.subject_code;
-
-      const query = limit
-        ? `SELECT code, name, id FROM subjects 
+        return client.query(
+          `SELECT id, code, name FROM subjects 
            WHERE code = ANY($1::int[]) AND name ILIKE $2 
            ORDER BY name ASC 
-           LIMIT $3 OFFSET $4`
-        : `SELECT code, name, id FROM subjects 
-           WHERE code = ANY($1::int[]) AND name ILIKE $2 
-           ORDER BY name ASC`;
+           ${limit ? "LIMIT $3 OFFSET $4" : ""}`,
+          limit
+            ? [subjectCodes, `%${search}%`, limit, offset]
+            : [subjectCodes, `%${search}%`]
+        );
+      }
+    };
 
-      const subjectData = await client.query(
-        query,
-        limit
-          ? [subjectCodes, `%${search}%`, limit, offset]
-          : [subjectCodes, `%${search}%`]
-      );
+    const subjects = await querySubjects();
 
-      const totalSubjects = await client.query(
-        `SELECT COUNT(*) FROM subjects WHERE code = ANY($1::int[]) AND name ILIKE $2`,
-        [subjectCodes, `%${search}%`]
-      );
+    const totalSubjectsQuery =
+      role === "admin"
+        ? `SELECT COUNT(*) FROM subjects WHERE homebase_id = $1 AND name ILIKE $2`
+        : `SELECT COUNT(*) FROM subjects WHERE code = ANY($1::int[]) AND name ILIKE $2`;
 
-      const total = parseInt(totalSubjects.rows[0].count, 10);
-      const totalPages = limit ? Math.ceil(total / limit) : 1;
+    const totalSubjectsParams =
+      role === "admin"
+        ? [req.user.homebase_id, `%${search}%`]
+        : [subjects.rows.map((subj) => subj.code), `%${search}%`];
 
-      const subjectsWithCounts = await Promise.all(
-        subjectData.rows.map(async (subject) => {
-          const { rows: chapterCount } = await client.query(
-            `SELECT COUNT(*) FROM lms_chapters WHERE subject_code = $1`,
-            [subject.code]
-          );
+    const totalSubjects = await client.query(
+      totalSubjectsQuery,
+      totalSubjectsParams
+    );
 
+    const total = parseInt(totalSubjects.rows[0].count, 10);
+    const totalPages = limit ? Math.ceil(total / limit) : 1;
+
+    const subjectsWithCounts = await Promise.all(
+      subjects.rows.map(async (subject) => {
+        const { rows: chapters } = await client.query(
+          `SELECT id, grade_id, class_code FROM lms_chapters WHERE subject_code = $1`,
+          [subject.code]
+        );
+
+        const levelCounts = [];
+        for (const chapter of chapters) {
           const { rows: topicCount } = await client.query(
-            `SELECT COUNT(*) FROM lms_topics WHERE subject_code = $1`,
-            [subject.code]
+            `SELECT COUNT(*) FROM lms_topics WHERE chapter_id = $1`,
+            [chapter.id]
           );
 
-          return {
-            ...subject,
-            chapter_count: parseInt(chapterCount[0].count, 10),
-            topic_count: parseInt(topicCount[0].count, 10),
-          };
-        })
-      );
+          const { rows: grade } = await client.query(
+            `SELECT grade FROM grades WHERE id = $1`,
+            [chapter.grade_id]
+          );
 
-      res.status(200).json({
-        subjects: subjectsWithCounts,
-        totalPages,
-        total,
-      });
-    }
+          const classList = await getClassesFromCode(chapter.class_code);
+
+          levelCounts.push({
+            level: grade[0].grade,
+            total_chapters: 1,
+            total_topics: parseInt(topicCount[0].count, 10),
+            classes: classList,
+          });
+        }
+
+        // Gabungkan data per tingkat
+        const groupedLevels = levelCounts.reduce((acc, curr) => {
+          const existing = acc.find((lvl) => lvl.level === curr.level);
+          if (existing) {
+            existing.total_chapters += curr.total_chapters;
+            existing.total_topics += curr.total_topics;
+            existing.classes = Array.from(
+              new Set([...existing.classes, ...curr.classes])
+            );
+          } else {
+            acc.push(curr);
+          }
+          return acc;
+        }, []);
+
+        return {
+          ...subject,
+          levelCounts: groupedLevels,
+        };
+      })
+    );
+
+    res.status(200).json({
+      subjects: subjectsWithCounts,
+      totalPages,
+      total,
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: error.message });
@@ -267,85 +293,43 @@ router.delete("/delete-data", authorize("admin"), async (req, res) => {
 // Menampilkan mapel berdasarkan kelas yang ditentukan guru
 router.get("/get-for-class", authorize("student"), async (req, res) => {
   try {
-    // Retrieve the class_code of the student
-    const student = await client.query(
-      `SELECT class_code FROM students_class WHERE nis = $1`,
-      [req.user.nis]
-    );
+    const nis = req.user.nis;
 
-    if (student.rows.length === 0) {
-      return res.status(404).json({ message: "Student not found." });
-    }
+    const studentClassQuery = `
+      SELECT class_code
+      FROM students_class
+      WHERE nis = $1
+    `;
 
-    const classCode = student.rows[0].class_code; // Get the class_code from the student's record
+    const studentClassResult = await client.query(studentClassQuery, [nis]);
+    const classCodes = studentClassResult.rows.map((row) => row.class_code);
 
-    // Query to get teachers who have this class_code assigned in their subject_classes
-    const { rows: teacherRows } = await client.query(
-      `SELECT id, name, subject_classes
-         FROM teachers
-         WHERE EXISTS (
-           SELECT 1
-           FROM jsonb_each(subject_classes) AS subj(subject_id, class_list)
-           WHERE class_list @> to_jsonb($1::int)  -- Convert classCode to integer
-         )`,
-      [classCode] // Pass the classCode to check within subject_classes
-    );
-
-    if (teacherRows.length === 0) {
+    if (classCodes.length === 0) {
       return res
         .status(404)
-        .json({ message: "No subjects found for the given class code." });
+        .json({ message: "Student not found or no class assigned" });
     }
 
-    // Get subject data from subjects table for the subjectCodes found
-    const subjectCodes = new Set();
-    teacherRows.forEach((teacher) => {
-      const subjectClasses = teacher.subject_classes;
+    // Dapatkan subjects, jumlah chapters, jumlah topics, dan nama guru berdasarkan class_code
+    const subjectQuery = `
+      SELECT 
+        s.name AS subject_name, s.code, s.id,
+        COUNT(DISTINCT c.id) AS total_chapters,
+        COUNT(t.id) AS total_topics,
+        COALESCE(
+          STRING_AGG(DISTINCT ut.name, ', '),
+          'No Teacher Assigned'
+        ) AS teacher_name
+      FROM subjects s
+      LEFT JOIN lms_chapters c ON c.subject_code = s.code
+      LEFT JOIN lms_topics t ON t.chapter_id = c.id
+      LEFT JOIN user_teacher ut ON ut.subject_code && ARRAY[s.code]::integer[]
+      WHERE c.class_code && $1::integer[]
+      GROUP BY s.id
+    `;
+    const subjectResult = await client.query(subjectQuery, [classCodes]);
 
-      // Get the subjectCodes where the classCode is present
-      Object.entries(subjectClasses).forEach(([subjectCode, classList]) => {
-        if (classList.includes(classCode)) {
-          subjectCodes.add(subjectCode); // Add subjectCode to the set
-        }
-      });
-    });
-
-    // Query the subjects table to get the subjects' details
-    const { rows: subjects } = await client.query(
-      `SELECT id, name, code FROM subjects WHERE code = ANY($1::int[])`,
-      [Array.from(subjectCodes)] // Pass the subjectCodes as an array
-    );
-
-    if (subjects.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "No subjects found for the given class code." });
-    }
-
-    const subjectsWithCounts = await Promise.all(
-      subjects.map(async (subject) => {
-        // Count chapters for each subject
-        const { rows: chapterCount } = await client.query(
-          `SELECT COUNT(*) FROM lms_chapters WHERE subject_code = $1`,
-          [subject.code]
-        );
-
-        // Count topics for each subject
-        const { rows: topicCount } = await client.query(
-          `SELECT COUNT(*) FROM lms_topics WHERE subject_code = $1`,
-          [subject.code]
-        );
-
-        return {
-          ...subject,
-          chapter_count: parseInt(chapterCount[0].count, 10), // Add the chapter count to the subject
-          topic_count: parseInt(topicCount[0].count, 10), // Add the topic count to the subject
-        };
-      })
-    );
-
-    // Respond with the subjects and their chapter and topic counts
-    res.status(200).json(subjectsWithCounts);
+    res.json(subjectResult.rows);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: error.message });
