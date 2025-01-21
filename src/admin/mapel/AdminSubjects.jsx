@@ -10,16 +10,20 @@ import {
 } from "../../control/api/subjectApi";
 import { toast } from "react-toastify";
 import BtnLoader from "../../components/loader/BtnLoader";
+import { useNavigate } from "react-router-dom";
 
 const columns = [
   { label: "No" },
   { label: "Kode" },
   { label: "Satuan" },
   { label: "Nama" },
+  { label: "Detail" },
   { label: "Aksi" },
 ];
 
 const AdminSubjects = () => {
+  const navigate = useNavigate();
+
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState("");
@@ -56,6 +60,11 @@ const AdminSubjects = () => {
     if (confirm) {
       deleteSubject(code);
     }
+  };
+
+  const goToLink = (name, code, id) => {
+    const formatted = name.replace(/\s+/g, "-");
+    navigate(`/lms-mapel/${id}/${formatted}/${code}`);
   };
 
   const clearData = () => {
@@ -122,11 +131,45 @@ const AdminSubjects = () => {
                     </th>
                     <td className="text-center align-middle">{subject.code}</td>
                     <td className="text-center align-middle">
-                      {subject.homebase}
+                      {subject.homebase_name}
                     </td>
                     <td className="align-middle">{subject.name}</td>
-                    <td>
+                    <td className="align-middle">
+                      {subject.levelCounts.length > 0 ? (
+                        subject.levelCounts.map((item, i) => (
+                          <div key={i}>
+                            <div className="d-flex gap-3 text-muted">
+                              <p className="m-0">
+                                Tingkat: <span>{item.level}</span>
+                              </p>
+                              <p className="m-0">
+                                kelas: <span>{item.classes.join(", ")}</span>
+                              </p>
+                            </div>
+                            <div className="d-flex gap-3 text-muted">
+                              <p className="m-0">
+                                Bab: <span>{item.total_chapters}</span>
+                              </p>
+                              <p className="m-0">
+                                Topik: <span>{item.total_topics}</span>
+                              </p>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-muted m-0">Data belum tersedia</p>
+                      )}
+                    </td>
+                    <td className="align-middle">
                       <div className="d-flex justify-content-center gap-2">
+                        <button
+                          className="btn btn-primary"
+                          onClick={() =>
+                            goToLink(subject.name, subject.code, subject.id)
+                          }
+                        >
+                          Detail
+                        </button>
                         <button
                           className="btn btn-warning"
                           onClick={() => setId(subject.id)}

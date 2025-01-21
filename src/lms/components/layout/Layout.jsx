@@ -2,6 +2,7 @@ import React, { Fragment } from "react";
 import { useNavigate } from "react-router-dom";
 import { AdminMenus } from "../../../admin/components/layout/Menus";
 import { TeacherMenus } from "../../../guru/components/layout/Menus";
+import { StudentMenus } from "../../../siswa/components/menu/Menus";
 import MetaData from "../../../components/meta/MetaData";
 import Protected from "../../../components/otentikasi/Protected";
 import { useDispatch, useSelector } from "react-redux";
@@ -34,10 +35,23 @@ const Layout = ({ children, title }) => {
       console.log(error.data.message);
     }
   };
+
+  const getHomePageLink = () => {
+    switch (role) {
+      case "admin":
+        return "/admin-beranda";
+      case "teacher":
+        return "/guru-beranda";
+      case "student":
+        return "/siswa-beranda";
+      default:
+        return "/";
+    }
+  };
   return (
     <Fragment>
       <MetaData title={title} />
-      <Protected roles={["teacher"]} />
+      <Protected roles={["teacher", "admin", "student"]} />
       <div className="container-fluid fixed-top bg-info">
         <nav
           className="navbar navbar-expand-lg"
@@ -46,7 +60,7 @@ const Layout = ({ children, title }) => {
           <div className="container-fluid">
             <a
               className="navbar-brand col-lg-2 me-0 text-white"
-              href={role === "admin" ? "/admin-dashboard" : "/guru-dashboard"}
+              href={getHomePageLink()}
             >
               {role === "admin" ? "Admin Satuan" : name}
             </a>
@@ -68,17 +82,20 @@ const Layout = ({ children, title }) => {
               id="navbarsExample11"
             >
               <div className="navbar-nav col-12 justify-content-lg-end d-flex gap-2">
-                {(role === "admin" ? AdminMenus : TeacherMenus).map(
-                  (menu, i) => (
-                    <button
-                      key={i}
-                      className="btn btn-light"
-                      onClick={() => goToLink(menu.link)}
-                    >
-                      {menu.label}
-                    </button>
-                  )
-                )}
+                {(role === "admin"
+                  ? AdminMenus
+                  : role === "teacher"
+                  ? TeacherMenus
+                  : StudentMenus
+                ).map((menu, i) => (
+                  <button
+                    key={i}
+                    className="btn btn-light"
+                    onClick={() => goToLink(menu.link)}
+                  >
+                    {menu.label}
+                  </button>
+                ))}
 
                 {isLoading ? (
                   <BtnLoader />

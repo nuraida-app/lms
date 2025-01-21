@@ -43,7 +43,7 @@ const Layout = ({ children, title }) => {
           <div className="container-fluid">
             <a
               className="navbar-brand col-lg-2 me-0 text-white"
-              href="/guru-dashboard"
+              href="/guru-profil"
             >
               {user?.name}
             </a>

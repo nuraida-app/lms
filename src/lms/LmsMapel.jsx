@@ -18,6 +18,7 @@ const LmsMapel = () => {
     navigate(`/lms-mapel/${id}/${formatted}/${code}`);
   };
 
+  console.log(subjects);
   return (
     <Layout title={"Learning Management System"}>
       {/* <LmsList subjects={subjects} /> */}
@@ -54,45 +55,78 @@ const LmsMapel = () => {
                       <div className="col-lg-6 col-12">
                         <div className="border border-2 border-secondary rounded  p-2">
                           <h6 className="card-title">Tingkat</h6>
-                          <p className="card-text">7, 8, 9</p>
+                          <p className="card-text">
+                            {item.levelCounts.length > 0 ? (
+                              item.levelCounts
+                                .map((level) => level.level)
+                                .join(", ")
+                            ) : (
+                              <span className="text-muted mt-2">
+                                Data belum tersedia
+                              </span>
+                            )}
+                          </p>
                         </div>
                       </div>
                       <div className="col-lg-6 col-12">
                         <div className="border border-2 border-secondary rounded  p-2">
                           <h6 className="card-title">Kelas</h6>
-                          <p className="card-text">7A, 8A, 9A</p>
+                          <p className="card-text">
+                            {item.levelCounts.length > 0 &&
+                            item.levelCounts.some(
+                              (level) => level.classes.length > 0
+                            ) ? (
+                              item.levelCounts
+                                .flatMap((level) => level.classes)
+                                .join(", ")
+                            ) : (
+                              <span className="text-muted mt-2">
+                                Data belum tersedia
+                              </span>
+                            )}
+                          </p>
                         </div>
                       </div>
                     </div>
 
-                    <div className="table-responsive mt-2">
-                      <table className="table table-striped table-hover">
-                        <thead>
-                          <tr>
-                            <th scope="col" className="text-center">
-                              #
-                            </th>
-                            <th className="text-center">7</th>
-                            <th className="text-center">8</th>
-                            <th className="text-center">9</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td>Bab</td>
-                            <td className="text-center">100</td>
-                            <td className="text-center">100</td>
-                            <td className="text-center">100</td>
-                          </tr>
-                          <tr>
-                            <td>Topik</td>
-                            <td className="text-center">100</td>
-                            <td className="text-center">100</td>
-                            <td className="text-center">100</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
+                    {item.levelCounts.length > 0 ? (
+                      <div className="table-responsive mt-2">
+                        <table className="table table-striped table-hover">
+                          <thead>
+                            <tr>
+                              <th scope="col" className="text-center">
+                                #
+                              </th>
+                              {item.levelCounts.map((level) => (
+                                <th key={level.level} className="text-center">
+                                  {level.level}
+                                </th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>Bab</td>
+                              {item.levelCounts.map((level) => (
+                                <td key={level.level} className="text-center">
+                                  {level.total_chapters}
+                                </td>
+                              ))}
+                            </tr>
+                            <tr>
+                              <td>Topik</td>
+                              {item.levelCounts.map((level) => (
+                                <td key={level.level} className="text-center">
+                                  {level.total_topics}
+                                </td>
+                              ))}
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <p className="text-muted mt-2">Data belum tersedia</p>
+                    )}
                   </div>
                 </div>
               </div>

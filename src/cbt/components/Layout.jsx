@@ -45,7 +45,7 @@ const Layout = ({ children, title }) => {
           <div className="container-fluid">
             <a
               className="navbar-brand col-lg-2 me-0 text-white"
-              href={role === "admin" ? "/admin-dashboard" : "/guru-dashboard"}
+              href={role === "admin" ? "/admin-dashboard" : "/guru-profil"}
             >
               {role === "admin" ? "Admin Satuan" : name}
             </a>

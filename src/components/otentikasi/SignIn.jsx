@@ -64,7 +64,7 @@ const SignIn = () => {
           window.location.href = "/siswa-dashboard";
           break;
         case "teacher":
-          window.location.href = "/guru-dashboard";
+          window.location.href = "/guru-profil";
           break;
         case "super-admin":
           window.location.href = "/center-dashboard";

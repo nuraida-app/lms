@@ -1,15 +1,22 @@
 import React, { Fragment } from "react";
 import { useNavigate } from "react-router-dom";
 import { StudentMenus } from "../menu/Menus";
+import MetaData from "../../../components/meta/MetaData";
+import Protected from "../../../components/otentikasi/Protected";
+import { useSelector } from "react-redux";
 
-const Layout = ({ children }) => {
+const Layout = ({ children, title }) => {
   const navigate = useNavigate();
+
+  const { user } = useSelector((state) => state.auth);
 
   const goToLink = (link) => {
     navigate(link);
   };
   return (
     <Fragment>
+      <MetaData title={title} />
+      <Protected roles={["student"]} />
       <div className="container-fluid fixed-top bg-info">
         <nav
           className="navbar navbar-expand-lg"
@@ -20,7 +27,7 @@ const Layout = ({ children }) => {
               className="navbar-brand col-lg-2 me-0 text-white"
               href="/guru-dashboard"
             >
-              Halaman Siswa
+              {user?.name}
             </a>
 
             <button

@@ -18,6 +18,7 @@ const CbtSchedules = lazy(() => import("./cbt/jadwal/CbtSchedules"));
 const CbtReport = lazy(() => import("./cbt/jadwal/laporan/CbtReport"));
 
 const LmsMapel = lazy(() => import("./lms/LmsMapel"));
+const LmsStudent = lazy(() => import("./lms/LmsStudent"));
 const LmsMapelDetail = lazy(() => import("./lms/mapel/LmsMapelDetail"));
 
 const CenterDash = lazy(() => import("./center/dashboard/CenterDash"));
@@ -40,6 +41,7 @@ const TeacherDash = lazy(() => import("./guru/dahsboard/TeacherDash"));
 const TeacherProfile = lazy(() => import("./guru/profil/TeacherProfile"));
 const TeacherSubjects = lazy(() => import("./guru/mapel/TeacherSubjects"));
 
+const StudentDash = lazy(() => import("./siswa/dashboard/StudentDash"));
 const StudentExam = lazy(() => import("./siswa/ujian/StudentExam"));
 const StudentExamPage = lazy(() => import("./cbt/ujian/CbtPage"));
 
@@ -62,7 +64,7 @@ function App() {
 
   return (
     <BrowserRouter>
-      <ToastContainer autoClose={2000} />
+      <ToastContainer autoClose={4000} />
       <MetaData
         title={"Pilih Akun"}
         desc={
@@ -102,6 +104,8 @@ function App() {
 
           {/* LMS */}
           <Route path="/lms-mapel" element={<LmsMapel />} />
+
+          <Route path="/lms-mapel-siswa" element={<LmsStudent />} />
 
           <Route
             path="/lms-mapel/:id/:name/:code"
@@ -149,6 +153,8 @@ function App() {
           <Route path="/guru-mapel" element={<TeacherSubjects />} />
 
           {/* Siswa */}
+          <Route path="/siswa-dashboard" element={<StudentDash />} />
+
           <Route path="/cbt-jawdal-ujian" element={<StudentExam />} />
 
           <Route

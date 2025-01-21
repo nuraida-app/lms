@@ -5,15 +5,19 @@ import { useGetClassByGradeQuery } from "../../control/api/classApi";
 import { useAddChapterMutation } from "../../control/api/lmsApi";
 import { toast } from "react-toastify";
 import BtnLoader from "../../components/loader/BtnLoader";
+import { useSelector } from "react-redux";
 
-const LmsAddChapter = ({ add, id, grades, gLoad }) => {
+const LmsAddChapter = ({ add, grades, gLoad }) => {
   const params = useParams();
   const code = params.code;
+
+  const { user } = useSelector((state) => state.auth);
 
   const [title, setTitle] = useState("");
   const [goal, setGoal] = useState("");
   const [classIds, setClasses] = useState([]);
   const [gradeid, setGradeId] = useState("");
+  const [id, setId] = useState("");
 
   const { data: classes, isLoading: cLoad } = useGetClassByGradeQuery(gradeid, {
     skip: !gradeid,
@@ -28,6 +32,10 @@ const LmsAddChapter = ({ add, id, grades, gLoad }) => {
         : [...prev, id]
     );
   };
+  const gradeHandler = (id) => {
+    setClasses([]);
+    setGradeId(id);
+  };
 
   const addHandler = (e) => {
     e.preventDefault();
@@ -37,10 +45,32 @@ const LmsAddChapter = ({ add, id, grades, gLoad }) => {
       return;
     }
 
-    const data = { id: id ? id : "", code, title, classIds, gradeid, goal };
+    const data = {
+      id: id ? id : "",
+      code,
+      title,
+      classIds,
+      gradeid,
+      goal,
+      teacher_id: user.id,
+    };
+
+    console.log(data);
 
     addChapter(data);
   };
+
+  useEffect(() => {
+    const editChapterData = localStorage.getItem("chapter");
+    if (editChapterData) {
+      const chapter = JSON.parse(editChapterData);
+      setTitle(chapter.chapter_title);
+      setGoal(chapter.chapter_goal);
+      setClasses(chapter.class_codes || []);
+      setGradeId(chapter.grade_id || "");
+      setId(chapter.chapter_id);
+    }
+  }, []);
 
   useEffect(() => {
     if (isSuccess) {
@@ -50,6 +80,7 @@ const LmsAddChapter = ({ add, id, grades, gLoad }) => {
       setGoal("");
       setClasses([]);
       add();
+      localStorage.removeItem("chapter");
     }
 
     if (error) {
@@ -96,7 +127,7 @@ const LmsAddChapter = ({ add, id, grades, gLoad }) => {
                 className={`btn ${
                   gradeid == g.id ? "btn-success" : "btn-secondary"
                 }`}
-                onClick={() => setGradeId(g.id)}
+                onClick={() => gradeHandler(g.id)}
               >
                 {g.grade}
               </button>
