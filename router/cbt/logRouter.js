@@ -135,14 +135,18 @@ router.get("/get", authorize("admin", "teacher"), async (req, res) => {
 });
 
 // Menampilkan log berdasarkan nis
-router.get("/detail/:nis", authorize("student"), async (req, res) => {
+router.get("/detail/:nis/:quiz", authorize("student"), async (req, res) => {
   try {
-    const { nis } = req.params;
+    const { nis, quiz } = req.params;
 
-    const data = await client.query("SELECT * FROM log WHERE nis = $1", [nis]);
+    const data = await client.query(
+      "SELECT * FROM log WHERE nis = $1 AND quiz_id = $2",
+      [nis, quiz]
+    );
 
     res.status(200).json(data.rows[0]);
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ message: error.message });
   }
 });
@@ -176,11 +180,11 @@ router.put("/finished/:quizId", authorize("student"), async (req, res) => {
         [isActive, isDone, quizId, req.user.nis]
       );
 
-      res.status(200).json({ message: "Your answers successfully saved" });
+      res.status(200).json({ message: "Jawaban berhasil disimpan" });
     } else {
       return res
-        .status(500)
-        .json({ message: `You didn't answer ${left} questions` });
+        .status(400)
+        .json({ message: `Anda belum menjawab ${left} pertanyaan` });
     }
   } catch (error) {
     return res.status(500).json({ message: error.message });

@@ -162,37 +162,60 @@ router.get("/get", authorize("admin", "teacher"), async (req, res) => {
 });
 
 // jadwal berdasarkan tingkat
-router.get(
-  "/get-by-grade/:grade",
-  authorize("student", "admin"),
-  async (req, res) => {
-    try {
-      const grade = await client.query(
-        `SELECT grade_id FROM students_class
-        WHERE nis = $1`,
-        [req.user.nis]
-      );
+router.get("/get-by-grade", authorize("student", "admin"), async (req, res) => {
+  try {
+    // Ambil parameter dari query
+    const { page = 1, limit = 10, search = "", grade } = req.query;
 
-      const data = await client.query(
-        "SELECT schedules.id, schedules.name, schedules.quiz_id, schedules.status, schedules.description, schedules.token, grades.grade, " +
-          "teachers.name AS teacher, quizzes.quiz_name AS quiz, " +
-          "schedules.status, schedules.start, schedules.end " +
-          "FROM schedules " +
-          "INNER JOIN teachers ON schedules.teacher_id = teachers.id " +
-          "INNER JOIN quizzes ON schedules.quiz_id = quizzes.id " +
-          "INNER JOIN grades ON schedules.grade_id = grades.id " +
-          "WHERE schedules.grade_id = $1 ORDER BY schedules.name ASC",
-        [req.params.grade]
-      );
+    // Konversi page dan limit ke integer
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
+    const offset = (pageNumber - 1) * limitNumber;
 
-      const schedules = data.rows;
+    // Query untuk total data
+    const totalDataQuery = await client.query(
+      "SELECT COUNT(*) AS total FROM schedules " +
+        "INNER JOIN grades ON schedules.grade_id = grades.id " +
+        "WHERE schedules.grade_id = $1 AND schedules.name ILIKE $2",
+      [grade, `%${search}%`]
+    );
+    const totalData = parseInt(totalDataQuery.rows[0].total, 10);
 
-      res.status(200).json(schedules);
-    } catch (error) {
-      return res.status(500).json({ error: error.message });
-    }
+    // Hitung total halaman
+    const totalPages = Math.ceil(totalData / limitNumber);
+
+    // Query untuk data dengan paginasi dan pencarian
+    const dataQuery = await client.query(
+      `SELECT schedules.id, schedules.name, schedules.quiz_id, schedules.status, 
+        schedules.description, schedules.token, grades.grade, schedules.time,
+          user_teacher.name AS teacher, quizzes.quiz_name AS quiz,
+          schedules.start, schedules.end 
+          FROM schedules 
+          INNER JOIN grades ON schedules.grade_id = grades.id 
+          INNER JOIN quizzes ON schedules.quiz_id = quizzes.id 
+          INNER JOIN user_teacher ON schedules.teacher_id = user_teacher.id
+          WHERE schedules.grade_id = $1 AND schedules.status = true AND 
+          (schedules.name ILIKE $2 OR user_teacher.name ILIKE $2) 
+          ORDER BY schedules.name ASC
+          LIMIT $3 OFFSET $4`,
+      [grade, `%${search}%`, limitNumber, offset]
+    );
+
+    const schedules = dataQuery.rows;
+
+    // Respon dengan data paginasi
+    res.status(200).json({
+      schedules,
+      page: pageNumber,
+      limit: limitNumber,
+      totalData,
+      totalPages,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: error.message });
   }
-);
+});
 
 // Detail Schedule
 router.get("/detail/:id", authorize("admin", "teacher"), async (req, res) => {

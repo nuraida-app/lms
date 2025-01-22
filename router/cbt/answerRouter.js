@@ -210,7 +210,7 @@ router.post("/create", authorize("student"), async (req, res) => {
       [quizId, questionId, type, req.user.nis, mc, essay, poin]
     );
 
-    return res.status(200).json({ message: "Saved" });
+    return res.status(200).json({ message: "Berhasil disimpan" });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -231,7 +231,7 @@ router.put("/doubt", authorize("student"), async (req, res) => {
     );
 
     if (!data) {
-      return res.status(404).json({ message: "Answer not found" });
+      return res.status(404).json({ message: "Jawaban tidak ditemukan" });
     }
 
     const yes = true;
@@ -244,7 +244,7 @@ router.put("/doubt", authorize("student"), async (req, res) => {
         [no, quizId, questionId, req.user.nis]
       );
 
-      return res.status(200).json({ message: "Saved" });
+      return res.status(200).json({ message: "Berhasil diperbarui" });
     } else {
       await client.query(
         `UPDATE answers SET doubt = $1
@@ -252,7 +252,7 @@ router.put("/doubt", authorize("student"), async (req, res) => {
         [yes, quizId, questionId, req.user.nis]
       );
 
-      return res.status(200).json({ message: "Saved" });
+      return res.status(200).json({ message: "Berhasil disimpan" });
     }
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -291,7 +291,7 @@ router.put(
       );
 
       if (answer.rowCount === 0) {
-        return res.status(404).json({ error: "Data not found" });
+        return res.status(404).json({ error: "Data tidak ditemukan" });
       }
 
       await client.query(
@@ -300,7 +300,7 @@ router.put(
       );
 
       // Kembalikan respons berhasil
-      return res.status(200).json({ message: "Saved" });
+      return res.status(200).json({ message: "Berhasil disimpan" });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ message: error.message });
