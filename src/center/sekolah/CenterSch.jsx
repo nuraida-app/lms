@@ -1,7 +1,12 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "../components/layout/Layout";
 import TableContainer from "../../components/tabel/TabelContainer";
 import FormComponent from "./FormComponent";
+import {
+  useDeleteHomebaseMutation,
+  useGetHomebasesQuery,
+} from "../../control/api/homebaseApi";
+import { toast } from "react-toastify";
 
 const usersData = [
   { id: 1, first: "Mark", last: "Otto", handle: "@mdo" },
@@ -17,11 +22,28 @@ const usersData = [
 ];
 
 const CenterSch = () => {
+  const [detail, setDetail] = useState("");
+
+  const { data } = useGetHomebasesQuery();
+  const [deleteHomebase, { data: msg, isSuccess, isLoading, error, reset }] =
+    useDeleteHomebaseMutation();
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success(msg.message);
+      reset();
+    }
+
+    if (error) {
+      toast.error(error.data.message);
+    }
+  }, [msg, isSuccess, error]);
+
   return (
-    <Layout>
+    <Layout title={"Satuan Pendidikan"}>
       <div className="row" style={{ height: "100%" }}>
         <div className="col-lg-3 col-12">
-          <FormComponent />
+          <FormComponent homebase={detail} clear={() => setDetail({})} />
         </div>
         <div className="col-lg-9 col-12 ">
           <TableContainer>
@@ -32,25 +54,38 @@ const CenterSch = () => {
                     #
                   </th>
                   <th scope="col" className="text-center">
-                    First
+                    Nama Satuan Pendidikan
                   </th>
-                  <th scope="col" className="text-center">
-                    Last
-                  </th>
+
                   <th scope="col" className="text-center">
                     Handle
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {usersData.map((user, index) => (
-                  <tr key={user.id}>
+                {data?.map((item, index) => (
+                  <tr key={item.id}>
                     <th scope="row" className="text-center">
                       {index + 1}
                     </th>
-                    <td>{user.first}</td>
-                    <td>{user.last}</td>
-                    <td>{user.handle}</td>
+                    <td>{item.name}</td>
+
+                    <td>
+                      <div className="d-flex justify-content-center gap-2">
+                        <button
+                          className="btn btn-warning"
+                          onClick={() => setDetail(item)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="btn btn-danger"
+                          onClick={() => deleteHomebase(item.id)}
+                        >
+                          {isLoading ? `Loading...` : `Hapus`}
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>

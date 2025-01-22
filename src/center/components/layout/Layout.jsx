@@ -1,15 +1,38 @@
 import React, { Fragment } from "react";
 import { useNavigate } from "react-router-dom";
 import { menus } from "./Menus";
+import Protected from "../../../components/otentikasi/Protected";
+import MetaData from "../../../components/meta/MetaData";
+import { useDispatch, useSelector } from "react-redux";
+import { useLogoutMutation } from "../../../control/api/authApi";
+import { setLogout } from "../../../control/slice/authSlice";
 
-const Layout = ({ children }) => {
+const Layout = ({ children, title }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const { user } = useSelector((state) => state.auth);
+  const [logout, { isLoading }] = useLogoutMutation();
 
   const goToLink = (link) => {
     navigate(link);
   };
+
+  const logutHandler = async () => {
+    try {
+      await logout().unwrap();
+
+      dispatch(setLogout());
+
+      navigate("/");
+    } catch (error) {
+      console.log(error.data.message);
+    }
+  };
   return (
     <Fragment>
+      <Protected roles={["super-admin"]} />
+      <MetaData title={title} />
       <div className="container-fluid fixed-top bg-info">
         <nav
           className="navbar navbar-expand-lg"
@@ -20,7 +43,7 @@ const Layout = ({ children }) => {
               className="navbar-brand col-lg-2 me-0 text-white"
               href="/center-dashboard"
             >
-              Admin Pusat
+              {user?.name}
             </a>
 
             <button
@@ -50,7 +73,9 @@ const Layout = ({ children }) => {
                   </button>
                 ))}
 
-                <button className="btn btn-danger">Logout</button>
+                <button className="btn btn-danger" onClick={logutHandler}>
+                  {isLoading ? `Loading...` : `Logout`}
+                </button>
               </div>
             </div>
           </div>

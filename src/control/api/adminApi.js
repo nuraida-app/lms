@@ -18,34 +18,14 @@ export const adminApi = createApi({
         url: "/data-admin",
       }),
     }),
-    getAdmin: builder.query({
-      query: () => ({
-        url: "/profile",
-      }),
-      providesTags: ["admin"],
-    }),
     getAdmins: builder.query({
       query: () => `/get-admins`,
       providesTags: ["Admins"],
-    }),
-    getDetailAdmin: builder.query({
-      query: (id) => ({
-        url: `/admin/${id}`,
-      }),
-      providesTags: ["Admin"],
     }),
     addAdmin: builder.mutation({
       query: (body) => ({
         url: "/create",
         method: "POST",
-        body,
-      }),
-      invalidatesTags: ["Admin", "Admins"],
-    }),
-    editAdmin: builder.mutation({
-      query: (body) => ({
-        url: "/update",
-        method: "PUT",
         body,
       }),
       invalidatesTags: ["Admin", "Admins"],
@@ -63,10 +43,7 @@ export const adminApi = createApi({
 export const {
   useGetUserDataQuery,
   useAdminDashboardQuery,
-  useGetAdminQuery,
   useGetAdminsQuery,
-  useGetDetailAdminQuery,
   useAddAdminMutation,
-  useEditAdminMutation,
   useDeleteAdminMutation,
 } = adminApi;
