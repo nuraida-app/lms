@@ -4,7 +4,7 @@ import CbtList from "../../cbt/ujian/CbtList";
 
 const StudentExam = () => {
   return (
-    <Layout>
+    <Layout title={"Jadwal Ujian"}>
       <CbtList />
     </Layout>
   );

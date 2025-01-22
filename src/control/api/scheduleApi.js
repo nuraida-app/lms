@@ -17,7 +17,11 @@ export const scheduleApi = createApi({
       providesTags: ["schedules"],
     }),
     getSchedulesByGrade: builder.query({
-      query: (grade) => `/get-by-grade/${grade}`,
+      query: ({ grade, page, limit, search }) => ({
+        url: `/get-by-grade`,
+        params: { page, limit, search, grade },
+        method: "GET",
+      }),
     }),
     getSchedule: builder.query({
       query: (id) => ({

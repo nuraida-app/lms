@@ -75,7 +75,7 @@ class Editor extends Component {
           formats={Editor.formats}
           placeholder={placeholder}
           style={{ width: "100%" }}
-          className="react-quill rounded shadow"
+          className="react-quill border border-2 rounded shadow"
         />
       </div>
     );

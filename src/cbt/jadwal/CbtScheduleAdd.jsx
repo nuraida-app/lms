@@ -83,7 +83,7 @@ const CbtScheduleAdd = ({ total, detail, id }) => {
     }
   }, [user]);
   return (
-    <div className="container-fluid d-flex align-items-center justify-content-between p-2 rounded shadow">
+    <div className="container-fluid d-flex align-items-center justify-content-between p-2 rounded shadow bg-white">
       <p className="m-0 h6">
         Jumlah Ujian: <span>{total}</span>
       </p>

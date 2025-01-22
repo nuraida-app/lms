@@ -158,7 +158,7 @@ function App() {
           <Route path="/cbt-jawdal-ujian" element={<StudentExam />} />
 
           <Route
-            path="/cbt-halaman/:name/:bankId/:start/:end"
+            path="/cbt-halaman/:name/:bankId/:time"
             element={<StudentExamPage />}
           />
         </Routes>

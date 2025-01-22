@@ -24,8 +24,8 @@ export const logApi = createApi({
       }),
       invalidatesTags: ["logs"],
     }),
-    getMyLogs: builder.query({
-      query: (nis) => `/detail/${nis}`,
+    getMyLog: builder.query({
+      query: ({ nis, quiz }) => `/detail/${nis}/${quiz}`,
       providesTags: ["log"],
     }),
     resetLog: builder.mutation({
@@ -56,7 +56,7 @@ export const logApi = createApi({
 export const {
   useGetLogsQuery,
   useCreateLogMutation,
-  useGetMyLogsQuery,
+  useGetMyLogQuery,
   useFinishedQuizMutation,
   useResetLogMutation,
   useClearLogAnswersMutation,

@@ -39,11 +39,11 @@ const Layout = ({ children, title }) => {
   const getHomePageLink = () => {
     switch (role) {
       case "admin":
-        return "/admin-beranda";
+        return "/admin-dashboard";
       case "teacher":
-        return "/guru-beranda";
+        return "/guru-dashboard";
       case "student":
-        return "/siswa-beranda";
+        return "/siswa-dashboard";
       default:
         return "/";
     }

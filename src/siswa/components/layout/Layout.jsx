@@ -3,15 +3,32 @@ import { useNavigate } from "react-router-dom";
 import { StudentMenus } from "../menu/Menus";
 import MetaData from "../../../components/meta/MetaData";
 import Protected from "../../../components/otentikasi/Protected";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useLogoutMutation } from "../../../control/api/authApi";
+import { setLogout } from "../../../control/slice/authSlice";
+import BtnLoader from "../../../components/loader/BtnLoader";
 
 const Layout = ({ children, title }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const { user } = useSelector((state) => state.auth);
+  const [logout, { isLoading }] = useLogoutMutation();
 
   const goToLink = (link) => {
     navigate(link);
+  };
+
+  const logutHandler = async () => {
+    try {
+      await logout().unwrap();
+
+      dispatch(setLogout());
+
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+    }
   };
   return (
     <Fragment>
@@ -25,7 +42,7 @@ const Layout = ({ children, title }) => {
           <div className="container-fluid">
             <a
               className="navbar-brand col-lg-2 me-0 text-white"
-              href="/guru-dashboard"
+              href="/siswa-dashboard"
             >
               {user?.name}
             </a>
@@ -57,7 +74,13 @@ const Layout = ({ children, title }) => {
                   </button>
                 ))}
 
-                <button className="btn btn-danger">Logout</button>
+                {isLoading ? (
+                  <BtnLoader />
+                ) : (
+                  <button className="btn btn-danger" onClick={logutHandler}>
+                    Logout
+                  </button>
+                )}
               </div>
             </div>
           </div>
