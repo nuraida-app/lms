@@ -9,29 +9,38 @@ const router = express.Router();
 // super admin
 router.post("/create", authorize("admin", "super-admin"), async (req, res) => {
   try {
-    const { name, email, password, homebase_id, role } = req.body;
+    const { name, email, password, homebase_id, role, id } = req.body;
 
-    bcrypt.hash(password, 10, async (err, hash) => {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      } else {
-        const data = await client.query(
-          `INSERT INTO user_admin (name, email, password, role, homebase_id) 
-            VALUES($1, $2, $3, $4, $5) RETURNING *`,
-          [name, email, hash, role, homebase_id]
-        );
-        const admin = data.rows[0];
+    if (id) {
+      await client.query(
+        `UPDATE user_admin SET name = $1, email = $2, role = $3 
+      WHERE id = $4`,
+        [name, email, role, id]
+      );
 
-        if (admin) {
-          return res
-            .status(200)
-            .json({ message: "Admin berhasil ditambahkan", admin });
+      res.status(200).json({ message: "Berhasil diperbarui" });
+    } else {
+      bcrypt.hash(password, 10, async (err, hash) => {
+        if (err) {
+          return res.status(500).json({ error: err.message });
         } else {
-          return res.status(500).json({ message: "Gagal ditambahkan" });
+          const data = await client.query(
+            `INSERT INTO user_admin (name, email, password, role, homebase_id) 
+            VALUES($1, $2, $3, $4, $5) RETURNING *`,
+            [name, email, hash, role, homebase_id]
+          );
+          const admin = data.rows[0];
+
+          if (admin) {
+            return res.status(201).json({ message: "Berhasil ditambahkan" });
+          } else {
+            return res.status(500).json({ message: "Gagal ditambahkan" });
+          }
         }
-      }
-    });
+      });
+    }
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ error: error.message });
   }
 });
@@ -53,23 +62,6 @@ router.get(
   }
 );
 
-router.get(
-  "/admin/:id",
-  authorize("admin", "super-admin"),
-  async (req, res) => {
-    try {
-      const data = await client.query(
-        "SELECT * FROM user_admin where id = $1",
-        [req.params.id]
-      );
-
-      res.status(200).json(data.rows[0]);
-    } catch (error) {
-      return res.status(500).json({ error: error.message });
-    }
-  }
-);
-
 router.delete(
   "/delete/:id",
   authorize("admin", "super-admin"),
@@ -85,67 +77,6 @@ router.delete(
     }
   }
 );
-
-router.put("/update", authorize("admin", "super-admin"), async (req, res) => {
-  try {
-    const { name, email, role, homebase_id, password, id } = req.body;
-
-    if (password) {
-      bcrypt.hash(password, 10, async (err, hash) => {
-        if (err) {
-          return res.status(500).json({ error: err.message });
-        } else {
-          await client.query(
-            `UPDATE user_admin SET name = $1, email = $2, password = $3,
-              role = $4, homebase_id = $5 WHERE id = $6`,
-            [name, email, hash, role, homebase_id, id]
-          );
-
-          res.status(200).json({ message: "Updated successfully" });
-        }
-      });
-    } else {
-      await client.query(
-        `UPDATE user_admin SET name = $1, email = $2,
-              role = $3, homebase_id = $4 WHERE id = $5`,
-        [name, email, role, homebase_id, id]
-      );
-
-      res.status(200).json({ message: "Updated successfully" });
-    }
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
-});
-
-router.get("/profile", authorize("admin", "super-admin"), async (req, res) => {
-  try {
-    const user = req.user;
-
-    if (user.role === "admin") {
-      const data = await client.query(
-        "SELECT user_admin.id, user_admin.name, user_admin.role, homebase.name FROM user_admin " +
-          "INNER JOIN homebase ON homebase.id = user_admin.homebase_id " +
-          "WHERE user_admin.id = $1",
-        [user.id]
-      );
-      const adminData = data.rows[0];
-
-      res.status(200).json(adminData);
-    } else {
-      const data = await client.query(
-        "SELECT user_admin.id, user_admin.name, user_admin.role, user_admin.email FROM user_admin " +
-          "WHERE user_admin.id = $1",
-        [user.id]
-      );
-      const adminData = data.rows[0];
-
-      res.status(200).json(adminData);
-    }
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
-});
 
 // Admin Center data
 // Dashboard

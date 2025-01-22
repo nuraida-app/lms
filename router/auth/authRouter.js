@@ -112,7 +112,7 @@ router.post("/logout", (req, res) => {
 
 router.get(
   "/load",
-  authorize("admin", "student", "teacher", "parent"),
+  authorize("admin", "student", "teacher", "parent", "super-admin"),
   async (req, res) => {
     try {
       // Extract token from cookies
@@ -137,7 +137,19 @@ router.get(
       const { role, id } = req.user;
 
       // Query data based on user role
-      if (role === "admin" || role === "super-admin") {
+      if (role === "super-admin") {
+        const query = `
+          SELECT *
+          FROM user_admin 
+          WHERE id = $1
+        `;
+        const result = await client.query(query, [id]);
+        const superAdmin = result.rows[0];
+
+        return res.status(200).json(superAdmin);
+      }
+
+      if (role === "admin") {
         const query = `
           SELECT user_admin.name, user_admin.role, homebase.name AS homebase, user_admin.homebase_id 
           FROM user_admin 
