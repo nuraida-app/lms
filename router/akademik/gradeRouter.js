@@ -11,22 +11,32 @@ const router = express.Router();
 // Membuat tingkat
 router.post("/create", authorize("admin", "super-admin"), async (req, res) => {
   try {
-    const homebase = req.user.homebase_id;
+    const { home, grade, id } = req.body;
 
     const checking = await client.query(
       "SELECT * FROM grades WHERE grade = $1",
-      [req.body.grade]
+      [grade]
     );
 
-    if (checking.rowCount > 0) {
-      res.status(500).json({ message: "Grade has been used" });
-    } else {
+    if (id) {
       await client.query(
-        "INSERT INTO grades(grade, homebase_id) VALUES($1, $2) RETURNING *",
-        [req.body.grade, homebase]
+        `UPDATE grades SET grade = $1, 
+      homebase_id = $2 WHERE id = $3`,
+        [grade, home, id]
       );
 
-      res.status(200).json({ message: "Berhasil ditambahkan" });
+      res.status(200).json({ message: "Berhasil diperbarui" });
+    } else {
+      if (checking.rowCount > 0) {
+        res.status(500).json({ message: "Tingkat sudah digunakan" });
+      } else {
+        await client.query(
+          "INSERT INTO grades(grade, homebase_id) VALUES($1, $2) RETURNING *",
+          [grade, home]
+        );
+
+        res.status(200).json({ message: "Berhasil ditambahkan" });
+      }
     }
   } catch (error) {
     console.log(error);
@@ -45,7 +55,7 @@ router.get(
       if (req.user.role === "super-admin") {
         // Jika user adalah super-admin, tampilkan semua grade
         const data = await client.query(
-          "SELECT grades.id, grades.grade, homebase.name AS homebase FROM grades " +
+          "SELECT grades.id, grades.grade, grades.homebase_id, homebase.name AS homebase FROM grades " +
             "INNER JOIN homebase ON grades.homebase_id = homebase.id " +
             "ORDER BY CAST(grades.grade AS INTEGER) ASC"
         );

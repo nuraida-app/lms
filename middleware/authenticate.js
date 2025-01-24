@@ -67,7 +67,16 @@ export const authorize = (...allowedRoles) => {
       const { id, type } = decode;
 
       let data;
-      if (type === "super-admin" || type === "admin") {
+
+      if (type === "tahfiz") {
+        data = await client.query("SELECT * FROM user_admin WHERE id = $1", [
+          id,
+        ]);
+      } else if (type === "super-admin") {
+        data = await client.query("SELECT * FROM user_admin WHERE id = $1", [
+          id,
+        ]);
+      } else if (type === "admin") {
         data = await client.query("SELECT * FROM user_admin WHERE id = $1", [
           id,
         ]);

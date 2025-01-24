@@ -9,41 +9,43 @@ const router = express.Router();
 // Menambahkan siswa
 router.post("/create", authorize("admin", "super-admin"), async (req, res) => {
   try {
-    const { nis, name } = req.body;
+    const { id, nis, name } = req.body;
 
     const password = "12345678";
     const role = "student";
 
     const userChecking = await client.query(
-      "SELECT * FROM students WHERE nis = $1",
+      "SELECT * FROM user_student WHERE nis = $1",
       [nis]
     );
 
-    if (userChecking.rowCount > 0)
-      return res.status(500).json({ message: "NIS has been used" });
+    if (id) {
+      await client.query(
+        "UPDATE user_student SET nis = $1, name = $2 WHERE id = $3 RETURNING *",
+        [nis, name, id]
+      );
 
-    bcrypt.hash(password, 10, async (err, hash) => {
-      if (err) {
-        return res.status(500).json({ message: err.message });
-      }
+      res.status(200).json({ message: "Berhasil diperbarui" });
+    } else {
+      if (userChecking.rowCount > 0)
+        return res.status(500).json({ message: "NIS sudah digunakan" });
 
-      const insertionQuery =
-        "INSERT INTO students (nis, name, password, role) " +
-        "VALUES ($1, $2, $3, $4) RETURNING *";
+      bcrypt.hash(password, 10, async (err, hash) => {
+        if (err) {
+          return res.status(500).json({ message: err.message });
+        }
 
-      const insertionValues = [nis, name, hash, role];
+        const insertionQuery =
+          "INSERT INTO user_student (nis, name, password, role) " +
+          "VALUES ($1, $2, $3, $4) RETURNING *";
 
-      try {
-        const process = await client.query(insertionQuery, insertionValues);
-        const user = process.rows[0];
+        const insertionValues = [nis, name, hash, role];
 
-        return res
-          .status(200)
-          .json({ message: "Student is successfully added", user });
-      } catch (error) {
-        return res.status(500).json({ message: error.message });
-      }
-    });
+        await client.query(insertionQuery, insertionValues);
+
+        res.status(201).json({ message: "Berhasil ditambahkan" });
+      });
+    }
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -105,21 +107,21 @@ router.get(
       let countParams = [];
 
       if (homebase) {
-        // Query for filtering by homebase
         query = `
-          SELECT students_class.id, students_class.nis, user_student.name, homebase.name AS homebase,
-          classes.name AS class, grades.grade
-          FROM students_class
-          INNER JOIN user_student ON user_student.nis = students_class.nis
-          INNER JOIN homebase ON homebase.id = students_class.homebase_id
-          INNER JOIN grades ON grades.id = students_class.grade_id
-          INNER JOIN classes ON classes.code = students_class.class_code
-          LEFT JOIN db_students ON db_students.nis = students_class.nis
-          WHERE students_class.homebase_id = $1 AND (
-            CAST(students_class.nis AS TEXT) ILIKE $2 OR user_student.name ILIKE $2
-          )
-          ORDER BY user_student.name
-          LIMIT $3 OFFSET $4;
+          SELECT DISTINCT ON (students_class.nis) students_class.id, students_class.nis, 
+         user_student.name, homebase.name AS homebase, classes.name AS class, 
+         grades.grade
+  FROM students_class
+  INNER JOIN user_student ON user_student.nis = students_class.nis
+  INNER JOIN homebase ON homebase.id = students_class.homebase_id
+  INNER JOIN grades ON grades.id = students_class.grade_id
+  INNER JOIN classes ON classes.code = students_class.class_code
+  LEFT JOIN db_students ON db_students.nis = students_class.nis
+  WHERE students_class.homebase_id = $1 AND (
+    CAST(students_class.nis AS TEXT) ILIKE $2 OR user_student.name ILIKE $2
+  )
+  ORDER BY students_class.nis DESC
+  LIMIT $3 OFFSET $4;
         `;
         countQuery = `
           SELECT COUNT(*) AS total
@@ -132,7 +134,6 @@ router.get(
         params = [homebase, `%${search}%`, limit, offset];
         countParams = [homebase, `%${search}%`];
       } else if (gradeId) {
-        // Query for filtering by grade
         query = `
           SELECT students_class.id, students_class.nis, user_student.name, grades.grade,
                  classes.name AS class
@@ -143,7 +144,7 @@ router.get(
           WHERE students_class.grade_id = $1 AND (
             CAST(students_class.nis AS TEXT) ILIKE $2 OR user_student.name ILIKE $2
           )
-          ORDER BY classes.name, user_student.name
+          ORDER BY grades.grade ASC, classes.name ASC, user_student.name ASC
           LIMIT $3 OFFSET $4;
         `;
         countQuery = `
@@ -157,7 +158,6 @@ router.get(
         params = [gradeId, `%${search}%`, limit, offset];
         countParams = [gradeId, `%${search}%`];
       } else if (classCode) {
-        // Query for filtering by class code
         query = `
           SELECT DISTINCT students_class.id, students_class.nis, grades.grade, user_student.name,
                  classes.name AS class
@@ -168,7 +168,7 @@ router.get(
           WHERE students_class.class_code = $1 AND (
             CAST(students_class.nis AS TEXT) ILIKE $2 OR user_student.name ILIKE $2
           )
-          ORDER BY classes.name ASC, user_student.name ASC
+          ORDER BY grades.grade ASC, classes.name ASC, user_student.name ASC
           LIMIT $3 OFFSET $4;
         `;
         countQuery = `
@@ -182,7 +182,6 @@ router.get(
         params = [classCode, `%${search}%`, limit, offset];
         countParams = [classCode, `%${search}%`];
       } else {
-        // Default query for all students
         query = `
           SELECT user_student.id, user_student.name, user_student.nis
           FROM user_student
@@ -203,6 +202,7 @@ router.get(
       const countData = await client.query(countQuery, countParams);
 
       const students = data.rows;
+
       const totalStudents = parseInt(countData.rows[0].total, 10);
       const totalPages = Math.ceil(totalStudents / limit);
 
@@ -279,26 +279,28 @@ router.put(
 );
 
 // Menghapus siswa
-router.delete("/delete/:id", authorize("admin"), async (req, res) => {
-  try {
-    const id = req.params.id;
+router.delete(
+  "/delete/:id",
+  authorize("admin", "super-admin"),
+  async (req, res) => {
+    try {
+      const id = req.params.id;
 
-    const data = await client.query(
-      "DELETE FROM students WHERE id = $1 RETURNING *",
-      [id]
-    );
+      const data = await client.query(
+        "DELETE FROM user_student WHERE id = $1 RETURNING *",
+        [id]
+      );
 
-    if (data.rows.length === 0) {
-      return res.status(404).json({ message: "Student not found" });
+      if (data.rows.length === 0) {
+        return res.status(404).json({ message: "Siswa tidak ditemukan" });
+      }
+
+      res.status(200).json({ message: "Berhasil dihapus" });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
-
-    res.status(200).json({
-      message: "Students is successfully deleted",
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
   }
-});
+);
 
 // ADMIN SATUAN
 // Menambahkan siswa ke dalam kelas

@@ -471,7 +471,7 @@ router.delete("/delete-file/:id", authorize("teacher"), async (req, res) => {
     const serverUrl = process.env.SERVER_2;
 
     // Check if the file is hosted on the server (not a URL like YouTube)
-    if (fileLink.startsWith(serverUrl)) {
+    if (fileLink && fileLink.startsWith(serverUrl)) {
       const filePath = fileLink.replace(serverUrl, ".");
 
       // Check if the file exists and delete it
@@ -482,12 +482,15 @@ router.delete("/delete-file/:id", authorize("teacher"), async (req, res) => {
           }
         });
       }
+
+      await client.query("DELETE FROM lms_files WHERE id = $1", [id]);
+    } else {
+      await client.query("DELETE FROM lms_files WHERE id = $1", [id]);
     }
 
     // Delete the file record from the database
-    await client.query("DELETE FROM lms_files WHERE id = $1", [id]);
 
-    res.status(200).json({ message: "File deleted successfully" });
+    res.status(200).json({ message: "Berhasil dihapus" });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: error.message });

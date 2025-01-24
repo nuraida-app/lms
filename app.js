@@ -23,6 +23,9 @@ import answerRouter from "./router/cbt/answerRouter.js";
 import logRouter from "./router/cbt/logRouter.js";
 import dbRouter from "./router/dbRouter.js";
 import lmsRouter from "./router/lms/lmsRouter.js";
+import quranRouter from "./router/tahfiz/quranRouter.js";
+import metricsRouter from "./router/tahfiz/metricsRouter.js";
+import scoreRouter from "./router/tahfiz/scoreRouter.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -63,5 +66,8 @@ app.use("/answer", answerRouter);
 app.use("/log", logRouter);
 app.use("/database", dbRouter);
 app.use("/lms", lmsRouter);
+app.use("/alquran", quranRouter);
+app.use("/metrics", metricsRouter);
+app.use("/scoring", scoreRouter);
 
 export default app;

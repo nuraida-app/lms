@@ -82,9 +82,13 @@ router.post("/login", async (req, res) => {
         return res.status(401).json({ message: "Password salah" });
       }
 
-      const token = jwt.sign({ id: user.id, type: userType }, process.env.JWT, {
-        expiresIn: "8h",
-      });
+      const token = jwt.sign(
+        { id: user.id, type: user.role },
+        process.env.JWT,
+        {
+          expiresIn: "8h",
+        }
+      );
 
       res.cookie("token", token, { httpOnly: true, maxAge: 28800000 });
       res.status(200).json(user);
@@ -112,7 +116,7 @@ router.post("/logout", (req, res) => {
 
 router.get(
   "/load",
-  authorize("admin", "student", "teacher", "parent", "super-admin"),
+  authorize("admin", "student", "teacher", "parent", "super-admin", "tahfiz"),
   async (req, res) => {
     try {
       // Extract token from cookies
@@ -137,6 +141,19 @@ router.get(
       const { role, id } = req.user;
 
       // Query data based on user role
+
+      if (role === "tahfiz") {
+        const query = `
+          SELECT *
+          FROM user_admin 
+          WHERE id = $1
+        `;
+        const result = await client.query(query, [id]);
+        const tahfiz = result.rows[0];
+
+        return res.status(200).json(tahfiz);
+      }
+
       if (role === "super-admin") {
         const query = `
           SELECT *
