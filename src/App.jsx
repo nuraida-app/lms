@@ -10,6 +10,7 @@ import { useLoadMutation } from "./control/api/authApi";
 import MetaData from "./components/meta/MetaData";
 import { setLogin } from "./control/slice/authSlice";
 import Loader from "./components/loader/Loader";
+import TahfizAssess from "./tahfiz/penilaian/TahfizAssess";
 
 const CbtBankList = lazy(() => import("./cbt/Bank/CbtBankList"));
 const ListQuestions = lazy(() => import("./cbt/Bank/forms/ListQuestions"));
@@ -28,6 +29,11 @@ const CenterGrade = lazy(() => import("./center/jenjang/CenterGrade"));
 const CenterTeacher = lazy(() => import("./center/guru/CenterTeacher"));
 const CenterStudent = lazy(() => import("./center/siswa/CenterStudent"));
 const CenterDb = lazy(() => import("./center/database/CenterDb"));
+
+const TahfizDash = lazy(() => import("./tahfiz/dahboard/TahfizDash"));
+const TahfizAlquran = lazy(() => import("./tahfiz/index/TahfizAlquran"));
+const TahfizMetriks = lazy(() => import("./tahfiz/metriks/TahfizMetriks"));
+const TahfizAssessment = lazy(() => import("./tahfiz/penilaian/TahfizAssess"));
 
 const AdminDash = lazy(() => import("./admin/dashboard/AdminDash"));
 const AdminGrade = lazy(() => import("./admin/tingkat/AdminGrade"));
@@ -66,7 +72,7 @@ function App() {
     <BrowserRouter>
       <ToastContainer autoClose={4000} />
       <MetaData
-        title={"Pilih Akun"}
+        title={"Nuraida"}
         desc={
           "LMS mempermudah pembelajaran online dengan fitur interaktif. Solusi ideal untuk pengajar dan pelajar modern."
         }
@@ -111,6 +117,15 @@ function App() {
             path="/lms-mapel/:id/:name/:code"
             element={<LmsMapelDetail />}
           />
+
+          {/* Tahfiz */}
+          <Route path="/tahfiz-dashboard" element={<TahfizDash />} />
+
+          <Route path="/tahfiz-alquran" element={<TahfizAlquran />} />
+
+          <Route path="/tahfiz-metriks" element={<TahfizMetriks />} />
+
+          <Route path="/tahfiz-penilaian" element={<TahfizAssess />} />
 
           {/* Center */}
           <Route path="/center-dashboard" element={<CenterDash />} />

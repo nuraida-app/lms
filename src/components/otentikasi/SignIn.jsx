@@ -69,6 +69,9 @@ const SignIn = () => {
         case "super-admin":
           window.location.href = "/center-dashboard";
           break;
+        case "tahfiz":
+          window.location.href = "/tahfiz-dashboard";
+          break;
         default:
           break;
       }

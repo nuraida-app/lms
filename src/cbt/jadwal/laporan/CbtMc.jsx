@@ -35,7 +35,7 @@ const CbtMc = ({ tableRef }) => {
   });
   const { results = [], totalPages, totalData } = rawData;
   const { data: questions } = useGetQuestionsQuery(quizId, { skip: !quizId });
-  const { data: classes } = useGetClassByGradeQuery({ gradeId });
+  const { data: classes } = useGetClassByGradeQuery(gradeId);
 
   return (
     <TableContainer

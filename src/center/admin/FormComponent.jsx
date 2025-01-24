@@ -82,10 +82,10 @@ const FormComponent = ({ admin, remove }) => {
         <input
           type="text"
           name="name"
-          id=""
+          id="1"
           placeholder="Nama Admin"
           className="form-control"
-          value={name}
+          value={name || ""}
           onChange={(e) => setName(e.target.value)}
           required
         />
@@ -93,18 +93,18 @@ const FormComponent = ({ admin, remove }) => {
         <input
           type="email"
           name="email"
-          id=""
+          id="2"
           placeholder="Email"
           className="form-control"
-          value={email}
+          value={email || ""}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
 
         <select
           name="role"
-          id=""
-          value={role}
+          id="3"
+          value={role || ""}
           onChange={(e) => setRole(e.target.value)}
           className="form-select"
           required
@@ -120,8 +120,8 @@ const FormComponent = ({ admin, remove }) => {
         {role === "admin" && (
           <select
             name="role"
-            id=""
-            value={homebase_id}
+            id="4"
+            value={homebase_id || ""}
             onChange={(e) => setHome(e.target.value)}
             className="form-select"
             required
@@ -140,10 +140,10 @@ const FormComponent = ({ admin, remove }) => {
         <input
           type="password"
           name="password"
-          id=""
+          id="5"
           placeholder="Masukan Password"
           className="form-control"
-          value={password}
+          value={password || ""}
           onChange={(e) => setPassword(e.target.value)}
         />
 

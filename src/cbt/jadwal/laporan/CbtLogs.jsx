@@ -39,7 +39,7 @@ const CbtLogs = ({ tableRef }) => {
     quizId,
   });
   const { logs = [], totalPages, total } = rawData;
-  const { data: classes } = useGetClassByGradeQuery({ gradeId });
+  const { data: classes } = useGetClassByGradeQuery(gradeId);
   const [resetLog, { data: message, isSuccess, isLoading, error }] =
     useResetLogMutation();
   const [

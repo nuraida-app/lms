@@ -1,16 +1,70 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useCreateStudentMutation } from "../../control/api/studentApi";
+import { toast } from "react-toastify";
 
-const FormComponent = () => {
+const FormComponent = ({ student, clear }) => {
+  const [id, setId] = useState("");
+  const [name, setName] = useState("");
+  const [nis, setNis] = useState("");
+
+  const [createStudent, { data, isSuccess, isLoading, error, reset }] =
+    useCreateStudentMutation();
+
+  const addHandler = (e) => {
+    e.preventDefault();
+
+    if (!name || !nis) {
+      toast.error("Semua data harus diisi");
+      return;
+    }
+
+    const data = { id, nis, name };
+
+    createStudent(data);
+  };
+
+  const cancelHandler = () => {
+    setId("");
+    setName("");
+    setNis("");
+    clear();
+  };
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success(data.message);
+      reset();
+      setId("");
+      setName("");
+      setNis("");
+    }
+
+    if (error) {
+      toast.error(error.data.message);
+      reset();
+    }
+  }, [data, isSuccess, error]);
+
+  useEffect(() => {
+    if (student) {
+      setId(student.id);
+      setName(student.name);
+      setNis(student.nis);
+    }
+  }, [student]);
   return (
-    <div className="mt-2 p-2 shadow rounded d-flex flex-column gap-2">
+    <div className="mt-2 p-2 shadow rounded d-flex flex-column gap-2 bg-white">
       <p className="h5">Tambahkan Peseta Didik</p>
-      <form className="d-flex flex-column gap-2">
+      <form className="d-flex flex-column gap-2" onSubmit={addHandler}>
         <input
           type="number"
           name="name"
           id=""
           placeholder="NIS"
           className="form-control"
+          value={nis || ""}
+          onChange={(e) => setNis(e.target.value)}
+          required
         />
 
         <input
@@ -19,21 +73,34 @@ const FormComponent = () => {
           id=""
           placeholder="Nama Lengkap"
           className="form-control"
+          value={name || ""}
+          onChange={(e) => setName(e.target.value)}
+          required
         />
 
-        <button type="button" className="btn btn-success">
-          + Tambahkan
-        </button>
-      </form>
+        <div className="d-flex align-items-center justify-content-end gap-2">
+          <button
+            type="button"
+            className="btn btn-danger"
+            onClick={cancelHandler}
+          >
+            Batal
+          </button>
 
-      <button
-        type="button"
-        className="btn btn-info"
-        data-bs-toggle="modal"
-        data-bs-target="#staticBackdrop"
-      >
-        Unggah Berkas
-      </button>
+          <button
+            type="button"
+            className="btn btn-info"
+            data-bs-toggle="modal"
+            data-bs-target="#staticBackdrop"
+          >
+            upload
+          </button>
+
+          <button type="submit" className="btn btn-success">
+            {isLoading ? `Loading...` : `+ Tambahkan`}
+          </button>
+        </div>
+      </form>
 
       <div
         className="modal fade"

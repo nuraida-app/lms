@@ -1,30 +1,70 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "../components/layout/Layout";
 import TableContainer from "../../components/tabel/TabelContainer";
 import FormComponent from "./FormComponent";
-
-const usersData = [
-  { id: 1, first: "Mark", last: "Otto", handle: "@mdo" },
-  { id: 2, first: "Jacob", last: "Thornton", handle: "@fat" },
-  { id: 3, first: "Larry", last: "Bird", handle: "@twitter" },
-  { id: 4, first: "John", last: "Doe", handle: "@jdoe" },
-  { id: 5, first: "Jane", last: "Smith", handle: "@jsmith" },
-  { id: 6, first: "Chris", last: "Evans", handle: "@cevans" },
-  { id: 7, first: "Emily", last: "Clark", handle: "@eclark" },
-  { id: 8, first: "Michael", last: "Scott", handle: "@mscott" },
-  { id: 9, first: "Pam", last: "Beesly", handle: "@pbeesly" },
-  { id: 10, first: "Dwight", last: "Schrute", handle: "@dschrute" },
-];
+import {
+  useDeleteStudentMutation,
+  useGetStudentsQuery,
+} from "../../control/api/studentApi";
+import { toast } from "react-toastify";
 
 const CenterStudent = () => {
+  const [detail, setDetail] = useState({});
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(15);
+  const [search, setSearch] = useState("");
+  const homebase = "";
+  const gradeId = "";
+  const classCode = "";
+
+  const { data: rawData = {} } = useGetStudentsQuery({
+    page,
+    limit,
+    search,
+    homebase,
+    gradeId,
+    classCode,
+  });
+  const { students, totalPages, totalStudents } = rawData;
+  const [deleteStudent, { data, isSuccess, isLoading, error, reset }] =
+    useDeleteStudentMutation();
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success(data.message);
+      reset();
+    }
+
+    if (error) {
+      toast.error(error.data.message);
+      reset();
+    }
+  }, [data, isSuccess, error]);
+
   return (
-    <Layout>
+    <Layout title={"Daftar Siswa"}>
       <div className="row" style={{ height: "100%" }}>
         <div className="col-lg-3 col-12">
-          <FormComponent />
+          <FormComponent student={detail} clear={() => setDetail({})} />
         </div>
-        <div className="col-lg-9 col-12">
-          <TableContainer>
+        <div
+          className="col-lg-9 col-12"
+          style={{ height: "100%", overflow: "auto" }}
+        >
+          <TableContainer
+            page={page}
+            setPage={(e) => setPage(e)}
+            setLimit={(e) => setLimit(e)}
+            onValue={(e) => setSearch(e)}
+            totalPages={totalPages}
+          >
+            <div className="d-flex align-items-center justify-content-between my-1">
+              <h6 className="m-0">
+                Jumlah Siswa <span>{totalStudents}</span>
+              </h6>
+
+              <button className="btn btn-danger">Hapus Data</button>
+            </div>
             <table className="table table-striped table-hover mt-2">
               <thead>
                 <tr>
@@ -32,25 +72,40 @@ const CenterStudent = () => {
                     #
                   </th>
                   <th scope="col" className="text-center">
-                    First
+                    NIS
                   </th>
                   <th scope="col" className="text-center">
-                    Last
+                    Nama Siswa
                   </th>
                   <th scope="col" className="text-center">
-                    Handle
+                    Aksi
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {usersData.map((user, index) => (
-                  <tr key={user.id}>
+                {students?.map((student, index) => (
+                  <tr key={student.id}>
                     <th scope="row" className="text-center">
-                      {index + 1}
+                      {(page - 1) * limit + index + 1}
                     </th>
-                    <td>{user.first}</td>
-                    <td>{user.last}</td>
-                    <td>{user.handle}</td>
+                    <td>{student.nis}</td>
+                    <td>{student.name}</td>
+                    <td>
+                      <div className="d-flex justify-content-center gap-2">
+                        <button
+                          className="btn btn-warning"
+                          onClick={() => setDetail(student)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="btn btn-danger"
+                          onClick={() => deleteStudent(student.id)}
+                        >
+                          {isLoading ? `Loading...` : `Hapus`}
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>

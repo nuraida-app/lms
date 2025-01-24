@@ -14,7 +14,6 @@ const TableContainer = ({
 
   const handleChange = (e) => {
     const newValue = e.target.value;
-    console.log(newValue);
     setValue(newValue);
     if (onValue) {
       onValue(newValue);
@@ -43,7 +42,7 @@ const TableContainer = ({
             type="text"
             className="form-control"
             placeholder="Cari ..."
-            value={value}
+            value={value || ""}
             onChange={handleChange}
           />
         </div>
@@ -66,8 +65,8 @@ const TableContainer = ({
       <div className="table-responsive my-2">
         {children}
 
-        <nav className="d-flex justify-content-between align-items-center">
-          <ul className="pagination pagination-sm justify-content-center m-0">
+        <nav className="d-flex flex-wrap justify-content-between align-items-center">
+          <ul className="pagination pagination-sm justify-content-center m-0 d-flex flex-wrap">
             <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
               <button
                 className="page-link"

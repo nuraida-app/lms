@@ -48,7 +48,7 @@ const CbtScore = ({ tableRef }) => {
     code,
   });
   const { results = [], totalPages, totalData } = rawData;
-  const { data: classes } = useGetClassByGradeQuery({ gradeId });
+  const { data: classes } = useGetClassByGradeQuery(gradeId);
 
   return (
     <TableContainer

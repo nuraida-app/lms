@@ -16,6 +16,9 @@ import { mediaApi } from "./api/mediaApi";
 import { homebaseApi } from "./api/homebaseApi";
 import { lmsApi } from "./api/lmsApi";
 import { authApi } from "./api/authApi";
+import { quranApi } from "./api/quranApi";
+import { metricsApi } from "./api/metricApi";
+import { scoreApi } from "./api/scoreApi";
 
 const store = configureStore({
   reducer: {
@@ -36,6 +39,9 @@ const store = configureStore({
     [adminApi.reducerPath]: adminApi.reducer,
     [mediaApi.reducerPath]: mediaApi.reducer,
     [lmsApi.reducerPath]: lmsApi.reducer,
+    [quranApi.reducerPath]: quranApi.reducer,
+    [metricsApi.reducerPath]: metricsApi.reducer,
+    [scoreApi.reducerPath]: scoreApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat([
@@ -56,6 +62,9 @@ const store = configureStore({
       mediaApi.middleware,
       homebaseApi.middleware,
       lmsApi.middleware,
+      quranApi.middleware,
+      metricsApi.middleware,
+      scoreApi.middleware,
     ]),
 });
 

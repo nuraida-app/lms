@@ -45,7 +45,7 @@ const CbtEssay = ({ tabelRef }) => {
   });
   const { results = [], totalPages, totalData } = rawData;
   const { data: questions } = useGetQuestionsQuery(quizId, { skip: !quizId });
-  const { data: classes } = useGetClassByGradeQuery({ gradeId });
+  const { data: classes } = useGetClassByGradeQuery(gradeId);
   const qEssay = questions?.filter((q) => q.type === 2);
 
   const [giveScore, { data, isSuccess, isLoading, error, reset }] =

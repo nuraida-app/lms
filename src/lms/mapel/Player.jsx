@@ -5,7 +5,8 @@ const Player = ({ name, url }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [playedSeconds, setPlayedSeconds] = useState(0);
-  const [seekTime, setSeekTime] = useState(10);
+  const [quality, setQuality] = useState("auto"); // Default quality
+  const [videoUrl, setVideoUrl] = useState(url); // Dynamic URL
   const playerContainerRef = useRef(null);
   const playerRef = useRef(null);
 
@@ -48,6 +49,23 @@ const Player = ({ name, url }) => {
     }
   };
 
+  const handleQualityChange = (newQuality) => {
+    setQuality(newQuality);
+
+    // Generate new URL with quality parameter
+    const baseUrl = url.split("?")[0];
+    const queryParams = new URLSearchParams(url.split("?")[1] || "");
+
+    if (newQuality !== "auto") {
+      queryParams.set("vq", newQuality); // Use 'vq' for YouTube quality
+    } else {
+      queryParams.delete("vq");
+    }
+
+    const newUrl = `${baseUrl}?${queryParams.toString()}`;
+    setVideoUrl(newUrl); // Update the URL state
+  };
+
   return (
     <div
       className="modal fade"
@@ -67,6 +85,7 @@ const Player = ({ name, url }) => {
               className="btn-close"
               data-bs-dismiss="modal"
               aria-label="Close"
+              onClick={() => setIsPlaying(false)}
             ></button>
           </div>
           <div className="modal-body d-flex flex-column gap-2">
@@ -74,25 +93,75 @@ const Player = ({ name, url }) => {
               <p className="text-muted m-0">Durasi: {formatTime(duration)}</p>
               <p className="text-muted m-0">{formatTime(playedSeconds)}</p>
             </div>
-            <div
-              ref={playerContainerRef}
-              style={{
-                aspectRatio: "16/9",
-                width: "100%",
-              }}
-            >
-              <ReactPlayer
-                ref={playerRef}
-                playing={isPlaying}
-                controls
-                url={url}
-                width="100%"
-                height="100%"
-                onDuration={handleDuration}
-                onProgress={handleProgress}
-                style={{ pointerEvents: "none" }}
-              />
-            </div>
+
+            {quality === "auto" ? (
+              <div className="dropdown text-center">
+                <button
+                  className="btn btn-secondary dropdown-toggle"
+                  type="button"
+                  id="qualityDropdown"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  Pilih Kualitas Video
+                </button>
+                <ul className="dropdown-menu" aria-labelledby="qualityDropdown">
+                  <li>
+                    <button
+                      className="dropdown-item"
+                      onClick={() => handleQualityChange("auto")}
+                    >
+                      Auto
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      className="dropdown-item"
+                      onClick={() => handleQualityChange("hd1080")}
+                    >
+                      1080p
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      className="dropdown-item"
+                      onClick={() => handleQualityChange("hd720")}
+                    >
+                      720p
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      className="dropdown-item"
+                      onClick={() => handleQualityChange("sd480")}
+                    >
+                      480p
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            ) : (
+              <div
+                ref={playerContainerRef}
+                style={{
+                  aspectRatio: "16/9",
+                  width: "100%",
+                }}
+              >
+                <ReactPlayer
+                  key={videoUrl} // Force remount when URL changes
+                  ref={playerRef}
+                  playing={isPlaying}
+                  controls
+                  url={videoUrl} // Dynamic URL
+                  width="100%"
+                  height="100%"
+                  onDuration={handleDuration}
+                  onProgress={handleProgress}
+                  style={{ pointerEvents: "none" }}
+                />
+              </div>
+            )}
 
             <div
               className="progress position-relative"
@@ -115,33 +184,6 @@ const Player = ({ name, url }) => {
                 aria-valuemax="100"
               ></div>
             </div>
-
-            <div className="d-flex justify-content-between align-items-center">
-              <button
-                className="btn btn-outline-primary me-2"
-                onClick={() => seekTo(playedSeconds - seekTime)}
-              >
-                -{seekTime} detik
-              </button>
-
-              <select
-                className="form-select w-auto"
-                value={seekTime}
-                onChange={(e) => setSeekTime(Number(e.target.value))}
-              >
-                <option value={10}>10 detik</option>
-                <option value={20}>20 detik</option>
-                <option value={50}>50 detik</option>
-                <option value={60}>60 detik</option>
-              </select>
-
-              <button
-                className="btn btn-outline-primary me-2"
-                onClick={() => seekTo(playedSeconds + seekTime)}
-              >
-                +{seekTime} detik
-              </button>
-            </div>
           </div>
           <div className="modal-footer">
             <button
@@ -151,6 +193,7 @@ const Player = ({ name, url }) => {
             >
               {isPlaying ? "Pause" : "Play"}
             </button>
+
             <button
               onClick={enterFullscreen}
               className="btn btn-secondary"
@@ -172,5 +215,4 @@ const Player = ({ name, url }) => {
     </div>
   );
 };
-
 export default Player;
