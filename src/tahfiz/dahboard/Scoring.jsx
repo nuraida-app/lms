@@ -6,34 +6,53 @@ import {
 } from "../../control/api/metricApi";
 import { toast } from "react-toastify";
 import { useGetQuranQuery } from "../../control/api/quranApi";
-
-const columns = [
-  { label: "No" },
-  { label: "NIS" },
-  { label: "Nama Lengkap" },
-  { label: "Tingkat" },
-  { label: "Kelas" },
-  { label: "Aksi" },
-];
+import SurahSelection from "./SurahSelection";
+import TableData from "./TableData";
+import CategoryTable from "./CategoryTable";
+import { useGetExaminersQuery } from "../../control/api/examinerApi";
 
 const Scoring = ({ student }) => {
   const [search, setSearch] = useState("");
   const [typeId, setTypeId] = useState("");
+  const [examiner, setExaminer] = useState("");
+
+  const [fromSurah, setFromSurah] = useState("");
+  const [fromAyat, setFromAyat] = useState("");
+  const [toSurah, setToSurah] = useState("");
+  const [toAyat, setToAyat] = useState("");
+  const [tableData, setTableData] = useState([]);
 
   const { data: types } = useGetTypesQuery();
   const { data: categories } = useGetCategoriesQuery();
   const [addScore, { data, isSuccess, isLoading, error, reset }] =
     useAddscoreMutation();
-
   const { data: surahs } = useGetQuranQuery({ search });
+  const { data: examiners } = useGetExaminersQuery({ search });
 
-  console.log(surahs);
+  const handleAddToTable = () => {
+    if (fromSurah && fromAyat && toSurah && toAyat) {
+      setTableData((prev) => [
+        ...prev,
+        { fromSurah, fromAyat, toSurah, toAyat },
+      ]);
+
+      setFromSurah("");
+      setFromAyat("");
+      setToSurah("");
+      setToAyat("");
+    }
+  };
+
+  const getAyatOptions = (surahId) => {
+    const selectedSurah = surahs?.find(
+      (surah) => surah.id === parseInt(surahId)
+    );
+    return selectedSurah
+      ? Array.from({ length: selectedSurah.ayat }, (_, i) => i + 1)
+      : [];
+  };
 
   const handleSave = () => {
-    if (!typeId) {
-      return toast.warning(`Lengkapi data`);
-    }
-
     const categoryInputs = document.querySelectorAll("[name='category-score']");
     const indicatorInputs = document.querySelectorAll(
       "input[data-indicator-id]"
@@ -61,21 +80,42 @@ const Scoring = ({ student }) => {
 
     const data = {
       nis: student.nis,
+      surahs: tableData,
+      examiner,
       poin: {
         type_id: parseInt(typeId),
         categories,
       },
     };
 
-    console.log(data);
+    if (!typeId || !examiner || !tableData || !categories) {
+      return toast.warning(`Lengkapi data`);
+    }
+
     addScore(data);
+  };
+
+  const handleCancel = () => {
+    setTypeId("");
+    setExaminer("");
+    setFromSurah("");
+    setFromAyat("");
+    setToSurah("");
+    setToAyat("");
+    setTableData([]);
   };
 
   useEffect(() => {
     if (isSuccess) {
       toast.success(data.message);
+      setTypeId("");
+      setExaminer("");
+      setFromSurah("");
+      setFromAyat("");
+      setToSurah("");
+      setToAyat("");
+      setTableData([]);
       reset();
-      window.location.reload();
     }
 
     if (error) {
@@ -93,7 +133,7 @@ const Scoring = ({ student }) => {
       aria-labelledby="exampleModalLabel"
       aria-hidden="true"
     >
-      <div className="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
+      <div className="modal-dialog modal-lg modal-dialog-scrollable">
         <div className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title" id="exampleModalLabel">
@@ -107,91 +147,68 @@ const Scoring = ({ student }) => {
             ></button>
           </div>
           <div className="modal-body d-flex flex-column gap-2">
-            <select
-              name="type"
-              id="1"
-              className="form-select"
-              value={typeId || ""}
-              onChange={(e) => setTypeId(e.target.value)}
-            >
-              <option value="" hidden>
-                Pilih Jenis Penilaian
-              </option>
-
-              {types?.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.name}
+            <div className="d-flex justify-content-between gap-2">
+              <select
+                name="type"
+                id="1"
+                className="form-select"
+                value={typeId || ""}
+                onChange={(e) => setTypeId(e.target.value)}
+              >
+                <option value="" hidden>
+                  Pilih Jenis Penilaian
                 </option>
-              ))}
-            </select>
 
-            {typeId && (
-              <table className="table table-striped table-hover">
-                <thead>
-                  <tr>
-                    <th>Kategori</th>
-                    <th>Indikator</th>
-                    <th>Poin</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {categories?.map((item, i) => (
-                    <tr key={i}>
-                      <td className="align-middle">{item.category}</td>
-                      <td className="align-middle">
-                        <div className="d-flex flex-column gap-2">
-                          {Array.isArray(item.indicators) &&
-                          item.indicators.filter((indi) => indi !== null)
-                            .length > 0 ? (
-                            item.indicators
-                              .filter((indi) => indi !== null)
-                              .map((indi, j) => (
-                                <div
-                                  key={j}
-                                  className="d-flex align-items-center justify-content-between p-2 rounded border border-2 bg-white"
-                                >
-                                  <p className="m-0">{indi.name}</p>
-                                  <input
-                                    style={{ width: 200 }}
-                                    type="text"
-                                    className="form-control"
-                                    placeholder="Penilaian"
-                                    data-indicator-id={indi.id}
-                                    data-category-id={item.id}
-                                  />
-                                </div>
-                              ))
-                          ) : (
-                            <p className="m-0 text-muted">
-                              Tidak ada indikator untuk kategori ini
-                            </p>
-                          )}
-                        </div>
-                      </td>
-                      <td className="align-middle">
-                        <div className="d-flex justify-content-center">
-                          <input
-                            type="text"
-                            name="category-score"
-                            className="form-control"
-                            placeholder="Nilai"
-                            style={{ width: 80 }}
-                            data-category-id={item.id}
-                          />
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
+                {types?.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.name}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                name="type"
+                id="1"
+                className="form-select"
+                value={examiner || ""}
+                onChange={(e) => setExaminer(e.target.value)}
+              >
+                <option value="" hidden>
+                  Pilih Penguji
+                </option>
+
+                {examiners?.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <SurahSelection
+              surahs={surahs}
+              fromSurah={fromSurah}
+              setFromSurah={setFromSurah}
+              fromAyat={fromAyat}
+              setFromAyat={setFromAyat}
+              toSurah={toSurah}
+              setToSurah={setToSurah}
+              toAyat={toAyat}
+              setToAyat={setToAyat}
+              getAyatOptions={getAyatOptions}
+              handleAddToTable={handleAddToTable}
+            />
+
+            <TableData tableData={tableData} />
+
+            {tableData?.length > 0 && <CategoryTable categories={categories} />}
           </div>
           <div className="modal-footer">
             <button
               type="button"
               className="btn btn-secondary"
               data-bs-dismiss="modal"
-              onClick={() => setStudent({})}
+              onClick={handleCancel}
             >
               Batal
             </button>

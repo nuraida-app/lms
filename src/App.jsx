@@ -34,6 +34,8 @@ const TahfizDash = lazy(() => import("./tahfiz/dahboard/TahfizDash"));
 const TahfizAlquran = lazy(() => import("./tahfiz/index/TahfizAlquran"));
 const TahfizMetriks = lazy(() => import("./tahfiz/metriks/TahfizMetriks"));
 const TahfizAssessment = lazy(() => import("./tahfiz/penilaian/TahfizAssess"));
+const TahfizExaminer = lazy(() => import("./tahfiz/penguji/TahfizExaminer"));
+const TahfizReport = lazy(() => import("./tahfiz/laporan/TahfizReport"));
 
 const AdminDash = lazy(() => import("./admin/dashboard/AdminDash"));
 const AdminGrade = lazy(() => import("./admin/tingkat/AdminGrade"));
@@ -126,6 +128,10 @@ function App() {
           <Route path="/tahfiz-metriks" element={<TahfizMetriks />} />
 
           <Route path="/tahfiz-penilaian" element={<TahfizAssess />} />
+
+          <Route path="/tahfiz-penguji" element={<TahfizExaminer />} />
+
+          <Route path="/tahfiz-laporan" element={<TahfizReport />} />
 
           {/* Center */}
           <Route path="/center-dashboard" element={<CenterDash />} />
