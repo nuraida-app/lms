@@ -11,14 +11,14 @@ router.post("/add-surah", authorize("tahfiz"), async (req, res) => {
     if (id) {
       await client.query(
         `UPDATE t_alquran
-      SET surah = $1, ayat = $2 WHERE id = $3`,
+      SET name = $1, ayat = $2 WHERE id = $3`,
         [name, count, id]
       );
     } else {
-      await client.query(
-        `INSERT INTO t_alquran (surah, ayat) VALUES ($1, $2)`,
-        [name, count]
-      );
+      await client.query(`INSERT INTO t_alquran (name, ayat) VALUES ($1, $2)`, [
+        name,
+        count,
+      ]);
     }
 
     const update = "Berhasil diperbarui";
@@ -40,7 +40,7 @@ router.get("/get-alquran", authorize("tahfiz"), async (req, res) => {
       const querySearch = `
                 SELECT * 
                 FROM t_alquran
-                WHERE surah ILIKE $1
+                WHERE name ILIKE $1
                 ORDER BY id
             `;
 
@@ -57,14 +57,14 @@ router.get("/get-alquran", authorize("tahfiz"), async (req, res) => {
     const querySearch = `
                 SELECT * 
                 FROM t_alquran
-                WHERE surah ILIKE $1
+                WHERE name ILIKE $1
                 ORDER BY id
                 LIMIT $2 OFFSET $3
             `;
     const queryTotalData = `
                 SELECT COUNT(*) as total_surah
                 FROM t_alquran
-                WHERE surah ILIKE $1
+                WHERE name ILIKE $1
             `;
     const queryTotalAyat = `
                 SELECT SUM(ayat) as total_ayat

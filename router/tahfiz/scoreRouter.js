@@ -58,46 +58,71 @@ router.get("/get-students", authorize("tahfiz"), async (req, res) => {
 });
 
 router.post("/add-score", authorize("tahfiz"), async (req, res) => {
+  // Asumsikan client database berasal dari app.locals
   try {
-    const { nis, poin } = req.body;
+    const { nis, poin, examiner, surahs } = req.body;
 
-    if (!nis || !poin || !poin.categories) {
+    // Validasi input
+    if (
+      !nis ||
+      !poin ||
+      !poin.type_id ||
+      !poin.categories ||
+      !Array.isArray(surahs)
+    ) {
       return res.status(400).json({ error: "Invalid request body." });
     }
 
-    // Start transaction
-    await client.query("BEGIN");
+    // Masukkan data ke tabel t_process
+    for (const surah of surahs) {
+      const { fromSurah, fromAyat, toSurah, toAyat } = surah;
+      if (!fromSurah || !fromAyat || !toSurah || !toAyat) {
+        throw new Error("Surah data is incomplete.");
+      }
+      await client.query(
+        `INSERT INTO t_process (nis, from_id, from_count, to_id, to_count, createdat)
+         VALUES ($1, $2, $3, $4, $5, NOW())`,
+        [nis, fromSurah, fromAyat, toSurah, toAyat]
+      );
+    }
 
-    // Insert data into t_scoring
+    // Masukkan data ke tabel t_scoring
     for (const category of poin.categories) {
       const { category_id, poin: categoryPoin, indicators } = category;
+      if (!category_id || categoryPoin === undefined) {
+        throw new Error("Category data is incomplete.");
+      }
 
-      // Insert category-level data
       const categoryInsertQuery = `
-        INSERT INTO t_scoring (nis, type_id, category_id, poin, createdat)
-        VALUES ($1, $2, $3, $4, NOW())
+        INSERT INTO t_scoring (nis, examiner_id, type_id, category_id, poin, createdat)
+        VALUES ($1, $2, $3, $4, $5, NOW())
         RETURNING id
       `;
       const categoryResult = await client.query(categoryInsertQuery, [
         nis,
-        poin.type_id, // type_id from the main request body
+        examiner,
+        poin.type_id,
         category_id,
         categoryPoin,
       ]);
 
       const scoringId = categoryResult.rows[0].id;
 
-      // Insert indicator-level data if present
-      if (indicators && indicators.length > 0) {
+      // Masukkan data indikator jika ada
+      if (indicators && Array.isArray(indicators)) {
         for (const indicator of indicators) {
           const { indicator_id, poin: indicatorPoin } = indicator;
+          if (!indicator_id || indicatorPoin === undefined) {
+            throw new Error("Indicator data is incomplete.");
+          }
 
           const indicatorInsertQuery = `
-            INSERT INTO t_scoring (nis, type_id, category_id, indicator_id, poin, createdat)
-            VALUES ($1, $2, $3, $4, $5, NOW())
+            INSERT INTO t_scoring (nis, examiner_id, type_id, category_id, indicator_id, poin, createdat)
+            VALUES ($1, $2, $3, $4, $5, $6, NOW())
           `;
           await client.query(indicatorInsertQuery, [
             nis,
+            examiner,
             poin.type_id,
             category_id,
             indicator_id,
@@ -107,15 +132,10 @@ router.post("/add-score", authorize("tahfiz"), async (req, res) => {
       }
     }
 
-    // Commit transaction
-    await client.query("COMMIT");
-
     res.status(200).json({ message: "Berhasil disimpan" });
   } catch (error) {
-    // Rollback transaction in case of error
-    await client.query("ROLLBACK");
-    console.error(error);
-    res.status(500).json({ error: error.message });
+    console.error("Transaction error:", error);
+    res.status(500).json({ error: error.message || "Internal server error" });
   }
 });
 

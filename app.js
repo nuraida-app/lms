@@ -26,6 +26,8 @@ import lmsRouter from "./router/lms/lmsRouter.js";
 import quranRouter from "./router/tahfiz/quranRouter.js";
 import metricsRouter from "./router/tahfiz/metricsRouter.js";
 import scoreRouter from "./router/tahfiz/scoreRouter.js";
+import examinerRouter from "./router/tahfiz/examinerRouter.js";
+import reportRouter from "./router/tahfiz/reportRouer.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -69,5 +71,7 @@ app.use("/lms", lmsRouter);
 app.use("/alquran", quranRouter);
 app.use("/metrics", metricsRouter);
 app.use("/scoring", scoreRouter);
+app.use("/examiner", examinerRouter);
+app.use("/report", reportRouter);
 
 export default app;
