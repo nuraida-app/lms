@@ -12,7 +12,7 @@ const fetchQueryResults = async (query, params = []) => {
   }
 };
 
-const buildStudentData = async (rows, categories, indicators) => {
+const buildStudentData = async (rows) => {
   return Promise.all(
     rows.map(async (row) => {
       const dates = await fetchQueryResults(
@@ -29,20 +29,44 @@ const buildStudentData = async (rows, categories, indicators) => {
             [row.nis, date.date]
           );
 
-          const filteredCategories = categories.filter(
-            (category) =>
-              category.createdat &&
-              category.createdat.toISOString().split("T")[0] === date.date
+          const categories = await fetchQueryResults(
+            `SELECT 
+          t_scoring.*, 
+          t_categories.name, 
+          DATE(t_scoring.createdat) AS created_date 
+       FROM 
+          t_scoring 
+       LEFT JOIN 
+          t_categories 
+       ON 
+          t_scoring.category_id = t_categories.id
+       WHERE 
+          t_scoring.indicator_id IS NULL 
+          AND t_scoring.type_id = $1 AND t_scoring.nis = $2 AND DATE(t_scoring.createdat) = $3`,
+            [row.type_id, row.nis, date.date]
           );
 
-          const filteredIndicators = indicators.filter(
-            (indicator) =>
-              indicator.createdat &&
-              indicator.createdat.toISOString().split("T")[0] === date.date
+          const indicators = await fetchQueryResults(
+            `SELECT 
+          t_scoring.*, 
+          t_indicators.name, 
+          DATE(t_scoring.createdat) AS created_date 
+       FROM 
+          t_scoring 
+       LEFT JOIN 
+          t_indicators 
+       ON 
+          t_scoring.indicator_id = t_indicators.id
+       WHERE 
+          t_scoring.indicator_id IS NOT NULL 
+          AND t_scoring.type_id = $1 AND t_scoring.nis = $2 AND DATE(t_scoring.createdat) = $3
+       ORDER BY 
+          t_indicators.name ASC`,
+            [row.type_id, row.nis, date.date]
           );
 
-          const scores = filteredCategories.map((category) => {
-            const relatedIndicators = filteredIndicators.filter(
+          const scores = categories.map((category) => {
+            const relatedIndicators = indicators.filter(
               (indi) => indi.category_id === category.category_id
             );
 
@@ -51,6 +75,7 @@ const buildStudentData = async (rows, categories, indicators) => {
               category_id: category.category_id,
               category: category.name,
               poin: Number(category.poin),
+              date: category.created_date,
               indicators: relatedIndicators.map((indi) => ({
                 id: indi.id,
                 indicator_id: indi.indicator_id,
@@ -118,22 +143,7 @@ router.get("/get-report/:type_id", async (req, res) => {
 
     const rows = await fetchQueryResults(mainQuery, [type_id]);
 
-    const categories = await fetchQueryResults(
-      `SELECT t_scoring.*, t_categories.name FROM t_scoring 
-       LEFT JOIN t_categories ON t_scoring.category_id = t_categories.id
-       WHERE t_scoring.indicator_id IS NULL AND t_scoring.type_id = $1`,
-      [type_id]
-    );
-
-    const indicators = await fetchQueryResults(
-      `SELECT t_scoring.*, t_indicators.name FROM t_scoring 
-       LEFT JOIN t_indicators ON t_scoring.indicator_id = t_indicators.id
-       WHERE t_scoring.indicator_id IS NOT NULL AND t_scoring.type_id = $1
-       ORDER BY t_indicators.name ASC`,
-      [type_id]
-    );
-
-    const result = await buildStudentData(rows, categories, indicators);
+    const result = await buildStudentData(rows, type_id);
 
     res.status(200).json(result);
   } catch (error) {
