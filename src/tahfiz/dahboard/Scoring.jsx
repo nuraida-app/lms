@@ -31,9 +31,14 @@ const Scoring = ({ student }) => {
 
   const handleAddToTable = () => {
     if (fromSurah && fromAyat && toSurah && toAyat) {
+      const fromSurahName =
+        surahs.find((surah) => surah.id === parseInt(fromSurah))?.name || "";
+      const toSurahName =
+        surahs.find((surah) => surah.id === parseInt(toSurah))?.name || "";
+
       setTableData((prev) => [
         ...prev,
-        { fromSurah, fromAyat, toSurah, toAyat },
+        { fromSurah, fromSurahName, fromAyat, toSurah, toSurahName, toAyat },
       ]);
 
       setFromSurah("");

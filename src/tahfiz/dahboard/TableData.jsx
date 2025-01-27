@@ -14,9 +14,9 @@ const TableData = ({ tableData }) => (
       <tbody>
         {tableData.map((row, index) => (
           <tr key={index}>
-            <td>{row.fromSurah}</td>
+            <td>{row.fromSurahName}</td>
             <td>{row.fromAyat}</td>
-            <td>{row.toSurah}</td>
+            <td>{row.toSurahName}</td>
             <td>{row.toAyat}</td>
           </tr>
         ))}
