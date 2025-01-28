@@ -75,14 +75,14 @@ router.post("/add-score", authorize("tahfiz"), async (req, res) => {
 
     // Masukkan data ke tabel t_process
     for (const surah of surahs) {
-      const { fromSurah, fromAyat, toSurah, toAyat } = surah;
-      if (!fromSurah || !fromAyat || !toSurah || !toAyat) {
+      const { fromSurah, fromAyat, toAyat } = surah;
+      if (!fromSurah || !fromAyat || !toAyat) {
         throw new Error("Surah data is incomplete.");
       }
       await client.query(
-        `INSERT INTO t_process (nis, from_id, from_count, to_id, to_count, createdat)
-         VALUES ($1, $2, $3, $4, $5, NOW())`,
-        [nis, fromSurah, fromAyat, toSurah, toAyat]
+        `INSERT INTO t_process (nis, from_id, from_count,  to_count, createdat)
+         VALUES ($1, $2, $3, $4, NOW())`,
+        [nis, fromSurah, fromAyat, toAyat]
       );
     }
 

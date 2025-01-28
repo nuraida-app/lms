@@ -49,6 +49,7 @@ router.get("/get-categories", authorize("tahfiz"), async (req, res) => {
               )
             ELSE NULL
           END
+          ORDER BY i.name ASC
         ) AS indicators
       FROM t_categories c
       LEFT JOIN t_indicators i ON c.id = i.category_id
