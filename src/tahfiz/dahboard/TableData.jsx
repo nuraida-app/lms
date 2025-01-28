@@ -5,9 +5,8 @@ const TableData = ({ tableData }) => (
     <table className="table table-striped table-hover mt-3">
       <thead>
         <tr>
-          <th>Dari Surah</th>
+          <th>Surah</th>
           <th>Dari Ayat</th>
-          <th>Sampai Surah</th>
           <th>Sampai Ayat</th>
         </tr>
       </thead>
@@ -16,7 +15,6 @@ const TableData = ({ tableData }) => (
           <tr key={index}>
             <td>{row.fromSurahName}</td>
             <td>{row.fromAyat}</td>
-            <td>{row.toSurahName}</td>
             <td>{row.toAyat}</td>
           </tr>
         ))}

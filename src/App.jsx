@@ -36,6 +36,7 @@ const TahfizMetriks = lazy(() => import("./tahfiz/metriks/TahfizMetriks"));
 const TahfizAssessment = lazy(() => import("./tahfiz/penilaian/TahfizAssess"));
 const TahfizExaminer = lazy(() => import("./tahfiz/penguji/TahfizExaminer"));
 const TahfizReport = lazy(() => import("./tahfiz/laporan/TahfizReport"));
+const ReportDetail = lazy(() => import("./tahfiz/laporan/ReportDetail"));
 
 const AdminDash = lazy(() => import("./admin/dashboard/AdminDash"));
 const AdminGrade = lazy(() => import("./admin/tingkat/AdminGrade"));
@@ -72,7 +73,7 @@ function App() {
 
   return (
     <BrowserRouter>
-      <ToastContainer autoClose={4000} />
+      <ToastContainer position="bottom-right" autoClose={4000} />
       <MetaData
         title={"Nuraida"}
         desc={
@@ -132,6 +133,8 @@ function App() {
           <Route path="/tahfiz-penguji" element={<TahfizExaminer />} />
 
           <Route path="/tahfiz-laporan" element={<TahfizReport />} />
+
+          <Route path="/tahfiz-laporan/:nis/:name" element={<ReportDetail />} />
 
           {/* Center */}
           <Route path="/center-dashboard" element={<CenterDash />} />

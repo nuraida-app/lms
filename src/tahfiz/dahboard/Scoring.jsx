@@ -18,7 +18,6 @@ const Scoring = ({ student }) => {
 
   const [fromSurah, setFromSurah] = useState("");
   const [fromAyat, setFromAyat] = useState("");
-  const [toSurah, setToSurah] = useState("");
   const [toAyat, setToAyat] = useState("");
   const [tableData, setTableData] = useState([]);
 
@@ -30,20 +29,17 @@ const Scoring = ({ student }) => {
   const { data: examiners } = useGetExaminersQuery({ search });
 
   const handleAddToTable = () => {
-    if (fromSurah && fromAyat && toSurah && toAyat) {
+    if (fromSurah && fromAyat && toAyat) {
       const fromSurahName =
         surahs.find((surah) => surah.id === parseInt(fromSurah))?.name || "";
-      const toSurahName =
-        surahs.find((surah) => surah.id === parseInt(toSurah))?.name || "";
 
       setTableData((prev) => [
         ...prev,
-        { fromSurah, fromSurahName, fromAyat, toSurah, toSurahName, toAyat },
+        { fromSurah, fromSurahName, fromAyat, toAyat },
       ]);
 
       setFromSurah("");
       setFromAyat("");
-      setToSurah("");
       setToAyat("");
     }
   };
@@ -105,7 +101,6 @@ const Scoring = ({ student }) => {
     setExaminer("");
     setFromSurah("");
     setFromAyat("");
-    setToSurah("");
     setToAyat("");
     setTableData([]);
   };
@@ -117,7 +112,6 @@ const Scoring = ({ student }) => {
       setExaminer("");
       setFromSurah("");
       setFromAyat("");
-      setToSurah("");
       setToAyat("");
       setTableData([]);
       reset();
@@ -196,8 +190,6 @@ const Scoring = ({ student }) => {
               setFromSurah={setFromSurah}
               fromAyat={fromAyat}
               setFromAyat={setFromAyat}
-              toSurah={toSurah}
-              setToSurah={setToSurah}
               toAyat={toAyat}
               setToAyat={setToAyat}
               getAyatOptions={getAyatOptions}
@@ -221,8 +213,9 @@ const Scoring = ({ student }) => {
               type="button"
               className="btn btn-primary"
               onClick={handleSave}
+              disabled={isLoading ? true : false}
             >
-              Simpan
+              {isLoading ? `Loading...` : `Simpan`}
             </button>
           </div>
         </div>

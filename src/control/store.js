@@ -20,6 +20,7 @@ import { quranApi } from "./api/quranApi";
 import { metricsApi } from "./api/metricApi";
 import { scoreApi } from "./api/scoreApi";
 import { examinerApi } from "./api/examinerApi";
+import { reportApi } from "./api/reportApi";
 
 const store = configureStore({
   reducer: {
@@ -44,6 +45,7 @@ const store = configureStore({
     [metricsApi.reducerPath]: metricsApi.reducer,
     [scoreApi.reducerPath]: scoreApi.reducer,
     [examinerApi.reducerPath]: examinerApi.reducer,
+    [reportApi.reducerPath]: reportApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat([
@@ -68,6 +70,7 @@ const store = configureStore({
       metricsApi.middleware,
       scoreApi.middleware,
       examinerApi.middleware,
+      reportApi.middleware,
     ]),
 });
 
