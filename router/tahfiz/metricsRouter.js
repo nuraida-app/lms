@@ -32,10 +32,13 @@ router.post("/add-category", authorize("tahfiz"), async (req, res) => {
   }
 });
 
-router.get("/get-categories", authorize("tahfiz"), async (req, res) => {
-  try {
-    // Query untuk mendapatkan kategori, ID, dan indikator terkait
-    const query = `
+router.get(
+  "/get-categories",
+  authorize("tahfiz", "student", "parent"),
+  async (req, res) => {
+    try {
+      // Query untuk mendapatkan kategori, ID, dan indikator terkait
+      const query = `
       SELECT 
         c.id AS category_id,
         c.name AS category, 
@@ -57,21 +60,22 @@ router.get("/get-categories", authorize("tahfiz"), async (req, res) => {
       ORDER BY c.id;
     `;
 
-    const result = await client.query(query);
+      const result = await client.query(query);
 
-    // Struktur data sesuai kebutuhan
-    const categories = result.rows.map((row) => ({
-      id: row.category_id,
-      category: row.category,
-      indicators: row.indicators || [],
-    }));
+      // Struktur data sesuai kebutuhan
+      const categories = result.rows.map((row) => ({
+        id: row.category_id,
+        category: row.category,
+        indicators: row.indicators || [],
+      }));
 
-    res.status(200).json(categories);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: error.message });
+      res.status(200).json(categories);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: error.message });
+    }
   }
-});
+);
 
 router.delete("/delete-category/:id", authorize("tahfiz"), async (req, res) => {
   try {

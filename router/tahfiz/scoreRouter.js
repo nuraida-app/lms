@@ -80,9 +80,9 @@ router.post("/add-score", authorize("tahfiz"), async (req, res) => {
         throw new Error("Surah data is incomplete.");
       }
       await client.query(
-        `INSERT INTO t_process (nis, from_id, from_count,  to_count, createdat)
-         VALUES ($1, $2, $3, $4, NOW())`,
-        [nis, fromSurah, fromAyat, toAyat]
+        `INSERT INTO t_process (nis, from_id, from_count,  to_count, type_id, createdat )
+         VALUES ($1, $2, $3, $4, $5, NOW())`,
+        [nis, fromSurah, fromAyat, toAyat, poin.type_id]
       );
     }
 
@@ -135,7 +135,7 @@ router.post("/add-score", authorize("tahfiz"), async (req, res) => {
     res.status(200).json({ message: "Berhasil disimpan" });
   } catch (error) {
     console.error("Transaction error:", error);
-    res.status(500).json({ error: error.message || "Internal server error" });
+    res.status(500).json({ messge: error.message || "Internal server error" });
   }
 });
 
