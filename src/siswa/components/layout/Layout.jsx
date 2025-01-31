@@ -15,8 +15,15 @@ const Layout = ({ children, title }) => {
   const { user } = useSelector((state) => state.auth);
   const [logout, { isLoading }] = useLogoutMutation();
 
-  const goToLink = (link) => {
-    navigate(link);
+  const goToLink = (menu) => {
+    if (menu.label === "Tahfiz") {
+      const formatted = user.name.replace(/\s+/g, "-");
+      const link = menu.link + `/${user.nis}/${formatted}`;
+
+      navigate(link);
+    } else {
+      navigate(menu.link);
+    }
   };
 
   const logutHandler = async () => {
@@ -68,7 +75,7 @@ const Layout = ({ children, title }) => {
                   <button
                     key={i}
                     className="btn btn-light"
-                    onClick={() => goToLink(menu.link)}
+                    onClick={() => goToLink(menu)}
                   >
                     {menu.label}
                   </button>

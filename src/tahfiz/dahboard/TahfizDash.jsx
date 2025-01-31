@@ -3,6 +3,7 @@ import Layout from "../components/Layout";
 import { useGetStudentsQuery } from "../../control/api/scoreApi";
 import TableContainer from "../../components/tabel/TabelContainer";
 import Scoring from "./Scoring";
+import { useNavigate } from "react-router-dom";
 
 const columns = [
   { label: "No" },
@@ -14,6 +15,8 @@ const columns = [
 ];
 
 const TahfizDash = () => {
+  const navigate = useNavigate();
+
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState("");
@@ -22,6 +25,12 @@ const TahfizDash = () => {
 
   const { data: rawData = {} } = useGetStudentsQuery({ page, limit, search });
   const { students = [], totalPages, totalData } = rawData;
+
+  const goToPage = (nis, name) => {
+    const formatted = name.replace(/\s+/g, "-");
+
+    navigate(`/tahfiz-laporan-santri/${nis}/${formatted}`);
+  };
 
   return (
     <Layout title={"Administrator Tahfiz"}>
@@ -56,15 +65,24 @@ const TahfizDash = () => {
                   <td className="align-middle">{user.name}</td>
                   <td className="text-center align-middle">{user.grade}</td>
                   <td className="text-center align-middle">{user.class}</td>
-                  <td className="text-center align--middle">
-                    <button
-                      className="btn btn-primary"
-                      data-bs-toggle="modal"
-                      data-bs-target="#nilai"
-                      onClick={() => setStudent(user)}
-                    >
-                      Nilai
-                    </button>
+                  <td className="text-center align-middle">
+                    <div className="d-flex justify-content-center gap-2">
+                      <button
+                        className="btn btn-primary"
+                        data-bs-toggle="modal"
+                        data-bs-target="#nilai"
+                        onClick={() => setStudent(user)}
+                      >
+                        Nilai
+                      </button>
+
+                      <button
+                        className="btn btn-info"
+                        onClick={() => goToPage(user.nis, user.name)}
+                      >
+                        Laporan
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

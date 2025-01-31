@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import BtnLoader from "../../components/loader/BtnLoader";
 import Protected from "../../components/otentikasi/Protected";
 import MetaData from "../../components/meta/MetaData";
+import { StudentMenus } from "../../siswa/components/menu/Menus";
 
 const Layout = ({ children, title }) => {
   const navigate = useNavigate();
@@ -14,6 +15,8 @@ const Layout = ({ children, title }) => {
 
   const { user } = useSelector((state) => state.auth);
   const [logout, { isLoading, error }] = useLogoutMutation();
+
+  const role = user?.role;
 
   const goToLink = (link) => {
     navigate(link);
@@ -33,7 +36,7 @@ const Layout = ({ children, title }) => {
 
   return (
     <Fragment>
-      <Protected roles={["tahfiz"]} />
+      <Protected roles={["tahfiz", "student", "parent"]} />
       <MetaData title={title} />
       <div className="container-fluid fixed-top bg-info">
         <nav
@@ -43,7 +46,15 @@ const Layout = ({ children, title }) => {
           <div className="container-fluid">
             <a
               className="navbar-brand col-lg-2 me-0 text-white"
-              href="/tahfiz-dashboard"
+              href={
+                role === "tahfiz"
+                  ? "/tahfiz-dashboard"
+                  : role === "student"
+                  ? "/siswa-dashboard"
+                  : role === "parent"
+                  ? "/wasan-dashboard"
+                  : "/"
+              }
             >
               {user?.name}
             </a>
@@ -65,15 +76,17 @@ const Layout = ({ children, title }) => {
               id="navbarsExample11"
             >
               <div className="navbar-nav col-12 justify-content-lg-end d-flex gap-2">
-                {AdminMenus.map((menu, i) => (
-                  <button
-                    key={i}
-                    className="btn btn-light"
-                    onClick={() => goToLink(menu.link)}
-                  >
-                    {menu.label}
-                  </button>
-                ))}
+                {(role === "tahfiz" ? AdminMenus : StudentMenus)?.map(
+                  (menu, i) => (
+                    <button
+                      key={i}
+                      className="btn btn-light"
+                      onClick={() => goToLink(menu.link)}
+                    >
+                      {menu.label}
+                    </button>
+                  )
+                )}
 
                 {isLoading ? (
                   <BtnLoader />

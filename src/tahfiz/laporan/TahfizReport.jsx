@@ -1,9 +1,13 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import TableContainer from "../../components/tabel/TabelContainer";
-import { useGetReportQuery } from "../../control/api/reportApi";
+import {
+  useDeleteReportMutation,
+  useGetReportQuery,
+} from "../../control/api/reportApi";
 import { useNavigate } from "react-router-dom";
 import { useGetTypesQuery } from "../../control/api/metricApi";
+import { toast } from "react-toastify";
 
 const TahfizReport = () => {
   const navigate = useNavigate();
@@ -21,8 +25,10 @@ const TahfizReport = () => {
   });
   const { report = [], totalPages, totalData } = rawData;
   const { data: types } = useGetTypesQuery();
-
-  console.log(types);
+  const [
+    deleteReport,
+    { data, isSuccess, isLoading: delLoading, error, reset },
+  ] = useDeleteReportMutation();
 
   const goToLink = (detail) => {
     localStorage.setItem("report", JSON.stringify(detail));
@@ -31,6 +37,23 @@ const TahfizReport = () => {
 
     navigate(`/tahfiz-laporan/${detail.nis}/${formatted}`);
   };
+
+  const deleteHandler = (nis, type, date) => {
+    deleteReport({ nis, typeId: type, createdat: date });
+  };
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success(data.message);
+      reset();
+    }
+
+    if (error) {
+      toast.error(error.data.message);
+      reset();
+      console.log(error);
+    }
+  }, [data, isSuccess, error]);
 
   return (
     <Layout title={"Laporan"}>
@@ -98,7 +121,7 @@ const TahfizReport = () => {
                   <td className="text-center align-middle">{data.type}</td>
                   <td className="text-center align-middle">
                     {data.surahs?.map((item, i) => (
-                      <p key={i}>
+                      <p key={i} className="m-0">
                         {item.name}{" "}
                         <span>{`(${item.from_ayat} - ${item.to_ayat})`}</span>
                       </p>
@@ -109,13 +132,28 @@ const TahfizReport = () => {
                     {data.totalPoints}
                   </td>
                   <td className="text-center align-middle">{data.examiner}</td>
-                  <td className="text-center align-middle">
-                    <button
-                      className="btn btn-primary"
-                      onClick={() => goToLink(data)}
-                    >
-                      Detail
-                    </button>
+                  <td className="align-middle">
+                    <div className="d-flex justify-content-center gap-2">
+                      <button
+                        className="btn btn-primary"
+                        onClick={() => goToLink(data)}
+                      >
+                        Detail
+                      </button>
+
+                      <button
+                        className="btn btn-danger"
+                        onClick={() =>
+                          deleteHandler(
+                            data.nis,
+                            data.type_id,
+                            new Date(data.date).toLocaleDateString()
+                          )
+                        }
+                      >
+                        {delLoading ? `Loading...` : `Hapus`}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

@@ -16,7 +16,26 @@ export const reportApi = createApi({
       }),
       providesTags: ["reports"],
     }),
+    deleteReport: builder.mutation({
+      query: ({ nis, typeId, createdat }) => ({
+        url: `/delete-report`,
+        params: { nis, typeId, createdat },
+        method: "DELETE",
+      }),
+      invalidatesTags: ["reports"],
+    }),
+    StudentReport: builder.query({
+      query: (nis) => ({
+        url: `/get-report/${nis}`,
+        method: "GET",
+      }),
+      providesTags: ["reports"],
+    }),
   }),
 });
 
-export const { useGetReportQuery } = reportApi;
+export const {
+  useGetReportQuery,
+  useDeleteReportMutation,
+  useStudentReportQuery,
+} = reportApi;
