@@ -1,34 +1,44 @@
-import React from "react";
+import React, { useState } from "react";
 import Layout from "../components/layout/Layout";
 import TableContainer from "./TabelContainer";
-
-const usersData = [
-  { id: 1, first: "Mark", last: "Otto", handle: "@mdo" },
-  { id: 2, first: "Jacob", last: "Thornton", handle: "@fat" },
-  { id: 3, first: "Larry", last: "Bird", handle: "@twitter" },
-  { id: 4, first: "John", last: "Doe", handle: "@jdoe" },
-  { id: 5, first: "Jane", last: "Smith", handle: "@jsmith" },
-  { id: 6, first: "Chris", last: "Evans", handle: "@cevans" },
-  { id: 7, first: "Emily", last: "Clark", handle: "@eclark" },
-  { id: 8, first: "Michael", last: "Scott", handle: "@mscott" },
-  { id: 9, first: "Pam", last: "Beesly", handle: "@pbeesly" },
-  { id: 10, first: "Dwight", last: "Schrute", handle: "@dschrute" },
-];
+import { useGetDatabaseQuery } from "../../control/api/dbApi";
 
 const columns = [
   { label: "No" },
+  { label: "NIS" },
   { label: "Nama Lengkap" },
-  { label: "Jenjang" },
   { label: "Tingkat" },
+  { label: "Kelas" },
   { label: "Status" },
   { label: "Kelengkapan" },
   { label: "Aksi" },
 ];
 
 const CenterDb = () => {
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [search, setSearch] = useState("");
+  const classCode = "";
+
+  const { data: rawData = {} } = useGetDatabaseQuery({
+    page,
+    limit,
+    search,
+    classCode,
+  });
+  const { database = [], totalPages, totalData } = rawData;
+
+  console.log(database);
+
   return (
-    <Layout>
-      <TableContainer>
+    <Layout title={"Database Pusat"}>
+      <TableContainer
+        page={page}
+        setPage={(e) => setPage(e)}
+        setLimit={(e) => setLimit(e)}
+        onValue={(e) => setSearch(e)}
+        totalPages={totalPages}
+      >
         <table className="table table-striped table-hover mt-2">
           <thead>
             <tr>
@@ -40,17 +50,51 @@ const CenterDb = () => {
             </tr>
           </thead>
           <tbody>
-            {usersData.map((user, index) => (
-              <tr key={user.id}>
-                <th scope="row" className="text-center">
-                  {index + 1}
+            {database?.map((user, index) => (
+              <tr key={index}>
+                <th scope="row" className="text-center align-middle">
+                  {(page - 1) * limit + index + 1}
                 </th>
-                <td>{user.first}</td>
-                <td>{user.last}</td>
-                <td>{user.handle}</td>
-                <td>{user.handle}</td>
-                <td>{user.handle}</td>
-                <td>
+                <td className="text-center align-middle">{user.nis}</td>
+                <td className=" align-middle">{user.nama_lengkap}</td>
+                <td className="text-center align-middle">{user.tingkat}</td>
+                <td className="text-center align-middle">{user.kelas}</td>
+                <td className="text-center align-middle">
+                  {user.status ? (
+                    <div className="d-flex gap-2 align-items-center justify-content-center">
+                      <div
+                        className="rounded-circle bg-success"
+                        style={{ height: 10, width: 10 }}
+                      ></div>
+                      <p className="m-0">Aktif</p>
+                    </div>
+                  ) : (
+                    <div className="d-flex gap-2 align-items-center justify-content-center">
+                      <div
+                        className="rounded-circle bg-danger"
+                        style={{ height: 10, width: 10 }}
+                      ></div>
+                      <p className="m-0">off</p>
+                    </div>
+                  )}
+                </td>
+                <td className="text-center align-middle">
+                  <div className="progress">
+                    <div
+                      className="progress-bar"
+                      role="progressbar"
+                      style={{
+                        width: `${user.kelengkapan}%`,
+                      }}
+                      aria-valuenow={user.kelengkapan}
+                      aria-valuemin="0"
+                      aria-valuemax={100}
+                    >
+                      {`${user.kelengkapan}%`}
+                    </div>
+                  </div>
+                </td>
+                <td className="text-center align-middle">
                   <div className="d-flex justify-content-center gap-2">
                     <button className="btn btn-warning">Edit</button>
                     <button className="btn btn-danger">Hapus</button>

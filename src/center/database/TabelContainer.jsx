@@ -48,8 +48,6 @@ const TableContainer = ({
           />
         </div>
 
-        <button className="btn btn-success">Naikan Kelas</button>
-
         <div className="d-flex align-items-center">
           <select
             className="form-select form-select-sm"
@@ -67,8 +65,8 @@ const TableContainer = ({
 
       <div className="table-responsive my-2">{children}</div>
 
-      <nav className="d-flex justify-content-between align-items-center">
-        <ul className="pagination pagination-sm justify-content-center m-0">
+      <nav className="d-flex justify-content-between align-items-center flex-wrap">
+        <ul className="pagination pagination-sm justify-content-center m-0 d-flex flex-wrap">
           <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
             <button
               className="page-link"

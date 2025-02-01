@@ -29,8 +29,10 @@ export const dbApi = createApi({
       }),
     }),
     getDatabase: builder.query({
-      query: () => ({
+      query: ({ page, limit, search, classCode }) => ({
         url: `/get-database`,
+        params: { page, limit, search, classCode },
+        method: "GET",
       }),
       providesTags: ["Database"],
     }),

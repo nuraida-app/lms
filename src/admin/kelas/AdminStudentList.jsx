@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Layout from "../components/layout/Layout";
 import TableContainer from "../../components/tabel/TabelContainer";
 import AddStudent from "./AddStudent";
-import { useParams } from "react-router-dom";
+import { data, useParams } from "react-router-dom";
 import {
   useClearClassMutation,
   useGetStudentsQuery,
@@ -10,6 +10,7 @@ import {
 } from "../../control/api/studentApi";
 import BtnLoader from "../../components/loader/BtnLoader";
 import { toast } from "react-toastify";
+import { useGetDatabaseQuery } from "../../control/api/dbApi";
 
 const columns = [
   { label: "No" },
@@ -17,6 +18,7 @@ const columns = [
   { label: "Nama" },
   { label: "Tingkat" },
   { label: "Kelas" },
+  { label: "Database" },
   { label: "Aksi" },
 ];
 
@@ -40,6 +42,14 @@ const AdminStudentList = () => {
     search,
   });
   const { students = [], totalPages, totalStudents } = rowData;
+  const { data: rawData = {} } = useGetDatabaseQuery({
+    page,
+    limit,
+    search,
+    classCode,
+  });
+
+  const { database = [], totalPages: pages } = rawData;
 
   const [
     removeStudentFromClass,
@@ -98,35 +108,60 @@ const AdminStudentList = () => {
                 </tr>
               </thead>
               <tbody>
-                {students?.map((student, index) => (
-                  <tr key={student.id}>
-                    <th scope="row" className="text-center align-middle">
-                      {index + 1}
-                    </th>
-                    <td className="text-center align-middle">{student.nis}</td>
-                    <td className="align-middle">{student.name}</td>
-                    <td className="text-center align-middle">
-                      {student.grade}
-                    </td>
-                    <td className="text-center align-middle">
-                      {student.class}
-                    </td>
-                    <td>
-                      {isLoading ? (
-                        <BtnLoader />
-                      ) : (
-                        <div className="d-flex justify-content-center gap-2">
-                          <button
-                            className="btn btn-danger"
-                            onClick={() => deleteHandler(student.id)}
+                {students?.map((student, index) => {
+                  const result = database?.find(
+                    (data) => data.nis === student.nis
+                  )?.kelengkapan;
+
+                  console.log(result);
+                  return (
+                    <tr key={student.id}>
+                      <th scope="row" className="text-center align-middle">
+                        {index + 1}
+                      </th>
+                      <td className="text-center align-middle">
+                        {student.nis}
+                      </td>
+                      <td className="align-middle">{student.name}</td>
+                      <td className="text-center align-middle">
+                        {student.grade}
+                      </td>
+                      <td className="text-center align-middle">
+                        {student.class}
+                      </td>
+                      <td className="text-center align-middle">
+                        <div className="progress" style={{ width: "100%" }}>
+                          <div
+                            className="progress-bar shadow"
+                            role="progressbar"
+                            style={{
+                              width: `${result ? result : 0}%`,
+                            }}
+                            aria-valuenow={result ? result : 0}
+                            aria-valuemin="0"
+                            aria-valuemax={100}
                           >
-                            Hapus
-                          </button>
+                            {`${result ? result : 0}%`}
+                          </div>
                         </div>
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td>
+                        {isLoading ? (
+                          <BtnLoader />
+                        ) : (
+                          <div className="d-flex justify-content-center gap-2">
+                            <button
+                              className="btn btn-danger"
+                              onClick={() => deleteHandler(student.id)}
+                            >
+                              Hapus
+                            </button>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </TableContainer>

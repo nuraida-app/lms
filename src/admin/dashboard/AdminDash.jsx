@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import Layout from "../components/layout/Layout";
 import Data1 from "./Data1";
 import TableContainer from "../../components/tabel/TabelContainer";
 import { useAdminDashboardQuery } from "../../control/api/adminApi";
+import { useGetDatabaseQuery } from "../../control/api/dbApi";
 
 const usersData = [
   { id: 1, first: "Mark", last: "Otto", handle: "@mdo" },
@@ -19,14 +20,30 @@ const usersData = [
 
 const columns = [
   { label: "No" },
+  { label: "Tahun Ajar" },
+  { label: "NIS" },
   { label: "Nama Lengkap" },
   { label: "Tingkat" },
-  { label: "kelas" },
+  { label: "Kelas" },
   { label: "Kelengkapan" },
 ];
 
 const AdminDash = () => {
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [search, setSearch] = useState();
+  const classCode = "";
+
   const { data } = useAdminDashboardQuery();
+  const { data: rawData = {} } = useGetDatabaseQuery({
+    page,
+    limit,
+    search,
+    classCode,
+  });
+  const { database = [], totalPages, totalData } = rawData;
+
+  console.log(database);
 
   return (
     <Layout title={"Admin Dashboard"}>
@@ -35,8 +52,16 @@ const AdminDash = () => {
           <Data1 data={data} />
         </div>
         <div className="col-lg-10 col-12">
-          <p className="m-0 h5">Kelengkapan Database Peserta Didik</p>
-          <TableContainer>
+          <p className="m-0 h5 p-2 rounded border shadow bg-white">
+            Kelengkapan Database Peserta Didik
+          </p>
+          <TableContainer
+            page={page}
+            setPage={(e) => setPage(e)}
+            setLimit={(e) => setLimit(e)}
+            onValue={(e) => setSearch(e)}
+            totalPages={totalPages}
+          >
             <table className="table table-striped table-hover mt-2">
               <thead>
                 <tr>
@@ -48,27 +73,29 @@ const AdminDash = () => {
                 </tr>
               </thead>
               <tbody>
-                {usersData.map((user, index) => (
-                  <tr key={user.id}>
+                {database?.map((user, index) => (
+                  <tr key={index}>
                     <th scope="row" className="text-center">
-                      {index + 1}
+                      {(page - 1) * limit + index + 1}
                     </th>
-                    <td>{user.first}</td>
-                    <td>{user.last}</td>
-                    <td>{user.handle}</td>
+                    <td>{user.year}</td>
+                    <td>{user.nis}</td>
+                    <td>{user.nama_lengkap}</td>
+                    <td>{user.tingkat}</td>
+                    <td>{user.kelas}</td>
                     <td>
-                      <div className="progress" style={{ width: "100%" }}>
+                      <div className="progress">
                         <div
                           className="progress-bar"
                           role="progressbar"
                           style={{
-                            width: `70%`,
+                            width: `${user.kelengkapan}%`,
                           }}
-                          aria-valuenow={70}
+                          aria-valuenow={user.kelengkapan}
                           aria-valuemin="0"
                           aria-valuemax={100}
                         >
-                          {70}
+                          {`${user.kelengkapan}%`}
                         </div>
                       </div>
                     </td>
