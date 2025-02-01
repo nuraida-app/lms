@@ -21,7 +21,7 @@ import scheduleRouter from "./router/cbt/scheduleRouter.js";
 import uploadRouter from "./router/uploadRouter.js";
 import answerRouter from "./router/cbt/answerRouter.js";
 import logRouter from "./router/cbt/logRouter.js";
-import dbRouter from "./router/dbRouter.js";
+import dbRouter from "./router/database/dbRouter.js";
 import lmsRouter from "./router/lms/lmsRouter.js";
 import quranRouter from "./router/tahfiz/quranRouter.js";
 import metricsRouter from "./router/tahfiz/metricsRouter.js";
