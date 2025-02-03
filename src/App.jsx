@@ -24,6 +24,7 @@ const LmsMapelDetail = lazy(() => import("./lms/mapel/LmsMapelDetail"));
 
 const CenterDash = lazy(() => import("./center/dashboard/CenterDash"));
 const CenterAdmin = lazy(() => import("./center/admin/CenterAdmin"));
+const CenterYears = lazy(() => import("./center/tapel/CenterYears"));
 const CenterSch = lazy(() => import("./center/sekolah/CenterSch"));
 const CenterGrade = lazy(() => import("./center/jenjang/CenterGrade"));
 const CenterTeacher = lazy(() => import("./center/guru/CenterTeacher"));
@@ -46,6 +47,7 @@ const AdminStudentList = lazy(() => import("./admin/kelas/AdminStudentList"));
 const AdminSubjects = lazy(() => import("./admin/mapel/AdminSubjects"));
 const AdminTeacher = lazy(() => import("./admin/guru/AdminTeacher"));
 const AdminStudents = lazy(() => import("./admin/siswa/AdminStudents"));
+const AdminDatabase = lazy(() => import("./admin/siswa/AdminDatabase"));
 
 const TeacherDash = lazy(() => import("./guru/dahsboard/TeacherDash"));
 const TeacherProfile = lazy(() => import("./guru/profil/TeacherProfile"));
@@ -147,6 +149,8 @@ function App() {
 
           <Route path="/center-admin" element={<CenterAdmin />} />
 
+          <Route path="/center-tapel" element={<CenterYears />} />
+
           <Route path="/center-sekolah" element={<CenterSch />} />
 
           <Route path="/center-jenjang" element={<CenterGrade />} />
@@ -174,6 +178,11 @@ function App() {
           <Route path="/admin-guru" element={<AdminTeacher />} />
 
           <Route path="/admin-siswa" element={<AdminStudents />} />
+
+          <Route
+            path="/admin-database/:name/:nis"
+            element={<AdminDatabase />}
+          />
 
           {/* Guru */}
           <Route path="/guru-dashboard" element={<TeacherDash />} />

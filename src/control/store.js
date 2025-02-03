@@ -1,6 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authSlice from "./slice/authSlice";
 import { subjectApi } from "./api/subjectApi";
+import { yearApi } from "./api/yearApi";
 import { gradeApi } from "./api/gradeApi";
 import { classApi } from "./api/classApi";
 import { teacherApi } from "./api/teacherApi";
@@ -27,6 +28,7 @@ const store = configureStore({
     auth: authSlice,
     [authApi.reducerPath]: authApi.reducer,
     [homebaseApi.reducerPath]: homebaseApi.reducer,
+    [yearApi.reducerPath]: yearApi.reducer,
     [gradeApi.reducerPath]: gradeApi.reducer,
     [classApi.reducerPath]: classApi.reducer,
     [subjectApi.reducerPath]: subjectApi.reducer,
@@ -51,6 +53,7 @@ const store = configureStore({
     getDefaultMiddleware().concat([
       authApi.middleware,
       homebaseApi.middleware,
+      yearApi.middleware,
       gradeApi.middleware,
       classApi.middleware,
       subjectApi.middleware,

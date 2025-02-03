@@ -58,7 +58,6 @@ export const studentApi = createApi({
       }),
       invalidatesTags: ["Students"],
     }),
-
     uploadToClass: builder.mutation({
       query: ({ gradeId, code, body }) => ({
         url: `/upload-to-class/${gradeId}/${code}`,
@@ -67,7 +66,6 @@ export const studentApi = createApi({
       }),
       invalidatesTags: ["Students"],
     }),
-
     updateStudent: builder.mutation({
       query: ({ id, body }) => ({
         url: `/update/${id}`,

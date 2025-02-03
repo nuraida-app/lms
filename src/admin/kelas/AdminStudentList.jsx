@@ -113,7 +113,6 @@ const AdminStudentList = () => {
                     (data) => data.nis === student.nis
                   )?.kelengkapan;
 
-                  console.log(result);
                   return (
                     <tr key={student.id}>
                       <th scope="row" className="text-center align-middle">

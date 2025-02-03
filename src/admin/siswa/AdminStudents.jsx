@@ -3,6 +3,7 @@ import Layout from "../components/layout/Layout";
 import TableContainer from "../../components/tabel/TabelContainer";
 import { useSelector } from "react-redux";
 import { useGetStudentsQuery } from "../../control/api/studentApi";
+import { useNavigate } from "react-router-dom";
 
 const columns = [
   { label: "No" },
@@ -15,6 +16,8 @@ const columns = [
 ];
 
 const AdminStudents = () => {
+  const navigate = useNavigate();
+
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState("");
@@ -26,6 +29,11 @@ const AdminStudents = () => {
     { skip: !user?.homebase_id }
   );
   const { students = [], totalPages } = rowData;
+
+  const goToLink = (name, nis) => {
+    const formatted = name.replace(/\s+/g, "-");
+    navigate(`/admin-database/${formatted}/${nis}`);
+  };
 
   return (
     <Layout title={"Daftar Siswa"}>
@@ -58,11 +66,32 @@ const AdminStudents = () => {
                     <td className="align-middle">{user.name}</td>
                     <td className="text-center align-middle">{user.grade}</td>
                     <td className="text-center align-middle">{user.class}</td>
-                    <td>{user.last}</td>
+                    <td className="text-center align-middle">
+                      <div className="progress" style={{ width: "100%" }}>
+                        <div
+                          className="progress-bar shadow"
+                          role="progressbar"
+                          style={{
+                            width: `${
+                              user.kelengkapan ? user.kelengkapan : 0
+                            }%`,
+                          }}
+                          aria-valuenow={user.kelengkapan}
+                          aria-valuemin="0"
+                          aria-valuemax={100}
+                        >
+                          {`${user.kelengkapan}%`}
+                        </div>
+                      </div>
+                    </td>
                     <td>
                       <div className="d-flex justify-content-center gap-2">
-                        <button className="btn btn-warning">Edit</button>
-                        <button className="btn btn-danger">Hapus</button>
+                        <button
+                          className="btn btn-primary"
+                          onClick={() => goToLink(user.name, user.nis)}
+                        >
+                          Detail
+                        </button>
                       </div>
                     </td>
                   </tr>
