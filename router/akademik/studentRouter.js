@@ -108,20 +108,67 @@ router.get(
 
       if (homebase) {
         query = `
+          WITH student_completeness AS (
+            SELECT 
+              s.nis,
+              34 AS total_columns,
+              (
+                SELECT COUNT(*)
+                FROM (
+                  VALUES
+                    (s.name),
+                    (s.nisn),
+                    (s.nis::text),
+                    (s.birth_place),
+                    (s.birth_date::text),
+                    (s.height::text),
+                    (s.weight::text),
+                    (s.around_head::text),
+                    (s.order_birth::text),
+                    (s.siblings::text),
+                    (s.province_id),
+                    (s.province_name),
+                    (s.regency_id),
+                    (s.regency_name),
+                    (s.district_id),
+                    (s.district_name),
+                    (s.village_id),
+                    (s.village_name),
+                    (s.address),
+                    (s.postal_code),
+                    (s.father_nik),
+                    (s.father_name),
+                    (s.father_birth_place),
+                    (s.father_birth_date::text),
+                    (s.father_job),
+                    (s.father_phone::text),
+                    (s.mother_nik),
+                    (s.mother_name),
+                    (s.mother_birth_place),
+                    (s.mother_birth_date::text),
+                    (s.mother_job),
+                    (s.mother_phone::text),
+                    (s.family_info::text),
+                    (s.year)
+                ) AS data(column_value)
+                WHERE column_value IS NOT NULL
+              ) AS filled_columns
+            FROM db_students s
+          )
           SELECT DISTINCT ON (students_class.nis) students_class.id, students_class.nis, 
-         user_student.name, homebase.name AS homebase, classes.name AS class, 
-         grades.grade
-  FROM students_class
-  INNER JOIN user_student ON user_student.nis = students_class.nis
-  INNER JOIN homebase ON homebase.id = students_class.homebase_id
-  INNER JOIN grades ON grades.id = students_class.grade_id
-  INNER JOIN classes ON classes.code = students_class.class_code
-  LEFT JOIN db_students ON db_students.nis = students_class.nis
-  WHERE students_class.homebase_id = $1 AND (
-    CAST(students_class.nis AS TEXT) ILIKE $2 OR user_student.name ILIKE $2
-  )
-  ORDER BY students_class.nis DESC
-  LIMIT $3 OFFSET $4;
+                 user_student.name, homebase.name AS homebase, classes.name AS class, 
+                 grades.grade, ROUND(((sc.filled_columns::numeric / sc.total_columns) * 100), 2) AS kelengkapan
+          FROM students_class
+          INNER JOIN user_student ON user_student.nis = students_class.nis
+          INNER JOIN homebase ON homebase.id = students_class.homebase_id
+          INNER JOIN grades ON grades.id = students_class.grade_id
+          INNER JOIN classes ON classes.code = students_class.class_code
+          LEFT JOIN student_completeness sc ON sc.nis = students_class.nis
+          WHERE students_class.homebase_id = $1 AND (
+            CAST(students_class.nis AS TEXT) ILIKE $2 OR user_student.name ILIKE $2
+          )
+          ORDER BY students_class.nis DESC
+          LIMIT $3 OFFSET $4;
         `;
         countQuery = `
           SELECT COUNT(*) AS total
@@ -265,12 +312,17 @@ router.put(
       const { nis, name } = req.body;
 
       await client.query(
-        "UPDATE students SET nis = $1, name = $2 WHERE id = $3 RETURNING *",
+        "UPDATE user_student SET nis = $1, name = $2 WHERE id = $3 RETURNING *",
         [nis, name, id]
       );
 
+      await client.query(
+        `UPDATE db_students SET nis = $1, name = $2 WHERE nis = $1`,
+        [nis, name]
+      );
+
       res.status(200).json({
-        message: "Student is updated successfully",
+        message: "Berhasil diperbarui",
       });
     } catch (error) {
       res.status(500).json({ message: error.message });

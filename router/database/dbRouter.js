@@ -10,8 +10,14 @@ router.get("/get-provinces", async (req, res) => {
       `SELECT * FROM provinces ORDER BY name ASC`
     );
 
-    res.status(200).json(data.rows);
+    const trimed = data.rows?.map((row) => ({
+      id: row.id.trim(),
+      name: row.name,
+    }));
+
+    res.json(trimed);
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ message: error.message });
   }
 });
@@ -23,7 +29,12 @@ router.get("/get-regencies/:provinceId", async (req, res) => {
       [req.params.provinceId]
     );
 
-    res.status(200).json(data.rows);
+    const trimed = data.rows.map((row) => ({
+      id: row.id.trim(),
+      name: row.name,
+    }));
+
+    res.json(trimed);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -36,7 +47,12 @@ router.get("/get-districts/:regencyId", async (req, res) => {
       [req.params.regencyId]
     );
 
-    res.status(200).json(data.rows);
+    const trimed = data.rows.map((row) => ({
+      id: row.id.trim(),
+      name: row.name,
+    }));
+
+    res.json(trimed);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -49,7 +65,12 @@ router.get("/get-villages/:districtId", async (req, res) => {
       [req.params.districtId]
     );
 
-    res.status(200).json(data.rows);
+    const trimed = data.rows.map((row) => ({
+      id: row.id.trim(),
+      name: row.name,
+    }));
+
+    res.json(trimed);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -60,6 +81,8 @@ router.post(
   authorize("admin", "teacher", "student"),
   async (req, res) => {
     const {
+      year_id,
+      year,
       name,
       nisn,
       nis,
@@ -93,28 +116,32 @@ router.post(
         // Jika NIS ditemukan, update kolom yang sesuai dengan data dari req.body
         await client.query(
           `UPDATE db_students SET
-                    name = COALESCE($1, name),
-                    birth_place = COALESCE($2, birth_place),
-                    birth_date = COALESCE($3, birth_date),
-                    height = COALESCE($4, height),
-                    weight = COALESCE($5, weight),
-                    around_head = COALESCE($6, around_head),
-                    order_birth = COALESCE($7, order_birth),
-                    siblings = COALESCE($8, siblings),
-                    province_id = COALESCE($9, province_id),
-                    province_name = COALESCE($10, province_name),
-                    regency_id = COALESCE($11, regency_id),
-                    regency_name = COALESCE($12, regency_name),
-                    district_id = COALESCE($13, district_id),
-                    district_name = COALESCE($14, district_name),
-                    village_id = COALESCE($15, village_id),
-                    village_name = COALESCE($16, village_name),
-                    address = COALESCE($17, address),
-                    postal_code = COALESCE($18, postal_code),
-                    nisn = COALESCE($19,nisn)
-                WHERE nis = $20
+                    year_id = COALESCE($1, year_id),
+                    year = COALESCE($2, year),
+                    name = COALESCE($3, name),
+                    birth_place = COALESCE($4, birth_place),
+                    birth_date = COALESCE($5, birth_date),
+                    height = COALESCE($6, height),
+                    weight = COALESCE($7, weight),
+                    around_head = COALESCE($8, around_head),
+                    order_birth = COALESCE($9, order_birth),
+                    siblings = COALESCE($10, siblings),
+                    province_id = COALESCE($11, province_id),
+                    province_name = COALESCE($12, province_name),
+                    regency_id = COALESCE($13, regency_id),
+                    regency_name = COALESCE($14, regency_name),
+                    district_id = COALESCE($15, district_id),
+                    district_name = COALESCE($16, district_name),
+                    village_id = COALESCE($17, village_id),
+                    village_name = COALESCE($18, village_name),
+                    address = COALESCE($19, address),
+                    postal_code = COALESCE($20, postal_code),
+                    nisn = COALESCE($21, nisn)
+                WHERE nis = $22
                 RETURNING *`,
           [
+            year_id,
+            year,
             name,
             birth_place,
             birth_date,
@@ -138,18 +165,20 @@ router.post(
           ]
         );
 
-        return res.status(200).json({ message: "Database updated" });
+        return res.status(200).json({ message: "Berhasil diperbarui" });
       } else {
         // Jika NIS tidak ditemukan, tambahkan data baru ke db_students
         await client.query(
           `INSERT INTO db_students (
-                    name, nisn, nis, birth_place, birth_date, height, weight, around_head,
+                   year_id, year, name, nisn, nis, birth_place, birth_date, height, weight, around_head,
                     order_birth, siblings, province_id, province_name, regency_id, 
                     regency_name, district_id, district_name, village_id, village_name, 
                     address, postal_code
-                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)
                 RETURNING *`,
           [
+            year_id,
+            year,
             name,
             nisn,
             nis,
@@ -173,7 +202,7 @@ router.post(
           ]
         );
 
-        return res.status(201).json({ message: "Student added to database" });
+        return res.status(201).json({ message: "Berhasil disimpan" });
       }
     } catch (error) {
       console.error(error);
@@ -343,6 +372,7 @@ router.delete(
   }
 );
 
+// menampilkan presentasi kelengkapaan data
 router.get(
   "/get-database",
   authorize("super-admin", "admin", "teacher"),
@@ -359,7 +389,7 @@ router.get(
             s.nis,
             s.name AS nama_lengkap,
             s.status,
-            33 AS total_columns,
+            34 AS total_columns,
             (
               SELECT COUNT(*)
               FROM (
@@ -396,13 +426,15 @@ router.get(
                   (s.mother_birth_date::text),
                   (s.mother_job),
                   (s.mother_phone::text),
-                  (s.family_info::text)
+                  (s.family_info::text),
+                  (s.year)
               ) AS data(column_value)
               WHERE column_value IS NOT NULL
             ) AS filled_columns
           FROM db_students s
         )
         SELECT 
+          us.id,
           sc.nis,
           c.name AS kelas,
           g.grade AS tingkat,
@@ -415,6 +447,7 @@ router.get(
         JOIN student_completeness s ON sc.nis = s.nis
         JOIN classes c ON sc.class_code = c.code AND sc.grade_id = c.grade_id
         JOIN grades g ON sc.grade_id = g.id
+        JOIN user_student us ON us.nis = sc.nis
         WHERE 
           ($1::text IS NULL OR s.nama_lengkap ILIKE '%' || $1 || '%')
           AND ($2::integer IS NULL OR sc.class_code = $2)

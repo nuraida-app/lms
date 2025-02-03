@@ -9,6 +9,7 @@ import useragent from "express-useragent";
 // Routers
 import authRouter from "./router/auth/authRouter.js";
 import adminRouter from "./router/auth/adminRouter.js";
+import yearsRouter from "./router/akademik/yearRouter.js";
 import homebaseRouter from "./router/akademik/homebaseRouter.js";
 import classRouter from "./router/akademik/classRouter.js";
 import gradeRouter from "./router/akademik/gradeRouter.js";
@@ -54,6 +55,7 @@ app.use(useragent.express());
 app.use("/upload", express.static(path.join(__dirname, "upload")));
 app.use("/auth", authRouter);
 app.use("/admin", adminRouter);
+app.use("/year", yearsRouter);
 app.use("/homebase", homebaseRouter);
 app.use("/grade", gradeRouter);
 app.use("/class", classRouter);
