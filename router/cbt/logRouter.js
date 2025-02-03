@@ -191,6 +191,25 @@ router.put("/finished/:quizId", authorize("student"), async (req, res) => {
   }
 });
 
+// Waktu Habis
+router.put("/time-out/:quizId", authorize("student"), async (req, res) => {
+  try {
+    const quizId = req.params.quizId;
+
+    const isActive = false;
+    const isDone = true;
+
+    await client.query(
+      `UPDATE log SET "isActive" = $1, "isDone" = $2 WHERE quiz_id = $3 AND nis = $4 `,
+      [isActive, isDone, quizId, req.user.nis]
+    );
+
+    res.status(200).json({ message: "Waktu ujian habis" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+});
+
 // Reset status
 router.put(
   "/change-status-log",

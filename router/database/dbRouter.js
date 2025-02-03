@@ -246,14 +246,14 @@ router.post(
               father_birth_place = COALESCE($3, father_birth_place),
               father_birth_date = COALESCE($4, father_birth_date),
               father_job = COALESCE($5, father_job),
-              father_phone = COALESCE($8, father_phone),
-              mother_nik = COALESCE($9, mother_nik),
-              mother_name = COALESCE($10, mother_name),
-              mother_birth_place = COALESCE($11, mother_birth_place),
-              mother_birth_date = COALESCE($12, mother_birth_date),
-              mother_job = COALESCE($13, mother_job),
-              mother_phone = COALESCE($16, mother_phone)
-            WHERE nis = $17
+              father_phone = COALESCE($6, father_phone),
+              mother_nik = COALESCE($7, mother_nik),
+              mother_name = COALESCE($8, mother_name),
+              mother_birth_place = COALESCE($9, mother_birth_place),
+              mother_birth_date = COALESCE($10, mother_birth_date),
+              mother_job = COALESCE($11, mother_job),
+              mother_phone = COALESCE($12, mother_phone)
+            WHERE nis = $13
             RETURNING *`,
           [
             father_nik,
@@ -321,10 +321,10 @@ router.post(
           [JSON.stringify(updatedFamilyInfo), nis]
         );
 
-        return res.status(200).json({ message: "Family data updated" });
+        return res.status(200).json({ message: "Berhasil disimpan" });
       } else {
         // Jika NIS tidak ditemukan, kembalikan error
-        return res.status(404).json({ message: "NIS not found" });
+        return res.status(404).json({ message: "NIS tidak ditemukan" });
       }
     } catch (error) {
       console.error(error.message);
@@ -361,9 +361,9 @@ router.delete(
           [JSON.stringify(updatedFamilyInfo), nis]
         );
 
-        return res.status(200).json({ message: "Family data deleted" });
+        return res.status(200).json({ message: "Berhasil dihapus" });
       } else {
-        return res.status(404).json({ message: "NIS not found" });
+        return res.status(404).json({ message: "NIS tidak ditemukan" });
       }
     } catch (error) {
       console.error(error.message);
