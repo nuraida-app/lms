@@ -156,8 +156,11 @@ const CbtQuestions = ({ question, note, answers }) => {
         className="col-lg-7 col-12"
         style={{ height: "100%", overflow: "auto" }}
       >
-        <div className="p-2 rounded shadow bg-white h-100 border border-2">
-          <div dangerouslySetInnerHTML={createMarkup(question?.question)} />
+        <div className="p-2 rounded shadow bg-white border border-2">
+          <div
+            className="p-4"
+            dangerouslySetInnerHTML={createMarkup(question?.question)}
+          />
         </div>
       </div>
     </div>

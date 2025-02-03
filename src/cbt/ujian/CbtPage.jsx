@@ -7,7 +7,10 @@ import { useParams } from "react-router-dom";
 import MetaData from "../../components/meta/MetaData";
 import { useGetQuestionsQuery } from "../../control/api/questionApi";
 import { useGetMyAnswersQuery } from "../../control/api/answerApi";
-import { useFinishedQuizMutation } from "../../control/api/logApi";
+import {
+  useFinishedQuizMutation,
+  useGetMyLogQuery,
+} from "../../control/api/logApi";
 import { toast } from "react-toastify";
 
 const CbtPage = () => {
@@ -26,10 +29,13 @@ const CbtPage = () => {
   const [finishedQuiz, { data: message, isSuccess, isLoading: fLoad, error }] =
     useFinishedQuizMutation();
 
+  const { data: log } = useGetMyLogQuery(
+    { nis: user?.nis, quiz: bankId },
+    { skip: !user?.nis || !bankId }
+  );
+
   const refreshQuestions = () => {
     refetch(); // Mengambil ulang data soal dari API
-
-    console.log("first");
 
     if (data && Array.isArray(data.questions)) {
       localStorage.setItem("questions", JSON.stringify(data));
@@ -97,7 +103,9 @@ const CbtPage = () => {
               refresh={refreshQuestions}
               isLoading={isLoading}
               number={currentPage}
-              ans
+              time={time}
+              log={log}
+              finishHandler={finishHandler}
             />
 
             {/* Soal dan jawaban CBT */}

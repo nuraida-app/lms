@@ -193,201 +193,199 @@ const FormStudent = ({ provinces, name, nis, student }) => {
   }, [student]);
 
   return (
-    <div className="container-fluid">
-      <form className="p-2 rounded border shadow bg-white mt-2 row g-2">
-        <div className="col-md-6 col-12 d-flex flex-column gap-3">
-          <select
-            className="form-select"
-            aria-label="Default select example"
-            name="year_id"
-            value={formData.year_id || ""}
-            onChange={handleChange}
-          >
-            <option value="" hidden>
-              Pilih Tahun Pelajaran
+    <form className="p-2 rounded border shadow bg-white mt-2 row g-2">
+      <div className="col-md-6 col-12 d-flex flex-column gap-3">
+        <select
+          className="form-select"
+          aria-label="Default select example"
+          name="year_id"
+          value={formData.year_id || ""}
+          onChange={handleChange}
+        >
+          <option value="" hidden>
+            Pilih Tahun Pelajaran
+          </option>
+          {years?.map((item) => (
+            <option key={item.id} value={item.id}>
+              {item.name}
             </option>
-            {years?.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.name}
-              </option>
-            ))}
-          </select>
+          ))}
+        </select>
 
-          <input
-            type="text"
-            name="name"
-            id="1"
-            className="form-control"
-            placeholder="Nama Lengkap"
-            value={formData.name || ""}
-            onChange={handleChange}
-          />
-          <input
-            type="text"
-            name="nisn"
-            id="2"
-            className="form-control"
-            placeholder="NISN"
-            value={formData.nisn || ""}
-            onChange={handleChange}
-          />
-          <input
-            type="text"
-            name="nis"
-            id="3"
-            className="form-control"
-            placeholder="NIS"
-            value={formData.nis || ""}
-            onChange={handleChange}
-          />
-          <input
-            type="text"
-            name="birth_place"
-            id="4"
-            className="form-control"
-            placeholder="Tempat Lahir"
-            value={formData.birth_place || ""}
-            onChange={handleChange}
-          />
-          <input
-            type="date"
-            name="birth_date"
-            id="5"
-            className="form-control"
-            placeholder="Tanggal Lahir"
-            value={formData.birth_date || ""}
-            onChange={handleChange}
-          />
-          <input
-            type="number"
-            name="order_birth"
-            id="6"
-            className="form-control"
-            placeholder="Urutan Kelahiran"
-            value={formData.order_birth || ""}
-            onChange={handleChange}
-          />
-          <input
-            type="number"
-            name="height"
-            id="7"
-            className="form-control"
-            placeholder="TB"
-            value={formData.height || ""}
-            onChange={handleChange}
-          />
-          <input
-            type="number"
-            name="weight"
-            id="8"
-            className="form-control"
-            placeholder="BB"
-            value={formData.weight || ""}
-            onChange={handleChange}
-          />
-          <input
-            type="number"
-            name="around_head"
-            id="9"
-            className="form-control"
-            placeholder="Lingkar Kepala"
-            value={formData.around_head || ""}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="col-md-6 col-12 d-flex flex-column gap-3">
-          <select
-            className="form-select"
-            aria-label="Default select example"
-            name="province_id"
-            value={formData.province_id || ""}
-            onChange={handleChange}
-          >
-            <option value="">Pilih Provinsi</option>
-            {provinces?.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.name}
-              </option>
-            ))}
-          </select>
+        <input
+          type="text"
+          name="name"
+          id="1"
+          className="form-control"
+          placeholder="Nama Lengkap"
+          value={formData.name || ""}
+          onChange={handleChange}
+        />
+        <input
+          type="text"
+          name="nisn"
+          id="2"
+          className="form-control"
+          placeholder="NISN"
+          value={formData.nisn || ""}
+          onChange={handleChange}
+        />
+        <input
+          type="text"
+          name="nis"
+          id="3"
+          className="form-control"
+          placeholder="NIS"
+          value={formData.nis || ""}
+          onChange={handleChange}
+        />
+        <input
+          type="text"
+          name="birth_place"
+          id="4"
+          className="form-control"
+          placeholder="Tempat Lahir"
+          value={formData.birth_place || ""}
+          onChange={handleChange}
+        />
+        <input
+          type="date"
+          name="birth_date"
+          id="5"
+          className="form-control"
+          placeholder="Tanggal Lahir"
+          value={formData.birth_date || ""}
+          onChange={handleChange}
+        />
+        <input
+          type="number"
+          name="order_birth"
+          id="6"
+          className="form-control"
+          placeholder="Urutan Kelahiran"
+          value={formData.order_birth || ""}
+          onChange={handleChange}
+        />
+        <input
+          type="number"
+          name="height"
+          id="7"
+          className="form-control"
+          placeholder="TB"
+          value={formData.height || ""}
+          onChange={handleChange}
+        />
+        <input
+          type="number"
+          name="weight"
+          id="8"
+          className="form-control"
+          placeholder="BB"
+          value={formData.weight || ""}
+          onChange={handleChange}
+        />
+        <input
+          type="number"
+          name="around_head"
+          id="9"
+          className="form-control"
+          placeholder="Lingkar Kepala"
+          value={formData.around_head || ""}
+          onChange={handleChange}
+        />
+      </div>
+      <div className="col-md-6 col-12 d-flex flex-column gap-3">
+        <select
+          className="form-select"
+          aria-label="Default select example"
+          name="province_id"
+          value={formData.province_id || ""}
+          onChange={handleChange}
+        >
+          <option value="">Pilih Provinsi</option>
+          {provinces?.map((item) => (
+            <option key={item.id} value={item.id}>
+              {item.name}
+            </option>
+          ))}
+        </select>
 
-          <select
-            className="form-select"
-            aria-label="Default select example"
-            name="regency_id"
-            value={formData.regency_id || ""}
-            onChange={handleChange}
-          >
-            <option value="">Pilih Kota / Kabupaten</option>
-            {regencies?.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.name}
-              </option>
-            ))}
-          </select>
+        <select
+          className="form-select"
+          aria-label="Default select example"
+          name="regency_id"
+          value={formData.regency_id || ""}
+          onChange={handleChange}
+        >
+          <option value="">Pilih Kota / Kabupaten</option>
+          {regencies?.map((item) => (
+            <option key={item.id} value={item.id}>
+              {item.name}
+            </option>
+          ))}
+        </select>
 
-          <select
-            className="form-select"
-            aria-label="Default select example"
-            name="district_id"
-            value={formData.district_id || ""}
-            onChange={handleChange}
-          >
-            <option value="">Pilih Kecamatan</option>
-            {districts?.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.name}
-              </option>
-            ))}
-          </select>
+        <select
+          className="form-select"
+          aria-label="Default select example"
+          name="district_id"
+          value={formData.district_id || ""}
+          onChange={handleChange}
+        >
+          <option value="">Pilih Kecamatan</option>
+          {districts?.map((item) => (
+            <option key={item.id} value={item.id}>
+              {item.name}
+            </option>
+          ))}
+        </select>
 
-          <select
-            className="form-select"
-            aria-label="Default select example"
-            name="village_id"
-            value={formData.village_id || ""}
-            onChange={handleChange}
-          >
-            <option value="">Pilih Desa</option>
-            {villages?.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.name}
-              </option>
-            ))}
-          </select>
+        <select
+          className="form-select"
+          aria-label="Default select example"
+          name="village_id"
+          value={formData.village_id || ""}
+          onChange={handleChange}
+        >
+          <option value="">Pilih Desa</option>
+          {villages?.map((item) => (
+            <option key={item.id} value={item.id}>
+              {item.name}
+            </option>
+          ))}
+        </select>
 
-          <input
-            type="text"
-            name="postal_code"
-            id="11"
-            className="form-control"
-            placeholder="Kode Pos"
-            value={formData.postal_code || ""}
-            onChange={handleChange}
-          />
+        <input
+          type="text"
+          name="postal_code"
+          id="11"
+          className="form-control"
+          placeholder="Kode Pos"
+          value={formData.postal_code || ""}
+          onChange={handleChange}
+        />
 
-          <textarea
-            name="adress"
-            id="10"
-            rows="6"
-            className="form-control"
-            placeholder="Alamat"
-            value={formData.address || ""}
-            onChange={handleChange}
-          ></textarea>
-        </div>
+        <textarea
+          name="adress"
+          id="10"
+          rows="6"
+          className="form-control"
+          placeholder="Alamat"
+          value={formData.address || ""}
+          onChange={handleChange}
+        ></textarea>
+      </div>
 
-        <div className="text-end">
-          <button
-            className="btn btn-success"
-            onClick={handleSubmit}
-            disabled={isLoading ? true : false}
-          >
-            {isLoading ? "loading..." : "Simpan"}
-          </button>
-        </div>
-      </form>
-    </div>
+      <div className="text-end">
+        <button
+          className="btn btn-success"
+          onClick={handleSubmit}
+          disabled={isLoading ? true : false}
+        >
+          {isLoading ? "loading..." : "Simpan"}
+        </button>
+      </div>
+    </form>
   );
 };
 
