@@ -301,34 +301,32 @@ router.get("/student-profile", authorize("student"), async (req, res) => {
   }
 });
 
-// Memperbarui siswa
-router.put(
-  "/update/:id",
-  authorize("admin", "student", "teacher", "super-admin"),
-  async (req, res) => {
-    try {
-      const { id } = req.params;
+// Memperbarui siswa Nis dan Nama
+router.put("/update/:id", authorize("super-admin"), async (req, res) => {
+  try {
+    const { id } = req.params;
 
-      const { nis, name } = req.body;
+    const { nis, name } = req.body;
 
-      await client.query(
-        "UPDATE user_student SET nis = $1, name = $2 WHERE id = $3 RETURNING *",
-        [nis, name, id]
-      );
+    await client.query(
+      "UPDATE user_student SET nis = $1, name = $2 WHERE id = $3 RETURNING *",
+      [nis, name, id]
+    );
 
-      await client.query(
-        `UPDATE db_students SET nis = $1, name = $2 WHERE nis = $1`,
-        [nis, name]
-      );
+    await client.query(
+      `UPDATE db_students SET nis = $1, name = $2 WHERE nis = $1`,
+      [nis, name]
+    );
 
-      res.status(200).json({
-        message: "Berhasil diperbarui",
-      });
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
+    await client.query(`UPDATE user_parent SET nis = $1 WHERE nis = $1`, [nis]);
+
+    res.status(200).json({
+      message: "Berhasil diperbarui",
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
-);
+});
 
 // Menghapus siswa
 router.delete(

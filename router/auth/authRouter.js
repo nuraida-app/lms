@@ -41,29 +41,69 @@ router.post("/super-admin/login", async (req, res) => {
   }
 });
 
+router.post("/signup", async (req, res) => {
+  try {
+    const { name, email, phone, password, nis } = req.body;
+
+    const check = await client.query(
+      `SELECT * FROM user_student WHERE nis = $1`,
+      [nis]
+    );
+
+    if (check.rowCount === 0) {
+      return res.status(404).json({ message: "Nis tidak ditemukan" });
+    }
+
+    const hash = await bcrypt.hash(password, 10);
+    const role = "parent";
+    const data = await client.query(
+      `INSERT INTO 
+    user_parent (nis, email, username, password, role, phone) 
+    VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [nis, email, name, hash, role, phone]
+    );
+
+    const user = data.rows[0];
+
+    const token = jwt.sign({ id: user.id, type: user.role }, process.env.JWT, {
+      expiresIn: "8h",
+    });
+
+    return res
+      .status(200)
+      .cookie("token", token, { httpOnly: true, maxAge: 43200000 }) // 12 jam
+      .json({ message: "Pendaftaran Berhasil" });
+  } catch (error) {
+    console.log(error);
+    res.status(200).json({ message: error.message });
+  }
+});
+
 router.post("/login", async (req, res) => {
   try {
-    const { nis, nip, email, password } = req.body;
-    let query, userType;
+    const { nis, nip, email, password, username } = req.body;
+    let query;
 
     if (nis) {
       query = {
         text: "SELECT * FROM user_student WHERE nis = $1",
         values: [nis],
       };
-      userType = "student";
     } else if (nip) {
       query = {
         text: "SELECT * FROM user_teacher WHERE nip = $1",
         values: [nip],
       };
-      userType = "teacher";
     } else if (email) {
       query = {
         text: "SELECT * FROM user_admin WHERE email = $1",
         values: [email],
       };
-      userType = "admin";
+    } else if (username) {
+      query = {
+        text: "SELECT * FROM user_parent WHERE email = $1",
+        values: [username],
+      };
     } else {
       return res.status(400).json({ message: "Kredensial tidak valid" });
     }
@@ -253,6 +293,60 @@ router.get(
         }
 
         return res.status(200).json(teacherData);
+      }
+
+      if (role === "parent") {
+        const parentQuery = `
+          SELECT user_parent.username,
+          user_parent.role, user_parent.nis,
+          user_parent.phone , user_parent.email
+          FROM user_parent 
+          WHERE user_parent.id = $1
+        `;
+        const parentResult = await client.query(parentQuery, [id]);
+        const parentData = parentResult.rows[0];
+
+        if (!parentData) {
+          return res.status(404).json({ message: "Data tidak ditemukan" });
+        }
+
+        const studentQuery = `
+          SELECT user_student.name, user_student.role, user_student.nis 
+          FROM user_student 
+          WHERE user_student.nis = $1
+        `;
+        const studentResult = await client.query(studentQuery, [
+          parentData.nis,
+        ]);
+        const studentData = studentResult.rows[0];
+
+        const detailQuery = `
+          SELECT students_class.grade_id, grades.grade, classes.name AS class,
+                 students_class.class_code, homebase.name AS homebase
+          FROM students_class 
+          INNER JOIN grades ON students_class.grade_id = grades.id
+          INNER JOIN classes ON students_class.class_code = classes.code
+          INNER JOIN homebase ON students_class.homebase_id = homebase.id
+          WHERE students_class.nis = $1
+        `;
+        const detailResult = await client.query(detailQuery, [studentData.nis]);
+        const detailData = detailResult.rows[0];
+
+        const student = {
+          name: parentData.username,
+          email: parentData.email,
+          phone: parentData.phone,
+          student: studentData.name,
+          nis: parentData.nis,
+          homebase: detailData.homebase,
+          grade_id: detailData.grade_id,
+          grade: detailData.grade,
+          class: detailData.class,
+          class_code: detailData.class_code,
+          role: parentData.role,
+        };
+
+        return res.status(200).json(student);
       }
 
       // Default response for unsupported roles

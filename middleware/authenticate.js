@@ -21,6 +21,8 @@ export const authenticatedUser = async (req, res, next) => {
       data = await client.query("SELECT * FROM students WHERE id = $1", [id]);
     } else if (type === "teacher") {
       data = await client.query("SELECT * FROM teachers WHERE id = $1", [id]);
+    } else if (type === "parent") {
+      data = await client.query("SELECT * FROM teachers WHERE id = $1", [id]);
     } else {
       return res.status(401).json({ message: "You dont have any permission" });
     }
@@ -86,6 +88,10 @@ export const authorize = (...allowedRoles) => {
         ]);
       } else if (type === "teacher") {
         data = await client.query("SELECT * FROM user_teacher WHERE id = $1", [
+          id,
+        ]);
+      } else if (type === "parent") {
+        data = await client.query("SELECT * FROM user_parent WHERE id = $1", [
           id,
         ]);
       } else {

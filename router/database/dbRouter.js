@@ -496,7 +496,7 @@ router.get(
 
 router.get(
   `/get-student/:nis`,
-  authorize("super-admin", "admin", "teacher", "student"),
+  authorize("super-admin", "admin", "teacher", "student", "parent"),
   async (req, res) => {
     try {
       const data = await client.query(

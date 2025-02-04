@@ -192,7 +192,7 @@ router.put("/finished/:quizId", authorize("student"), async (req, res) => {
 });
 
 // Waktu Habis
-router.put("/time-out/:quizId", authorize("student"), async (req, res) => {
+router.put("/timeout/:quizId", authorize("student"), async (req, res) => {
   try {
     const quizId = req.params.quizId;
 
