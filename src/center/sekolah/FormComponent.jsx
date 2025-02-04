@@ -45,7 +45,7 @@ const FormComponent = ({ homebase, clear }) => {
   }, [homebase]);
 
   return (
-    <div className="mt-2 p-2 shadow rounded">
+    <div className="mt-2 p-2 shadow rounded bg-white border border-2">
       <p className="h5">Tambahkan Satuan</p>
 
       <form action="" className="d-flex flex-column gap-3">

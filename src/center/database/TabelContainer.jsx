@@ -33,7 +33,7 @@ const TableContainer = ({
   };
 
   return (
-    <div className="container-fluid p-2 shadow rounded mt-2">
+    <div className="container-fluid p-2 shadow rounded mt-2 bg-white">
       <div
         className="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3 d-flex justify-content-between"
         role="search"

@@ -53,7 +53,7 @@ const FormComponent = ({ student, clear }) => {
     }
   }, [student]);
   return (
-    <div className="mt-2 p-2 shadow rounded d-flex flex-column gap-2 bg-white">
+    <div className="mt-2 p-2 shadow rounded d-flex flex-column gap-2 bg-white border border-2">
       <p className="h5">Tambahkan Peseta Didik</p>
       <form className="d-flex flex-column gap-2" onSubmit={addHandler}>
         <input

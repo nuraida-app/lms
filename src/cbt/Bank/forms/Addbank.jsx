@@ -80,7 +80,7 @@ const Addbank = ({ detail, id }) => {
   }, [user]);
 
   return (
-    <div className="rounded shadow d-flex flex-column gap-2 mt-2 p-2">
+    <div className="rounded shadow d-flex flex-column gap-2 mt-2 p-2 bg-white border border-2">
       <p className="h5 m-0">Buat Bank Soal Baru</p>
 
       <form

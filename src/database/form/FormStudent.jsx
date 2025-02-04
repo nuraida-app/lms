@@ -199,6 +199,7 @@ const FormStudent = ({ provinces, name, nis, student }) => {
           className="form-select"
           aria-label="Default select example"
           name="year_id"
+          required
           value={formData.year_id || ""}
           onChange={handleChange}
         >
@@ -218,6 +219,7 @@ const FormStudent = ({ provinces, name, nis, student }) => {
           id="1"
           className="form-control"
           placeholder="Nama Lengkap"
+          required
           value={formData.name || ""}
           onChange={handleChange}
         />
@@ -227,6 +229,7 @@ const FormStudent = ({ provinces, name, nis, student }) => {
           id="2"
           className="form-control"
           placeholder="NISN"
+          required
           value={formData.nisn || ""}
           onChange={handleChange}
         />
@@ -236,6 +239,7 @@ const FormStudent = ({ provinces, name, nis, student }) => {
           id="3"
           className="form-control"
           placeholder="NIS"
+          required
           value={formData.nis || ""}
           onChange={handleChange}
         />
@@ -245,6 +249,7 @@ const FormStudent = ({ provinces, name, nis, student }) => {
           id="4"
           className="form-control"
           placeholder="Tempat Lahir"
+          required
           value={formData.birth_place || ""}
           onChange={handleChange}
         />
@@ -254,6 +259,7 @@ const FormStudent = ({ provinces, name, nis, student }) => {
           id="5"
           className="form-control"
           placeholder="Tanggal Lahir"
+          required
           value={formData.birth_date || ""}
           onChange={handleChange}
         />

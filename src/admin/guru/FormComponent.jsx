@@ -148,7 +148,7 @@ const FormComponent = ({ detail, id }) => {
   }, [detail, id]);
 
   return (
-    <div className="mt-2 p-2 shadow rounded d-flex flex-column gap-2">
+    <div className="mt-2 p-2 shadow rounded d-flex flex-column gap-2 bg-white border border-2">
       <p className="h5">Tambahkan Guru</p>
 
       <form className="d-flex flex-column gap-2" onSubmit={submitHandler}>

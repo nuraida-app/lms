@@ -56,7 +56,7 @@ const FormComponent = ({ detail }) => {
   }, [detail]);
 
   return (
-    <div className="d-flex flex-column gap-2 rounded p-2 shadow mt-2">
+    <div className="d-flex flex-column gap-2 rounded p-2 shadow mt-2 bg-white border border-2">
       <p className="m-0 h5">Tambahkan Data Kelas</p>
 
       <form

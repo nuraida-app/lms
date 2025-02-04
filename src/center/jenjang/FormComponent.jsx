@@ -52,7 +52,7 @@ const FormComponent = ({ detail, clear }) => {
   }, [detail]);
 
   return (
-    <div className="mt-2 p-2 shadow rounded">
+    <div className="mt-2 p-2 shadow rounded bg-white border border-2">
       <p className="h5">Tambahkan Jenjang Pendidikan</p>
 
       <form

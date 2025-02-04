@@ -43,7 +43,7 @@ const FormComponent = ({ year, clear }) => {
     }
   }, [year]);
   return (
-    <div className="p-2 d-flex flex-column gap-2 border border-2 shadow rounded bg-white">
+    <div className="p-2 d-flex flex-column gap-2 border border-2 shadow rounded bg-white mt-2">
       <p className="m-0 h5">Tambah Tahun Ajar</p>
 
       <form

@@ -43,8 +43,6 @@ const AdminDash = () => {
   });
   const { database = [], totalPages, totalData } = rawData;
 
-  console.log(database);
-
   return (
     <Layout title={"Admin Dashboard"}>
       <div className="row" style={{ height: "100%" }}>
