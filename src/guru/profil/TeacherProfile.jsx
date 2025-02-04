@@ -40,8 +40,8 @@ const TeacherProfile = () => {
     name: user?.name || "",
     phone: "",
     email: user?.email || "",
-    homebase: user?.homebase.map((hb) => hb.name).join(", ") || "",
-    subject: user?.subjects.join(", ") || "",
+    homebase: user?.homebase?.map((hb) => hb.name).join(", ") || "",
+    subject: user?.subjects?.join(", ") || "",
     oldPassword: "",
     newPassword: "",
   });
