@@ -84,7 +84,7 @@ const TeacherProfile = () => {
                 id="subjects"
                 placeholder="name@example.com"
                 readOnly
-                value={user.subjects.join(", ")}
+                value={user?.subjects?.join(", ")}
               />
             </div>
             <form onSubmit={handleSubmit} className="d-flex flex-column gap-3">
