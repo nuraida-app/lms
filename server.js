@@ -6,12 +6,13 @@ app.get("/", (req, res) => {
   res.send("active");
 });
 
-app.listen(process.env.PORT, async (req, res) => {
-  try {
-    await connectToDatabase();
-
-    console.log("Connection on Port: " + process.env.PORT);
-  } catch (error) {
-    console.log("error: " + error);
-  }
-});
+connectToDatabase()
+  .then(() => {
+    const PORT = process.env.PORT || 2003;
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server berjalan di http://0.0.0.0:${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error("Gagal menyambungkan ke database:", error);
+  });
