@@ -21,6 +21,11 @@ const Layout = ({ children, title }) => {
       const link = menu.link + `/${user.nis}/${formatted}`;
 
       navigate(link);
+    } else if (menu.label === "Biodata") {
+      const formatted = user.name.replace(/\s+/g, "-");
+      const link = menu.link + `/${formatted}/${user.nis}`;
+
+      navigate(link);
     } else {
       navigate(menu.link);
     }

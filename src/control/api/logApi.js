@@ -50,6 +50,12 @@ export const logApi = createApi({
         method: "PUT",
       }),
     }),
+    timeoutQuiz: builder.mutation({
+      query: (quizId) => ({
+        url: `/timeout/${quizId}`,
+        method: "PUT",
+      }),
+    }),
   }),
 });
 
@@ -60,4 +66,5 @@ export const {
   useFinishedQuizMutation,
   useResetLogMutation,
   useClearLogAnswersMutation,
+  useTimeoutQuizMutation,
 } = logApi;

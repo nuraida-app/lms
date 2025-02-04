@@ -29,7 +29,7 @@ const TahfizDash = () => {
   const goToPage = (nis, name) => {
     const formatted = name.replace(/\s+/g, "-");
 
-    navigate(`/tahfiz-laporan-santri/${nis}/${formatted}`);
+    navigate(`/tahfiz-laporan-siswa/${nis}/${formatted}`);
   };
 
   return (

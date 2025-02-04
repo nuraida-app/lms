@@ -110,6 +110,11 @@ const CbtList = () => {
             </tr>
           </thead>
           <tbody>
+            {schedules?.length === 0 && (
+              <tr>
+                <td colSpan={5}>Data belum tersedia</td>
+              </tr>
+            )}
             {schedules?.map((item, i) => (
               <tr key={i}>
                 <td className="text-center">{i + 1 + (page - 1) * limit}</td>

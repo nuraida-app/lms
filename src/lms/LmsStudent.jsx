@@ -18,6 +18,7 @@ const LmsStudent = () => {
     <Layout title={"Halaman Siswa"}>
       <div className="container-fluid">
         <div className="row">
+          {subjects?.length === 0 && <p>Data belum tersedia</p>}
           {subjects?.map((item, i) => (
             <div key={i} className="col-md-4 col-12">
               <div className="card shadow border border-2">

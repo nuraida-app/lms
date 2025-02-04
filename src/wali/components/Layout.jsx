@@ -1,14 +1,11 @@
 import React, { Fragment } from "react";
+import { ParentMenus } from "./Menus";
 import { useNavigate } from "react-router-dom";
-import { AdminMenus } from "./Menus";
+import { useDispatch, useSelector } from "react-redux";
 import { useLogoutMutation } from "../../control/api/authApi";
 import { setLogout } from "../../control/slice/authSlice";
-import { useDispatch, useSelector } from "react-redux";
-import BtnLoader from "../../components/loader/BtnLoader";
-import Protected from "../../components/otentikasi/Protected";
 import MetaData from "../../components/meta/MetaData";
-import { StudentMenus } from "../../siswa/components/menu/Menus";
-import { ParentMenus } from "../../wali/components/Menus";
+import BtnLoader from "../../components/loader/BtnLoader";
 
 const Layout = ({ children, title }) => {
   const navigate = useNavigate();
@@ -17,16 +14,16 @@ const Layout = ({ children, title }) => {
   const { user } = useSelector((state) => state.auth);
   const [logout, { isLoading, error }] = useLogoutMutation();
 
-  const role = user?.role;
+  const name = user?.name;
 
   const goToLink = (menu) => {
     if (menu.label === "Tahfiz") {
-      const formatted = user.name.replace(/\s+/g, "-");
+      const formatted = user.student.replace(/\s+/g, "-");
       const link = menu.link + `/${user.nis}/${formatted}`;
 
       navigate(link);
     } else if (menu.label === "Biodata") {
-      const formatted = user.name.replace(/\s+/g, "-");
+      const formatted = user.student.replace(/\s+/g, "-");
       const link = menu.link + `/${formatted}/${user.nis}`;
 
       navigate(link);
@@ -49,7 +46,6 @@ const Layout = ({ children, title }) => {
 
   return (
     <Fragment>
-      <Protected roles={["tahfiz", "student", "parent"]} />
       <MetaData title={title} />
       <div className="container-fluid fixed-top bg-info">
         <nav
@@ -59,17 +55,9 @@ const Layout = ({ children, title }) => {
           <div className="container-fluid">
             <a
               className="navbar-brand col-lg-2 me-0 text-white"
-              href={
-                role === "tahfiz"
-                  ? "/tahfiz-dashboard"
-                  : role === "student"
-                  ? "/siswa-dashboard"
-                  : role === "parent"
-                  ? "/wali-dashboard"
-                  : "/"
-              }
+              href="/wali-dashboard"
             >
-              {user?.name}
+              {name}
             </a>
 
             <button
@@ -89,12 +77,7 @@ const Layout = ({ children, title }) => {
               id="navbarsExample11"
             >
               <div className="navbar-nav col-12 justify-content-lg-end d-flex gap-2">
-                {(role === "tahfiz"
-                  ? AdminMenus
-                  : role === "parent"
-                  ? ParentMenus
-                  : StudentMenus
-                )?.map((menu, i) => (
+                {ParentMenus.map((menu, i) => (
                   <button
                     key={i}
                     className="btn btn-light"
@@ -116,7 +99,6 @@ const Layout = ({ children, title }) => {
           </div>
         </nav>
       </div>
-
       <div
         className="container-fluid"
         style={{ marginTop: "65px", height: "calc(100vh - 65px)" }}

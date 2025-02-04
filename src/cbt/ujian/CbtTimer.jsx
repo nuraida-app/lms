@@ -1,7 +1,27 @@
 import React, { useState, useEffect } from "react";
+import { useTimeoutQuizMutation } from "../../control/api/logApi";
+import { toast } from "react-toastify";
 
-const CbtTimer = ({ refresh, isLoading, number, time, log, finishHandler }) => {
+const CbtTimer = ({ refresh, isLoading, number, time, log, bankid }) => {
   const [countdown, setCountdown] = useState("00:00:00");
+
+  const [timeoutQuiz, { isSuccess, error }] = useTimeoutQuizMutation();
+
+  const handleSync = () => {
+    localStorage.removeItem("questions");
+    refresh();
+  };
+
+  useEffect(() => {
+    if (isSuccess) {
+      window.location.href = `/cbt-jawdal-ujian`;
+      localStorage.removeItem("questions");
+    }
+
+    if (error) {
+      toast.error(error.data.message);
+    }
+  }, [isSuccess, error]);
 
   useEffect(() => {
     if (!log?.log_in) return;
@@ -15,6 +35,7 @@ const CbtTimer = ({ refresh, isLoading, number, time, log, finishHandler }) => {
 
       if (timeLeft <= 0) {
         setCountdown("00:00:00");
+        timeoutQuiz(bankid);
         return;
       }
 
@@ -37,11 +58,6 @@ const CbtTimer = ({ refresh, isLoading, number, time, log, finishHandler }) => {
 
     return () => clearInterval(interval);
   }, [log?.log_in, time]);
-
-  const handleSync = () => {
-    localStorage.removeItem("questions");
-    refresh();
-  };
 
   return (
     <div className="d-flex align-items-center justify-content-between bg-white p-1 rounded shadow border border-2">

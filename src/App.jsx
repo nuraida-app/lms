@@ -56,6 +56,10 @@ const TeacherSubjects = lazy(() => import("./guru/mapel/TeacherSubjects"));
 const StudentDash = lazy(() => import("./siswa/dashboard/StudentDash"));
 const StudentExam = lazy(() => import("./siswa/ujian/StudentExam"));
 const StudentExamPage = lazy(() => import("./cbt/ujian/CbtPage"));
+const StudentData = lazy(() => import("./siswa/biodata/StudentData"));
+
+const ParentDash = lazy(() => import("./wali/dashboard/ParentDash"));
+const ParentBio = lazy(() => import("./wali/biodata/ParentBio"));
 
 function App() {
   const dispatch = useDispatch();
@@ -140,7 +144,7 @@ function App() {
           <Route path="/tahfiz-laporan/:nis/:name" element={<ReportDetail />} />
 
           <Route
-            path="/tahfiz-laporan-santri/:nis/:name"
+            path="/tahfiz-laporan-siswa/:nis/:name"
             element={<TahfizStudent />}
           />
 
@@ -199,6 +203,16 @@ function App() {
           <Route
             path="/cbt-halaman/:name/:bankId/:time"
             element={<StudentExamPage />}
+          />
+
+          <Route path="/siswa-biodata/:name/:nis" element={<StudentData />} />
+
+          {/* Orang Tua */}
+          <Route path="/wali-dashboard" element={<ParentDash />} />
+
+          <Route
+            path="/wali-biodata-siswa/:name/:nis"
+            element={<ParentBio />}
           />
         </Routes>
       </Suspense>

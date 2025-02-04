@@ -105,7 +105,7 @@ const CbtPage = () => {
               number={currentPage}
               time={time}
               log={log}
-              finishHandler={finishHandler}
+              bankid={bankId}
             />
 
             {/* Soal dan jawaban CBT */}

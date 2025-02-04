@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { setLogin } from "../../control/slice/authSlice";
 import { useLoadMutation, useLoginMutation } from "../../control/api/authApi";
+import SignUp from "./SignUp";
 
 const SignIn = () => {
   const dispatch = useDispatch();
@@ -15,6 +16,7 @@ const SignIn = () => {
   const [load] = useLoadMutation();
 
   const [role, setRole] = useState("none");
+  const [isSignup, setSignup] = useState(false);
   const [accountValue, setAccountValue] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -28,6 +30,18 @@ const SignIn = () => {
     setAccountValue(""); // Reset account value when role changes
   };
 
+  const handleSignup = () => {
+    setRole("");
+    setSignup(true);
+    setAccountValue("");
+  };
+
+  const back = () => {
+    setRole("none");
+    setSignup(false);
+    setAccountValue("");
+  };
+
   const handleLogin = (e) => {
     e.preventDefault();
 
@@ -37,6 +51,8 @@ const SignIn = () => {
         ? { nis: accountValue }
         : role === "teacher"
         ? { nip: accountValue }
+        : role === "parent"
+        ? { username: accountValue }
         : { email: accountValue }),
     };
 
@@ -71,6 +87,9 @@ const SignIn = () => {
           break;
         case "tahfiz":
           window.location.href = "/tahfiz-dashboard";
+          break;
+        case "parent":
+          window.location.href = "/wali-dashboard";
           break;
         default:
           break;
@@ -127,10 +146,14 @@ const SignIn = () => {
             >
               Wali Murid
             </button>
+
+            <button className="btn btn-info btn-sign-in" onClick={handleSignup}>
+              Pendaftaran
+            </button>
           </>
         )}
 
-        {role !== "none" && (
+        {role !== "none" && !isSignup && (
           <form
             style={{ width: 300 }}
             className="d-flex flex-column gap-2"
@@ -204,6 +227,8 @@ const SignIn = () => {
             </div>
           </form>
         )}
+
+        {isSignup && <SignUp setRole={back} />}
       </div>
     </Fragment>
   );
