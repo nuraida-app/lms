@@ -165,6 +165,11 @@ router.post(
           ]
         );
 
+        await client.query(
+          `UPDATE user_student SET year_id = $1 WHERE nis = $2`,
+          [year_id, nis]
+        );
+
         return res.status(200).json({ message: "Berhasil diperbarui" });
       } else {
         // Jika NIS tidak ditemukan, tambahkan data baru ke db_students
@@ -200,6 +205,11 @@ router.post(
             address,
             postal_code,
           ]
+        );
+
+        await client.query(
+          `UPDATE user_student SET year_id = $1 WHERE nis = $2`,
+          [year_id, nis]
         );
 
         return res.status(201).json({ message: "Berhasil disimpan" });
