@@ -9,7 +9,7 @@ const router = express.Router();
 // Menambahkan siswa
 router.post("/create", authorize("admin", "super-admin"), async (req, res) => {
   try {
-    const { id, nis, name } = req.body;
+    const { id, nis, name, yearid } = req.body;
 
     const password = "12345678";
     const role = "student";
@@ -21,8 +21,8 @@ router.post("/create", authorize("admin", "super-admin"), async (req, res) => {
 
     if (id) {
       await client.query(
-        "UPDATE user_student SET nis = $1, name = $2 WHERE id = $3 RETURNING *",
-        [nis, name, id]
+        "UPDATE user_student SET nis = $1, name = $2, year_id = $3 WHERE id = $4 RETURNING *",
+        [nis, name, yearid, id]
       );
 
       res.status(200).json({ message: "Berhasil diperbarui" });
@@ -36,10 +36,10 @@ router.post("/create", authorize("admin", "super-admin"), async (req, res) => {
         }
 
         const insertionQuery =
-          "INSERT INTO user_student (nis, name, password, role) " +
-          "VALUES ($1, $2, $3, $4) RETURNING *";
+          "INSERT INTO user_student (nis, name, password, role, year_id) " +
+          "VALUES ($1, $2, $3, $4, $5) RETURNING *";
 
-        const insertionValues = [nis, name, hash, role];
+        const insertionValues = [nis, name, hash, role, yearid];
 
         await client.query(insertionQuery, insertionValues);
 
@@ -52,7 +52,7 @@ router.post("/create", authorize("admin", "super-admin"), async (req, res) => {
 });
 
 // Mengupload siswa
-router.post("/upload", authorize("admin"), async (req, res) => {
+router.post("/upload", authorize("admin", "super-admin"), async (req, res) => {
   try {
     const data = req.body.data;
 
@@ -70,8 +70,9 @@ router.post("/upload", authorize("admin"), async (req, res) => {
         const hash = await bcrypt.hash(password, 10);
 
         await client.query(
-          "INSERT INTO students ( nis, name, password, role) VALUES ($1, $2, $3, $4)",
-          [student[0], student[1], hash, role]
+          `INSERT INTO user_student( nis, name, year_id, password, role)
+          VALUES ($1, $2, $3, $4, $5)`,
+          [student[0], student[1], student[2], hash, role]
         );
       })
     );
@@ -156,7 +157,7 @@ router.get(
             FROM db_students s
           )
           SELECT DISTINCT ON (students_class.nis) students_class.id, students_class.nis, 
-                 user_student.name, homebase.name AS homebase, classes.name AS class, 
+                 user_student.name, homebase.name AS homebase, classes.name AS class, years.name AS year, 
                  grades.grade, ROUND(((sc.filled_columns::numeric / sc.total_columns) * 100), 2) AS kelengkapan
           FROM students_class
           INNER JOIN user_student ON user_student.nis = students_class.nis
@@ -164,6 +165,7 @@ router.get(
           INNER JOIN grades ON grades.id = students_class.grade_id
           INNER JOIN classes ON classes.code = students_class.class_code
           LEFT JOIN student_completeness sc ON sc.nis = students_class.nis
+          LEFT JOIN years ON user_student.year_id = years.id
           WHERE students_class.homebase_id = $1 AND (
             CAST(students_class.nis AS TEXT) ILIKE $2 OR user_student.name ILIKE $2
           )
@@ -183,11 +185,12 @@ router.get(
       } else if (gradeId) {
         query = `
           SELECT students_class.id, students_class.nis, user_student.name, grades.grade,
-                 classes.name AS class
+                 classes.name AS class, years.name AS year
           FROM students_class
           INNER JOIN user_student ON user_student.nis = students_class.nis
           INNER JOIN grades ON grades.id = students_class.grade_id
           INNER JOIN classes ON classes.code = students_class.class_code
+          LEFT JOIN years ON user_student.year_id = years.id
           WHERE students_class.grade_id = $1 AND (
             CAST(students_class.nis AS TEXT) ILIKE $2 OR user_student.name ILIKE $2
           )
@@ -206,12 +209,62 @@ router.get(
         countParams = [gradeId, `%${search}%`];
       } else if (classCode) {
         query = `
+        WITH student_completeness AS (
+            SELECT 
+              s.nis,
+              34 AS total_columns,
+              (
+                SELECT COUNT(*)
+                FROM (
+                  VALUES
+                    (s.name),
+                    (s.nisn),
+                    (s.nis::text),
+                    (s.birth_place),
+                    (s.birth_date::text),
+                    (s.height::text),
+                    (s.weight::text),
+                    (s.around_head::text),
+                    (s.order_birth::text),
+                    (s.siblings::text),
+                    (s.province_id),
+                    (s.province_name),
+                    (s.regency_id),
+                    (s.regency_name),
+                    (s.district_id),
+                    (s.district_name),
+                    (s.village_id),
+                    (s.village_name),
+                    (s.address),
+                    (s.postal_code),
+                    (s.father_nik),
+                    (s.father_name),
+                    (s.father_birth_place),
+                    (s.father_birth_date::text),
+                    (s.father_job),
+                    (s.father_phone::text),
+                    (s.mother_nik),
+                    (s.mother_name),
+                    (s.mother_birth_place),
+                    (s.mother_birth_date::text),
+                    (s.mother_job),
+                    (s.mother_phone::text),
+                    (s.family_info::text),
+                    (s.year)
+                ) AS data(column_value)
+                WHERE column_value IS NOT NULL
+              ) AS filled_columns
+            FROM db_students s
+          )
           SELECT DISTINCT students_class.id, students_class.nis, grades.grade, user_student.name,
-                 classes.name AS class
+                 classes.name AS class, years.name AS year,
+                 ROUND(((sc.filled_columns::numeric / sc.total_columns) * 100), 2) AS kelengkapan
           FROM students_class
           INNER JOIN classes ON students_class.class_code = classes.code
           INNER JOIN grades ON students_class.grade_id = grades.id
           INNER JOIN user_student ON students_class.nis = user_student.nis
+          LEFT JOIN student_completeness sc ON sc.nis = students_class.nis
+          LEFT JOIN years ON user_student.year_id = years.id
           WHERE students_class.class_code = $1 AND (
             CAST(students_class.nis AS TEXT) ILIKE $2 OR user_student.name ILIKE $2
           )
@@ -230,8 +283,9 @@ router.get(
         countParams = [classCode, `%${search}%`];
       } else {
         query = `
-          SELECT user_student.id, user_student.name, user_student.nis
+          SELECT user_student.id, user_student.name, user_student.nis, years.name AS year
           FROM user_student
+          LEFT JOIN years ON user_student.year_id = years.id
           WHERE CAST(user_student.nis AS TEXT) ILIKE $1 OR user_student.name ILIKE $1
           ORDER BY user_student.name ASC
           LIMIT $2 OFFSET $3;

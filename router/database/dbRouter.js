@@ -527,54 +527,116 @@ router.get(
   authorize("super-admin", "admin"),
   async (req, res) => {
     try {
+      const { page = 1, limit = 10, search = "" } = req.query;
+      const offset = (parseInt(page) - 1) * parseInt(limit);
+      const searchQuery = `%${search}%`;
       let data;
 
+      const getPaginatedQuery = (fieldId, fieldName) => `
+        SELECT ${fieldId} AS id, TRIM(${fieldName}) AS name, COUNT(*)::INTEGER AS total 
+        FROM db_students 
+        WHERE ${fieldName} ILIKE $1 
+        GROUP BY ${fieldId}, ${fieldName} 
+        ORDER BY ${fieldName} 
+        LIMIT $2 OFFSET $3
+      `;
+
+      const getTotalCountQuery = (fieldId, fieldName) => `
+        SELECT COUNT(DISTINCT ${fieldId})::INTEGER AS total 
+        FROM db_students 
+        WHERE ${fieldName} ILIKE $1
+      `;
+
+      const getTotalDataQuery = `
+        SELECT 
+          COUNT(*)::INTEGER AS total_data,
+          COUNT(DISTINCT province_id)::INTEGER AS total_provinces,
+          COUNT(DISTINCT regency_id)::INTEGER AS total_regencies,
+          COUNT(DISTINCT district_id)::INTEGER AS total_districts,
+          COUNT(DISTINCT village_id)::INTEGER AS total_villages
+        FROM db_students
+        WHERE province_id IS NOT NULL AND regency_id IS NOT NULL AND district_id IS NOT NULL AND village_id IS NOT NULL
+      `;
+
       if (req.user.role === "admin") {
-        // Get the list of NIS for students under the admin's homebase
         const { rows: students } = await client.query(
           `SELECT nis FROM students_class WHERE homebase_id = $1`,
           [req.user.homebase_id]
         );
 
-        // Extract NIS values into an array
         const nisList = students.map((student) => student.nis);
 
         if (nisList.length > 0) {
-          const queryProvince = `
-              SELECT province_id AS id, TRIM(province_name) AS name, COUNT(*)::INTEGER AS total 
-              FROM db_students 
-              WHERE nis = ANY($1)
-              GROUP BY province_id, province_name
+          const getPaginatedQueryWithNis = (fieldId, fieldName) => `
+            SELECT ${fieldId} AS id, TRIM(${fieldName}) AS name, COUNT(*)::INTEGER AS total 
+            FROM db_students 
+            WHERE nis = ANY($1) AND ${fieldName} ILIKE $2
+            GROUP BY ${fieldId}, ${fieldName} 
+            ORDER BY ${fieldName} 
+            LIMIT $3 OFFSET $4
           `;
-          const queryRegency = `
-              SELECT regency_id AS id, TRIM(regency_name) AS name, COUNT(*)::INTEGER AS total 
-              FROM db_students 
-              WHERE nis = ANY($1)
-              GROUP BY regency_id, regency_name
+
+          const getTotalCountQueryWithNis = (fieldId, fieldName) => `
+            SELECT COUNT(DISTINCT ${fieldId})::INTEGER AS total 
+            FROM db_students 
+            WHERE nis = ANY($1) AND ${fieldName} ILIKE $2
           `;
-          const queryDistrict = `
-              SELECT district_id AS id, TRIM(district_name) AS name, COUNT(*)::INTEGER AS total 
-              FROM db_students 
-              WHERE nis = ANY($1)
-              GROUP BY district_id, district_name
-          `;
-          const queryVillage = `
-              SELECT village_id AS id, TRIM(village_name) AS name, COUNT(*)::INTEGER AS total 
-              FROM db_students 
-              WHERE nis = ANY($1)
-              GROUP BY village_id, village_name
+
+          getTotalDataQuery = `
+            SELECT 
+              COUNT(*)::INTEGER AS total_data,
+              COUNT(DISTINCT province_id)::INTEGER AS total_provinces,
+              COUNT(DISTINCT regency_id)::INTEGER AS total_regencies,
+              COUNT(DISTINCT district_id)::INTEGER AS total_districts,
+              COUNT(DISTINCT village_id)::INTEGER AS total_villages
+            FROM db_students
+            WHERE nis = ANY($1) AND province_id IS NOT NULL AND regency_id IS NOT NULL AND district_id IS NOT NULL AND village_id IS NOT NULL
           `;
 
           const [
+            totalData,
             provincesResult,
             regenciesResult,
             districtsResult,
             villagesResult,
+            totalProvinces,
+            totalRegencies,
+            totalDistricts,
+            totalVillages,
           ] = await Promise.all([
-            client.query(queryProvince, [nisList]),
-            client.query(queryRegency, [nisList]),
-            client.query(queryDistrict, [nisList]),
-            client.query(queryVillage, [nisList]),
+            client.query(getTotalDataQuery, [nisList]),
+            client.query(
+              getPaginatedQueryWithNis("province_id", "province_name"),
+              [nisList, searchQuery, limit, offset]
+            ),
+            client.query(
+              getPaginatedQueryWithNis("regency_id", "regency_name"),
+              [nisList, searchQuery, limit, offset]
+            ),
+            client.query(
+              getPaginatedQueryWithNis("district_id", "district_name"),
+              [nisList, searchQuery, limit, offset]
+            ),
+            client.query(
+              getPaginatedQueryWithNis("village_id", "village_name"),
+              [nisList, searchQuery, limit, offset]
+            ),
+            client.query(
+              getTotalCountQueryWithNis("province_id", "province_name"),
+              [nisList, searchQuery]
+            ),
+            client.query(
+              getTotalCountQueryWithNis("regency_id", "regency_name"),
+              [nisList, searchQuery]
+            ),
+            client.query(
+              getTotalCountQueryWithNis("district_id", "district_name"),
+              [nisList, searchQuery]
+            ),
+            client.query(
+              getTotalCountQueryWithNis("village_id", "village_name"),
+              [nisList, searchQuery]
+            ),
           ]);
 
           data = {
@@ -582,47 +644,65 @@ router.get(
             regencies: regenciesResult.rows,
             districts: districtsResult.rows,
             villages: villagesResult.rows,
+            totalPages: {
+              provinces: Math.ceil(totalProvinces.rows[0].total / limit),
+              regencies: Math.ceil(totalRegencies.rows[0].total / limit),
+              districts: Math.ceil(totalDistricts.rows[0].total / limit),
+              villages: Math.ceil(totalVillages.rows[0].total / limit),
+            },
+            totalData: totalData.rows[0],
           };
         } else {
+          const totalData = await client.query(getTotalDataQuery);
           data = {
-            provinces: [],
-            regencies: [],
-            districts: [],
-            villages: [],
+            totalData: totalData.rows[0],
           };
         }
       } else {
-        const queryProvince = `
-            SELECT province_id AS id, TRIM(province_name) AS name, COUNT(*)::INTEGER AS total 
-            FROM db_students 
-            GROUP BY province_id, province_name
-        `;
-        const queryRegency = `
-            SELECT regency_id AS id, TRIM(regency_name) AS name, COUNT(*)::INTEGER AS total 
-            FROM db_students 
-            GROUP BY regency_id, regency_name
-        `;
-        const queryDistrict = `
-            SELECT district_id AS id, TRIM(district_name) AS name, COUNT(*)::INTEGER AS total 
-            FROM db_students 
-            GROUP BY district_id, district_name
-        `;
-        const queryVillage = `
-            SELECT village_id AS id, TRIM(village_name) AS name, COUNT(*)::INTEGER AS total 
-            FROM db_students 
-            GROUP BY village_id, village_name
-        `;
-
         const [
           provincesResult,
           regenciesResult,
           districtsResult,
           villagesResult,
+          totalProvinces,
+          totalRegencies,
+          totalDistricts,
+          totalVillages,
+          totalData,
         ] = await Promise.all([
-          client.query(queryProvince),
-          client.query(queryRegency),
-          client.query(queryDistrict),
-          client.query(queryVillage),
+          client.query(getPaginatedQuery("province_id", "province_name"), [
+            searchQuery,
+            limit,
+            offset,
+          ]),
+          client.query(getPaginatedQuery("regency_id", "regency_name"), [
+            searchQuery,
+            limit,
+            offset,
+          ]),
+          client.query(getPaginatedQuery("district_id", "district_name"), [
+            searchQuery,
+            limit,
+            offset,
+          ]),
+          client.query(getPaginatedQuery("village_id", "village_name"), [
+            searchQuery,
+            limit,
+            offset,
+          ]),
+          client.query(getTotalCountQuery("province_id", "province_name"), [
+            searchQuery,
+          ]),
+          client.query(getTotalCountQuery("regency_id", "regency_name"), [
+            searchQuery,
+          ]),
+          client.query(getTotalCountQuery("district_id", "district_name"), [
+            searchQuery,
+          ]),
+          client.query(getTotalCountQuery("village_id", "village_name"), [
+            searchQuery,
+          ]),
+          client.query(getTotalDataQuery),
         ]);
 
         data = {
@@ -630,6 +710,13 @@ router.get(
           regencies: regenciesResult.rows,
           districts: districtsResult.rows,
           villages: villagesResult.rows,
+          totalPages: {
+            provinces: Math.ceil(totalProvinces.rows[0].total / limit),
+            regencies: Math.ceil(totalRegencies.rows[0].total / limit),
+            districts: Math.ceil(totalDistricts.rows[0].total / limit),
+            villages: Math.ceil(totalVillages.rows[0].total / limit),
+          },
+          totalData: totalData.rows[0],
         };
       }
 

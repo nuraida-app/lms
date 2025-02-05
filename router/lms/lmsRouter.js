@@ -317,8 +317,6 @@ router.post(
     try {
       const { id, chapter_id, title, goal, subject_code } = req.body;
 
-      console.log(req.body);
-
       let topicId = id;
 
       // Jika `id` tidak disediakan, tambahkan topik baru dan ambil ID-nya
@@ -379,7 +377,7 @@ router.get("/topic/:id", authorize("teacher"), async (req, res) => {
 router.delete("/delete-topic/:id", authorize("teacher"), async (req, res) => {
   try {
     await client.query(`DELETE FROM lms_topics WHERE id = $1`, [req.params.id]);
-    res.status(200).json({ message: "Deleted" });
+    res.status(200).json({ message: "Berhasil dihapus" });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
