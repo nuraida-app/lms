@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 const columns = [
   { label: "No" },
+  { label: "Tahun Ajar" },
   { label: "NIS" },
   { label: "Nama Lengkap" },
   { label: "Tingkat" },
@@ -62,6 +63,7 @@ const AdminStudents = () => {
                     <th scope="row" className="text-center align-middle">
                       {(page - 1) * limit + index + 1}
                     </th>
+                    <td className="align-middle text-center">{user.year}</td>
                     <td className="align-middle text-center">{user.nis}</td>
                     <td className="align-middle">{user.name}</td>
                     <td className="text-center align-middle">{user.grade}</td>

@@ -52,7 +52,12 @@ const FileCard = ({ files }) => {
             data-bs-toggle={file.video ? "modal" : null}
             data-bs-target={file.video ? "#video" : null}
           >
-            <i className="bi bi-youtube"></i>
+            {file.video ? (
+              <i className="bi bi-youtube"></i>
+            ) : (
+              <i className="bi bi-file-earmark-pdf"></i>
+            )}
+
             {file.title}
           </button>
 

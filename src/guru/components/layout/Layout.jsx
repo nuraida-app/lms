@@ -19,6 +19,10 @@ const Layout = ({ children, title }) => {
     navigate(link);
   };
 
+  const goTo = () => {
+    navigate("/guru-database");
+  };
+
   const logutHandler = async () => {
     try {
       await logout().unwrap();
@@ -74,6 +78,12 @@ const Layout = ({ children, title }) => {
                     {menu.label}
                   </button>
                 ))}
+
+                {user && user?.homeroom === 1 && (
+                  <button className="btn btn-warning" onClick={goTo}>
+                    Database
+                  </button>
+                )}
 
                 {isLoading ? (
                   <BtnLoader />

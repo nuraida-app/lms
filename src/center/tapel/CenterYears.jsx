@@ -50,6 +50,7 @@ const CenterYears = () => {
               <thead>
                 <tr>
                   <th className="text-center">No</th>
+                  <th className="text-center">_id</th>
                   <th className="text-center">Tahun Pelajaran</th>
                   <th className="text-center">Aksi</th>
                 </tr>
@@ -60,6 +61,7 @@ const CenterYears = () => {
                     <td className="text-center align-middle">
                       {(page - 1) * limit + i + 1}
                     </td>
+                    <td className="text-center align-middle">{item.id}</td>
                     <td className="align-middle">{item.name}</td>
                     <td className="text-center align-middle">
                       <div className="d-flex justify-content-center gap-2">

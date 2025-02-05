@@ -114,7 +114,7 @@ const LmsAddFile = ({ type, topicId, subjectCode }) => {
               className="btn btn-secondary"
               data-bs-dismiss="modal"
             >
-              Batal
+              Tutup
             </button>
 
             <button

@@ -57,8 +57,6 @@ const TeacherProfile = () => {
     // Add form submission logic here (e.g., API call)
   };
 
-  console.log(user);
-
   return (
     <Layout title={user?.name}>
       <div className="row" style={{ height: "100%" }}>

@@ -23,7 +23,7 @@ const LmsMapel = () => {
     <Layout title={"Learning Management System"}>
       {/* <LmsList subjects={subjects} /> */}
       <div className="container-fluid">
-        <div className="d-flex flex-column gap-2 bg-white rounded p-2">
+        <div className="d-flex flex-column gap-2 bg-white rounded p-2 bg-white border shadow">
           <p className="m-0 h6">
             Jumlah Mata Pelajaran: <span>{total}</span>
           </p>
@@ -106,7 +106,7 @@ const LmsMapel = () => {
                           </thead>
                           <tbody>
                             <tr>
-                              <td>Bab</td>
+                              <td>Materi Pembelajaran</td>
                               {item.levelCounts.map((level) => (
                                 <td key={level.level} className="text-center">
                                   {level.total_chapters}
@@ -114,7 +114,7 @@ const LmsMapel = () => {
                               ))}
                             </tr>
                             <tr>
-                              <td>Topik</td>
+                              <td>Topik Pembelajaran</td>
                               {item.levelCounts.map((level) => (
                                 <td key={level.level} className="text-center">
                                   {level.total_topics}

@@ -20,7 +20,6 @@ const usersData = [
 
 const columns = [
   { label: "No" },
-  { label: "Tahun Ajar" },
   { label: "NIS" },
   { label: "Nama Lengkap" },
   { label: "Tingkat" },
@@ -76,12 +75,11 @@ const AdminDash = () => {
                     <th scope="row" className="text-center">
                       {(page - 1) * limit + index + 1}
                     </th>
-                    <td>{user.year}</td>
-                    <td>{user.nis}</td>
-                    <td>{user.nama_lengkap}</td>
-                    <td>{user.tingkat}</td>
-                    <td>{user.kelas}</td>
-                    <td>
+                    <td className="text-center align-middle">{user.nis}</td>
+                    <td className="align-middle">{user.nama_lengkap}</td>
+                    <td className="text-center align-middle">{user.tingkat}</td>
+                    <td className="text-center align-middle">{user.kelas}</td>
+                    <td className="text-center align-middle">
                       <div className="progress">
                         <div
                           className="progress-bar"

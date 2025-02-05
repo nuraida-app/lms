@@ -52,6 +52,8 @@ const AdminDatabase = lazy(() => import("./admin/siswa/AdminDatabase"));
 const TeacherDash = lazy(() => import("./guru/dahsboard/TeacherDash"));
 const TeacherProfile = lazy(() => import("./guru/profil/TeacherProfile"));
 const TeacherSubjects = lazy(() => import("./guru/mapel/TeacherSubjects"));
+const TeacherDatabase = lazy(() => import("./guru/database/TeacherDatabase"));
+const TeacherStudent = lazy(() => import("./guru/database/TeacherStudent"));
 
 const StudentDash = lazy(() => import("./siswa/dashboard/StudentDash"));
 const StudentExam = lazy(() => import("./siswa/ujian/StudentExam"));
@@ -194,6 +196,13 @@ function App() {
           <Route path="/guru-profil" element={<TeacherProfile />} />
 
           <Route path="/guru-mapel" element={<TeacherSubjects />} />
+
+          <Route path="/guru-database" element={<TeacherDatabase />} />
+
+          <Route
+            path="/guru-database/:name/:nis"
+            element={<TeacherStudent />}
+          />
 
           {/* Siswa */}
           <Route path="/siswa-dashboard" element={<StudentDash />} />

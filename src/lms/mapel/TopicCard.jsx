@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import FileCard from "./FileCard";
 import Player from "./Player";
+import { useDeleteTopicMutation } from "../../control/api/lmsApi";
+import { toast } from "react-toastify";
 
 const createMarkup = (html) => ({ __html: html });
 
@@ -16,12 +18,27 @@ const TopicCard = ({
   const [name, setName] = useState("");
   const [url, setUrl] = useState("");
 
+  const [deleteTopic, { data, isSuccess, isLoading, error, reset }] =
+    useDeleteTopicMutation();
+
   const handleEdit = () => {
     setTopicId(topic.topic_id);
     setTitle(topic.topic_title);
     setChapterId(topic.topic_chapter);
     setGoal(topic.goal);
   };
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success(data.message);
+      reset();
+    }
+
+    if (error) {
+      toast.error(error.data.message);
+      reset();
+    }
+  }, [data, isSuccess, error]);
 
   return (
     <div>
@@ -63,7 +80,13 @@ const TopicCard = ({
             >
               Edit
             </button>
-            <button className="btn btn-danger">Hapus</button>
+            <button
+              className="btn btn-danger"
+              disabled={isLoading ? true : false}
+              onClick={() => deleteTopic(topic.topic_id)}
+            >
+              {isLoading ? "Loading..." : "Hapus"}
+            </button>
           </div>
         )}
       </div>

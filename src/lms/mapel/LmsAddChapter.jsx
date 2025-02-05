@@ -102,7 +102,7 @@ const LmsAddChapter = ({ add, grades, gLoad }) => {
           type="text"
           className="form-control"
           aria-label="Username"
-          placeholder="Nama BAB"
+          placeholder="Nama Materi Pembelajaran"
           value={title || ""}
           onChange={(e) => setTitle(e.target.value)}
         />
@@ -162,7 +162,7 @@ const LmsAddChapter = ({ add, grades, gLoad }) => {
       <hr />
       <div className="text-end">
         <button className="btn btn-danger me-2" onClick={add}>
-          Batal
+          Tutup
         </button>
         {isLoading ? (
           <BtnLoader />

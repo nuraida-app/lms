@@ -45,7 +45,7 @@ const TopicModal = ({
               data-bs-dismiss="modal"
               onClick={closeHandler}
             >
-              Batal
+              Tutup
             </button>
             {aLoad ? (
               <button className="btn btn-primary" disabled>

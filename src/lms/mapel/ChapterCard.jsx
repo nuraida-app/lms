@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import TopicCard from "./TopicCard";
 import BtnLoader from "../../components/loader/BtnLoader";
+import { useDeleteChapterMutation } from "../../control/api/lmsApi";
+import { toast } from "react-toastify";
 
 const createMarkup = (html) => ({ __html: html });
 
@@ -14,11 +16,28 @@ const ChapterCard = ({
   setTitle,
   add,
 }) => {
+  const [deleteChapter, { data, isSuccess, isLoading, error, reset }] =
+    useDeleteChapterMutation();
+
   const handleEdit = () => {
     localStorage.setItem("chapter", JSON.stringify(chapter));
     add();
   };
 
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success(data.message);
+      reset();
+      window.location.reload();
+    }
+
+    if (error) {
+      toast.error(error.data.message);
+      reset();
+    }
+  }, [data, isSuccess, error]);
+
+  console.log(chapter);
   return (
     <div className="w-100 card shadow border border-info">
       <div className="card-header">
@@ -66,7 +85,13 @@ const ChapterCard = ({
             <button className="btn btn-warning mx-2" onClick={handleEdit}>
               Edit
             </button>
-            <button className="btn btn-danger">Hapus</button>
+            <button
+              className="btn btn-danger"
+              disabled={isLoading}
+              onClick={() => deleteChapter(chapter.chapter_id)}
+            >
+              {isLoading ? "Loading..." : "Hapus"}
+            </button>
           </div>
         )}
       </div>

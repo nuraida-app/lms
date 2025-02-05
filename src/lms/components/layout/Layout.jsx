@@ -36,6 +36,10 @@ const Layout = ({ children, title }) => {
     }
   };
 
+  const goTo = () => {
+    navigate("/guru-database");
+  };
+
   const logutHandler = async () => {
     try {
       await logout().unwrap();
@@ -53,13 +57,14 @@ const Layout = ({ children, title }) => {
       case "admin":
         return "/admin-dashboard";
       case "teacher":
-        return "/guru-dashboard";
+        return "/guru-profil";
       case "student":
         return "/siswa-dashboard";
       default:
         return "/";
     }
   };
+
   return (
     <Fragment>
       <MetaData title={title} />
@@ -108,6 +113,12 @@ const Layout = ({ children, title }) => {
                     {menu.label}
                   </button>
                 ))}
+
+                {user && user?.homeroom === 1 && (
+                  <button className="btn btn-warning" onClick={goTo}>
+                    Database
+                  </button>
+                )}
 
                 {isLoading ? (
                   <BtnLoader />

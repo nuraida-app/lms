@@ -1,43 +1,82 @@
-import React from "react";
+import React, { useState } from "react";
+import { useGetDemographicQuery } from "../../control/api/dbApi";
+import TableContainer from "../../components/tabel/TabelContainer";
 
-const Chart = () => {
-  const data = [
-    { month: "January", traffic: 10 },
-    { month: "February", traffic: 20 },
-    { month: "March", traffic: 30 },
-    { month: "April", traffic: 60 },
-    { month: "May", traffic: 50 },
-    { month: "June", traffic: 40 },
-    { month: "July", traffic: 70 },
-  ];
+const Chart = ({ type }) => {
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [search, setSearch] = useState("");
 
-  const maxTraffic = Math.max(...data.map((d) => d.traffic));
+  const { data: rawData = {} } = useGetDemographicQuery({
+    page,
+    limit,
+    search,
+  });
+
+  const dataMap = {
+    provinces: rawData.provinces || [],
+    regencies: rawData.regencies || [],
+    districts: rawData.districts || [],
+    villages: rawData.villages || [],
+  };
+
+  const selectedData = dataMap[type];
+  const totalPages = rawData.totalPages ? rawData.totalPages[type] : 1;
+  const maxTotal = selectedData?.length
+    ? Math.max(...selectedData.map((item) => item.total))
+    : 1;
 
   return (
-    <div className="container-fluid mt-2 rounded border border-2 bg-white p-2">
-      <div className="d-flex flex-column gap-2">
-        {data.map((item) => (
-          <div key={item.month} className="d-flex align-items-center">
-            <div className="me-2" style={{ width: "80px" }}>
-              {item.month}
-            </div>
-
-            <div className="progress" style={{ width: "100%" }}>
-              <div
-                className="progress-bar"
-                role="progressbar"
-                style={{ width: `${(item.traffic / maxTraffic) * 100}%` }}
-                aria-valuenow={(item.traffic / maxTraffic) * 100}
-                aria-valuemin="0"
-                aria-valuemax={maxTraffic}
-              >
-                {item.traffic}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+    <TableContainer
+      page={page}
+      setPage={(e) => setPage(e)}
+      setLimit={(e) => setLimit(e)}
+      onValue={(e) => setSearch(e)}
+      totalPages={totalPages}
+    >
+      <table className="table table-striped table-hover">
+        <thead>
+          <tr>
+            <td className="text-center align-middle">No</td>
+            <td className="text-center align-middle">Nama</td>
+            <td className="text-center align-middle">Data</td>
+          </tr>
+        </thead>
+        <tbody>
+          {selectedData?.map((item, i) => (
+            <tr key={i}>
+              <td className="text-center align-middle">
+                {(page - 1) * limit + i + 1}
+              </td>
+              <td className="align-middle">{item.name}</td>
+              <td className="text-center align-middle">
+                <div
+                  className="progress pointer"
+                  data-bs-toggle="tooltip"
+                  data-bs-placement="top"
+                  title={`${item.total} Data`}
+                  style={{ width: "100%" }}
+                >
+                  <div
+                    className="progress-bar"
+                    role="progressbar"
+                    style={{ width: `${(item.total / maxTotal) * 100}%` }}
+                    aria-valuenow={(item.total / maxTotal) * 100}
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    title={`${item.total} Data`}
+                  >
+                    {item.total}
+                  </div>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </TableContainer>
   );
 };
 

@@ -109,8 +109,10 @@ export const dbApi = createApi({
       ], // Invalidate cache after mutation
     }),
     getDemographic: builder.query({
-      query: () => ({
+      query: ({ page, limit, search }) => ({
         url: `/get-demographic`,
+        params: { page, limit, search },
+        method: "GET",
       }),
     }),
     getTargeted: builder.query({

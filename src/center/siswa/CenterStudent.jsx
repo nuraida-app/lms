@@ -26,6 +26,7 @@ const CenterStudent = () => {
     classCode,
   });
   const { students, totalPages, totalStudents } = rawData;
+
   const [deleteStudent, { data, isSuccess, isLoading, error, reset }] =
     useDeleteStudentMutation();
 
@@ -72,6 +73,9 @@ const CenterStudent = () => {
                     #
                   </th>
                   <th scope="col" className="text-center">
+                    Tahun Ajar
+                  </th>
+                  <th scope="col" className="text-center">
                     NIS
                   </th>
                   <th scope="col" className="text-center">
@@ -88,8 +92,9 @@ const CenterStudent = () => {
                     <th scope="row" className="text-center">
                       {(page - 1) * limit + index + 1}
                     </th>
-                    <td>{student.nis}</td>
-                    <td>{student.name}</td>
+                    <td className="text-center align-middle">{student.year}</td>
+                    <td className="text-center align-middle">{student.nis}</td>
+                    <td className="align-middle">{student.name}</td>
                     <td>
                       <div className="d-flex justify-content-center gap-2">
                         <button
