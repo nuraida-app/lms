@@ -74,22 +74,22 @@ const SignIn = () => {
     if (user) {
       switch (user.role) {
         case "admin":
-          window.location.href = "/admin-dashboard";
+          navigate("/admin-dashboard");
           break;
         case "student":
-          window.location.href = "/siswa-dashboard";
+          navigate("/siswa-dashboard");
           break;
         case "teacher":
-          window.location.href = "/guru-profil";
+          navigate("/guru-profil");
           break;
         case "super-admin":
-          window.location.href = "/center-dashboard";
+          navigate("/center-dashboard");
           break;
         case "tahfiz":
-          window.location.href = "/tahfiz-dashboard";
+          navigate("/tahfiz-dashboard");
           break;
         case "parent":
-          window.location.href = "/wali-dashboard";
+          navigate("/wali-dashboard");
           break;
         default:
           break;

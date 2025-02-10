@@ -1,0 +1,1 @@
+import{i as s,j as a}from"./index-SXBgl-Na.js";import{L as o}from"./Layout-DgTWkQ-1.js";import{F as e}from"./FormPage-BilmU9Nu.js";const p=()=>{const t=s(),{name:r}=t;return a.jsx(o,{title:`Data ${r.replace(/\-/g," ")}`,children:a.jsx(e,{})})};export{p as default};

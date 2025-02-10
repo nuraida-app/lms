@@ -6,12 +6,14 @@ import {
 import { setLogin } from "../../control/slice/authSlice";
 import { toast } from "react-toastify";
 import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const convertPhoneNumber = (phone) =>
   phone?.startsWith("0") ? `62${phone.slice(1)}` : phone;
 
 const SignUp = ({ setRole }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
   const [register, { isLoading }] = useRegisterMutation();
   const [load] = useLoadMutation();
@@ -46,7 +48,7 @@ const SignUp = ({ setRole }) => {
 
   useEffect(() => {
     if (user?.role === "parent") {
-      window.location.href = "/wali-dashboard";
+      navigate("/wali-dashboard");
     }
   }, [user]);
 
