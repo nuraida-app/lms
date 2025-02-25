@@ -6,19 +6,19 @@ const router = express.Router();
 
 router.post("/add-surah", authorize("tahfiz"), async (req, res) => {
   try {
-    const { id, name, count } = req.body;
+    const { id, name, count, lines } = req.body;
 
     if (id) {
       await client.query(
         `UPDATE t_alquran
-      SET name = $1, ayat = $2 WHERE id = $3`,
-        [name, count, id]
+      SET name = $1, ayat = $2, lines = $3 WHERE id = $4`,
+        [name, count, lines, id]
       );
     } else {
-      await client.query(`INSERT INTO t_alquran (name, ayat) VALUES ($1, $2)`, [
-        name,
-        count,
-      ]);
+      await client.query(
+        `INSERT INTO t_alquran (name, ayat, lines) VALUES ($1, $2, $3)`,
+        [name, count, lines]
+      );
     }
 
     const update = "Berhasil diperbarui";
