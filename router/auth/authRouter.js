@@ -126,11 +126,14 @@ router.post("/login", async (req, res) => {
         { id: user.id, type: user.role },
         process.env.JWT,
         {
-          expiresIn: "8h",
+          expiresIn: "7d",
         }
       );
 
-      res.cookie("token", token, { httpOnly: true, maxAge: 28800000 });
+      res.cookie("token", token, {
+        httpOnly: true,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
       res.status(200).json(user);
     });
   } catch (error) {
