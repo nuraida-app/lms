@@ -155,7 +155,7 @@ const FormParents = ({ student }) => {
           name="mother_nik"
           id="1"
           className="form-control"
-          placeholder="NIK Ayah"
+          placeholder="NIK Ibu"
           value={formData.mother_nik || ""}
           onChange={handleChange}
         />
@@ -164,7 +164,7 @@ const FormParents = ({ student }) => {
           name="mother_name"
           id="2"
           className="form-control"
-          placeholder="Nama Ayah"
+          placeholder="Nama Ibu"
           value={formData.mother_name || ""}
           onChange={handleChange}
         />
@@ -173,7 +173,7 @@ const FormParents = ({ student }) => {
           name="mother_birth_place"
           id="3"
           className="form-control"
-          placeholder="Tempat Lahir Ayah"
+          placeholder="Tempat Lahir Ibu"
           value={formData.mother_birth_place || ""}
           onChange={handleChange}
         />
@@ -182,7 +182,7 @@ const FormParents = ({ student }) => {
           name="mother_birth_date"
           id="4"
           className="form-control"
-          placeholder="Tanggal Lahir Ayah"
+          placeholder="Tanggal Lahir Ibu"
           value={formData.mother_birth_date || ""}
           onChange={handleChange}
         />
@@ -191,7 +191,7 @@ const FormParents = ({ student }) => {
           name="mother_job"
           id="5"
           className="form-control"
-          placeholder="Pekerjaan Ayah"
+          placeholder="Pekerjaan Ibu"
           value={formData.mother_job || ""}
           onChange={handleChange}
         />
@@ -200,7 +200,7 @@ const FormParents = ({ student }) => {
           name="mother_phone"
           id="6"
           className="form-control"
-          placeholder="Tlp Ayah"
+          placeholder="Tlp Ibu"
           value={formData.mother_phone || ""}
           onChange={handleChange}
         />

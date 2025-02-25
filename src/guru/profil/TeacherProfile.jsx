@@ -61,7 +61,7 @@ const TeacherProfile = () => {
     <Layout title={user?.name}>
       <div className="row" style={{ height: "100%" }}>
         <div className="col-12 d-flex align-items-center justify-content-center">
-          <div className="d-flex flex-column align-items-start gap-3 p-3 rounded shadow bg-white border border-2">
+          <div className="d-flex flex-column align-items-start gap-3 p-3 rounded shadow bg-white border-2">
             <div className="form-group w-100">
               <label htmlFor="homebase">Satuan Pendidikan</label>
               <input

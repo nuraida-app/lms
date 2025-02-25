@@ -128,10 +128,10 @@ const FormStudent = ({ provinces, name, nis, student }) => {
     }
 
     if (
-      name !== "province_id" &&
-      name !== "regency_id" &&
-      name !== "district_id" &&
-      name !== "village_id" &&
+      name !== "province_id" ||
+      name !== "regency_id" ||
+      name !== "district_id" ||
+      name !== "village_id" ||
       name !== "year"
     ) {
       setFormData((prev) => ({
@@ -372,7 +372,7 @@ const FormStudent = ({ provinces, name, nis, student }) => {
         />
 
         <textarea
-          name="adress"
+          name="address"
           id="10"
           rows="6"
           className="form-control"

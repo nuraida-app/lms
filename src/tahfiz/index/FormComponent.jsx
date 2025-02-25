@@ -6,6 +6,7 @@ const FormComponent = ({ surah, clear }) => {
   const [id, setId] = useState();
   const [name, setName] = useState("");
   const [count, setCount] = useState("");
+  const [lines, setLines] = useState("");
 
   const [addSurah, { data, isSuccess, isLoading, error, reset }] =
     useAddSurahMutation();
@@ -13,7 +14,7 @@ const FormComponent = ({ surah, clear }) => {
   const addHandler = (e) => {
     e.preventDefault();
 
-    const data = { id, name, count };
+    const data = { id, name, count: parseInt(count), lines: parseInt(lines) };
 
     addSurah(data);
   };
@@ -22,6 +23,7 @@ const FormComponent = ({ surah, clear }) => {
     setId("");
     setName("");
     setCount("");
+    setLines("");
     clear();
   };
 
@@ -31,6 +33,7 @@ const FormComponent = ({ surah, clear }) => {
       setId("");
       setName("");
       setCount("");
+      setLines("");
       reset();
     }
 
@@ -46,12 +49,13 @@ const FormComponent = ({ surah, clear }) => {
       setId(surah.id);
       setName(surah.name);
       setCount(surah.ayat);
+      setLines(surah.lines);
     }
   }, [surah]);
 
   return (
     <form
-      className="p-2 rounded border border-2 shadow d-flex flex-column gap-2 mt-2 bg-white"
+      className="p-2 rounded  border-2 shadow d-flex flex-column gap-2 mt-2 bg-white"
       onSubmit={addHandler}
     >
       <p className="m-0 h6">Tambah Surah</p>
@@ -59,7 +63,7 @@ const FormComponent = ({ surah, clear }) => {
       <input
         type="text"
         name="surah"
-        id="1"
+        id="surah"
         className="form-control"
         value={name || ""}
         onChange={(e) => setName(e.target.value)}
@@ -68,14 +72,24 @@ const FormComponent = ({ surah, clear }) => {
       />
 
       <input
-        type="number"
-        name="surah"
-        id="2"
+        type="text"
+        name="ayat"
+        id="ayat"
         className="form-control"
         value={count || ""}
         onChange={(e) => setCount(e.target.value)}
         required
         placeholder="Jumlah Ayat"
+      />
+
+      <input
+        type="text"
+        name="lines"
+        id="lines"
+        className="form-control"
+        value={lines || ""}
+        onChange={(e) => setLines(e.target.value)}
+        placeholder="Jumlah Baris"
       />
 
       <div className="d-flex justify-content-end gap-2">

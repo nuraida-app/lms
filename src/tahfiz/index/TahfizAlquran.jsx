@@ -12,6 +12,7 @@ const columns = [
   { label: "No" },
   { label: "Nama Surat" },
   { label: "Jumlah Ayat" },
+  { label: "Jumlah Baris" },
   { label: "Aksi" },
 ];
 
@@ -79,6 +80,7 @@ const TahfizAlquran = () => {
                     </td>
                     <td className="align-middle">{item.name}</td>
                     <td className="align-middle text-center">{item.ayat}</td>
+                    <td className="align-middle text-center">{item.lines}</td>
                     <td className="align-middle">
                       <div className="d-flex justify-content-center gap-2">
                         <button
