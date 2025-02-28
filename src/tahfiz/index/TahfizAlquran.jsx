@@ -41,7 +41,7 @@ const TahfizAlquran = () => {
   }, [data, isSuccess, error]);
 
   return (
-    <Layout title={"Index Al Qur`an"}>
+    <Layout title={"Surat Al Qur`an"}>
       <div className="row">
         <div className="col-md-3 col-12">
           <FormComponent surah={detail} clear={() => setDetail({})} />

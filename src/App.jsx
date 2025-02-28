@@ -33,6 +33,7 @@ const CenterDb = lazy(() => import("./center/database/CenterDb"));
 
 const TahfizDash = lazy(() => import("./tahfiz/dahboard/TahfizDash"));
 const TahfizAlquran = lazy(() => import("./tahfiz/index/TahfizAlquran"));
+const TahfizJuz = lazy(() => import("./tahfiz/Juz/TahfizJuz"));
 const TahfizMetriks = lazy(() => import("./tahfiz/metriks/TahfizMetriks"));
 const TahfizAssessment = lazy(() => import("./tahfiz/penilaian/TahfizAssess"));
 const TahfizExaminer = lazy(() => import("./tahfiz/penguji/TahfizExaminer"));
@@ -134,6 +135,8 @@ function App() {
           <Route path="/tahfiz-dashboard" element={<TahfizDash />} />
 
           <Route path="/tahfiz-alquran" element={<TahfizAlquran />} />
+
+          <Route path="/tahfiz-juz-alquran" element={<TahfizJuz />} />
 
           <Route path="/tahfiz-metriks" element={<TahfizMetriks />} />
 

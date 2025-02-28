@@ -6,7 +6,7 @@ export const quranApi = createApi({
     baseUrl: `${import.meta.env.VITE_BASE}/alquran`,
     credentials: "include",
   }),
-  tagTypes: ["surah"],
+  tagTypes: ["surah", "juz"],
   endpoints: (builder) => ({
     getQuran: builder.query({
       query: ({ page, limit, search }) => ({
@@ -31,8 +31,37 @@ export const quranApi = createApi({
       }),
       invalidatesTags: ["surah"],
     }),
+    getJuz: builder.query({
+      query: ({ page, search, limit }) => ({
+        url: `/get-juz`,
+        method: "GET",
+        params: { page, search, limit },
+      }),
+      providesTags: ["juz"],
+    }),
+    addJuz: builder.mutation({
+      query: (body) => ({
+        url: "/add-juz",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["juz"],
+    }),
+    deleteJuz: builder.mutation({
+      query: (id) => ({
+        url: `/delete-juz/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["juz"],
+    }),
   }),
 });
 
-export const { useGetQuranQuery, useAddSurahMutation, useDeleteSurahMutation } =
-  quranApi;
+export const {
+  useGetQuranQuery,
+  useAddSurahMutation,
+  useDeleteSurahMutation,
+  useGetJuzQuery,
+  useDeleteJuzMutation,
+  useAddJuzMutation,
+} = quranApi;
