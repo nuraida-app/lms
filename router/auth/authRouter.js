@@ -66,12 +66,15 @@ router.post("/signup", async (req, res) => {
     const user = data.rows[0];
 
     const token = jwt.sign({ id: user.id, type: user.role }, process.env.JWT, {
-      expiresIn: "8h",
+      expiresIn: "7d",
     });
 
     return res
       .status(200)
-      .cookie("token", token, { httpOnly: true, maxAge: 43200000 }) // 12 jam
+      .cookie("token", token, {
+        httpOnly: true,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      })
       .json({ message: "Pendaftaran Berhasil" });
   } catch (error) {
     console.log(error);
