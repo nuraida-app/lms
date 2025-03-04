@@ -25,6 +25,34 @@ router.post("/add-juz", authorize("tahfiz"), async (req, res) => {
   }
 });
 
+router.post("/add-surah-to-juz", authorize("tahfiz"), async (req, res) => {
+  try {
+    const { id, juzId, surahId, fromAyat, toAyat } = req.body;
+
+    if (id) {
+      await client.query(
+        `UPDATE t_juzitems 
+          SET juz_id = $1, surah_id = $2, 
+          from_ayat = $3, to_ayat = $4 
+          WHERE id = $5`,
+        [juzId, surahId, fromAyat, toAyat, id]
+      );
+    } else {
+      await client.query(
+        `INSERT INTO 
+          t_juzitems(juz_id, surah_id, from_ayat, to_ayat)
+          VALUES($1, $2, $3, $4) RETURNING *`,
+        [juzId, surahId, fromAyat, toAyat]
+      );
+    }
+
+    res.status(200).json({ message: id ? update : create });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
 router.delete("/delete-juz/:id", authorize("tahfiz"), async (req, res) => {
   try {
     await client.query("DELETE FROM t_juz WHERE id = $1", [req.params.id]);
@@ -43,7 +71,7 @@ router.get("/get-juz", authorize("tahfiz", "student"), async (req, res) => {
     let values = [];
 
     if (!page || !limit) {
-      query = `SELECT * FROM t_juz ORDER BY id ASC`;
+      query = `SELECT *, COALESCE((SELECT SUM(to_ayat) FROM t_juzitems WHERE t_juzitems.juz_id = t_juz.id), 0) AS total_ayat FROM t_juz ORDER BY id ASC`;
       const data = await client.query(query);
       return res.json(data.rows);
     } else {
@@ -68,13 +96,14 @@ router.get("/get-juz", authorize("tahfiz", "student"), async (req, res) => {
                 'to_ayat', t_juzitems.to_ayat
               )
             ) FILTER (WHERE t_juzitems.id IS NOT NULL), '[]'
-          ) AS surah
+          ) AS surah,
+          COALESCE((SELECT SUM(to_ayat) FROM t_juzitems WHERE t_juzitems.juz_id = t_juz.id), 0) AS total_ayat
         FROM t_juz
         LEFT JOIN t_juzitems ON t_juz.id = t_juzitems.juz_id
         LEFT JOIN t_alquran ON t_juzitems.surah_id = t_alquran.id
         WHERE LOWER(t_juz.name) LIKE LOWER($1)
         GROUP BY t_juz.id
-        ORDER BY t_juz.id DESC
+        ORDER BY t_juz.id ASC
         LIMIT $2 OFFSET $3
       `;
       values = [
@@ -95,6 +124,7 @@ router.get("/get-juz", authorize("tahfiz", "student"), async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
 router.post("/add-surah", authorize("tahfiz"), async (req, res) => {
   try {
     const { id, name, count, lines } = req.body;
