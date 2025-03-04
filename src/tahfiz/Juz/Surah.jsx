@@ -1,11 +1,17 @@
-import React, { useState } from "react";
-import { useGetJuzQuery, useGetQuranQuery } from "../../control/api/quranApi";
+import React, { useEffect, useState } from "react";
+import {
+  useAddSurahToJuzMutation,
+  useGetJuzQuery,
+  useGetQuranQuery,
+} from "../../control/api/quranApi";
+import { toast } from "react-toastify";
 
 const Surah = ({ detail, close }) => {
   const page = "";
   const limit = "";
   const search = "";
 
+  const [id, setId] = useState("");
   const [juzId, setJuzId] = useState("");
   const [surahId, setSurahId] = useState("");
   const [fromAyat, setFromAyat] = useState("");
@@ -13,8 +19,8 @@ const Surah = ({ detail, close }) => {
 
   const { data: juz } = useGetJuzQuery({ page, limit, search });
   const { data: surah } = useGetQuranQuery({ page, limit, search });
-
-  console.log(surahId);
+  const [addSurahToJuz, { data, isSuccess, isLoading, error, reset }] =
+    useAddSurahToJuzMutation();
 
   const getAyatOptions = (id) => {
     const selectedSurah = surah?.find((surah) => surah.id === parseInt(id));
@@ -22,6 +28,40 @@ const Surah = ({ detail, close }) => {
       ? Array.from({ length: selectedSurah.ayat }, (_, i) => i + 1)
       : [];
   };
+
+  const addHanlder = () => {
+    const data = { id, juzId, surahId, fromAyat, toAyat };
+
+    addSurahToJuz(data);
+  };
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success(data.message);
+      setId("");
+      setJuzId("");
+      setSurahId("");
+      setFromAyat("");
+      setToAyat("");
+      reset();
+      close();
+    }
+
+    if (error) {
+      toast.error(error.data.message);
+      reset();
+    }
+  }, [data, isSuccess, error]);
+
+  useEffect(() => {
+    if (detail) {
+      setId(detail.id);
+      setJuzId(detail.juz_id);
+      setSurahId(detail.surah_id);
+      setFromAyat(detail.from_ayat);
+      setToAyat(detail.to_ayat);
+    }
+  }, [detail]);
 
   return (
     <form className="mt-2 rounded border border-2 bg-white p-2 d-flex flex-column gap-2">
@@ -95,6 +135,19 @@ const Surah = ({ detail, close }) => {
           </option>
         ))}
       </select>
+
+      <div className="text-end">
+        <button className="btn btn-warning me-2" onClick={close}>
+          Batal
+        </button>
+        <button
+          className="btn btn-success"
+          disabled={isLoading}
+          onClick={addHanlder}
+        >
+          Simpan
+        </button>
+      </div>
     </form>
   );
 };

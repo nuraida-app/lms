@@ -54,6 +54,14 @@ export const quranApi = createApi({
       }),
       invalidatesTags: ["juz"],
     }),
+    addSurahToJuz: builder.mutation({
+      query: (body) => ({
+        url: "/add-surah-to-juz",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["juz"],
+    }),
   }),
 });
 
@@ -64,4 +72,5 @@ export const {
   useGetJuzQuery,
   useDeleteJuzMutation,
   useAddJuzMutation,
+  useAddSurahToJuzMutation,
 } = quranApi;

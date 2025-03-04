@@ -16,7 +16,7 @@ const TahfizJuz = () => {
   const [detail, setDetail] = useState({});
 
   const { data: rawData = {} } = useGetJuzQuery({ page, search, limit });
-  const { juz = [], totalPage, totalData } = rawData;
+  const { juz = [], totalPage } = rawData;
   const [deleteJuz, { data, isSuccess, isLoading, error, reset }] =
     useDeleteJuzMutation();
 
@@ -31,14 +31,14 @@ const TahfizJuz = () => {
       reset();
     }
   }, [data, isSuccess, error]);
+  console.log(juz);
 
   return (
     <Layout title={"Juz Al Qur'an"}>
       <div className="row">
         <div className="col-md-3 col-12">
           <Form detail={detail} close={() => setDetail({})} />
-
-          <Surah />
+          <Surah detail={detail} close={() => setDetail({})} />
         </div>
         <div className="col-md-9 col-12">
           <TableContainer
@@ -48,56 +48,92 @@ const TahfizJuz = () => {
             onValue={(e) => setSearch(e)}
             totalPages={totalPage}
           >
-            <table className="table table-hover table-striped">
+            <table className="table table-bordered table-striped table-hover">
               <thead>
                 <tr>
-                  <td className="text-center">No</td>
-                  <td className="text-center">Juz</td>
-                  <td className="text-center">Surah</td>
-                  <td className="text-center">Dari Ayat</td>
-                  <td className="text-center">Sampai Ayat</td>
-                  <td className="text-center">Total Ayat</td>
-                  <td className="text-center">Total Baris</td>
-                  <td className="text-center">Aksi</td>
+                  <th className="text-center">No</th>
+                  <th className="text-center">Juz</th>
+                  <th className="text-center">Surah</th>
+                  <th className="text-center">Dari Ayat</th>
+                  <th className="text-center">Sampai Ayat</th>
+                  <th className="text-center">Total Ayat</th>
+                  <th className="text-center">Total Baris</th>
+                  <th className="text-center">Aksi</th>
                 </tr>
               </thead>
               <tbody>
-                {juz?.map((item, i) => (
-                  <tr key={i}>
-                    <td className="text-center align-middle">
-                      {(page - 1) * limit + i + 1}
-                    </td>
-                    <td className="align-middle">{item.name}</td>
-                    {item.surah.length > 0 ? (
-                      item.surah?.map((s) => (
-                        <Fragment>
-                          <td key={s.id}>{s.name}</td>
-                        </Fragment>
-                      ))
-                    ) : (
-                      <td colSpan={5} className="text-center align-middle">
-                        Data belum tersedia
+                {juz.map((item, i) => (
+                  <Fragment key={i}>
+                    <tr>
+                      <td
+                        rowSpan={item.surah.length || 1}
+                        className="text-center"
+                      >
+                        {(page - 1) * limit + i + 1}
                       </td>
-                    )}
-                    <td className="text-center align-middle">
-                      <div className="d-flex justify-content-center gap-2">
-                        <button className="btn btn-success">Tambah</button>
-                        <button
-                          className="btn btn-warning"
-                          onClick={() => setDetail(item)}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="btn btn-danger"
-                          disabled={isLoading}
-                          onClick={() => deleteJuz(item.id)}
-                        >
-                          Hapus
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
+                      <td rowSpan={item.surah.length || 1}>{item.name}</td>
+                      {item.surah.length > 0 ? (
+                        <>
+                          <td className="text-center align-middle">
+                            {item.surah[0].surah}
+                          </td>
+                          <td className="text-center align-middle">
+                            {item.surah[0].from_ayat}
+                          </td>
+                          <td className="text-center align-middle">
+                            {item.surah[0].to_ayat}
+                          </td>
+                        </>
+                      ) : (
+                        <td colSpan={3} className="text-center align-middle">
+                          Data belum tersedia
+                        </td>
+                      )}
+                      <td
+                        rowSpan={item.surah.length || 1}
+                        className="text-center"
+                      >
+                        {item.total_ayat}
+                      </td>
+                      <td
+                        rowSpan={item.surah.length || 1}
+                        className="text-center"
+                      >
+                        0
+                      </td>
+                      <td
+                        rowSpan={item.surah.length || 1}
+                        className="text-center"
+                      >
+                        <div className="d-flex justify-content-center gap-2">
+                          <button
+                            className="btn btn-warning"
+                            onClick={() => setDetail(item)}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            className="btn btn-danger"
+                            disabled={isLoading}
+                            onClick={() => deleteJuz(item.id)}
+                          >
+                            Hapus
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                    {item.surah.slice(1).map((s, idx) => (
+                      <tr key={idx}>
+                        <td className="text-center align-middle">{s.surah}</td>
+                        <td className="text-center align-middle">
+                          {s.from_ayat}
+                        </td>
+                        <td className="text-center align-middle">
+                          {s.to_ayat}
+                        </td>
+                      </tr>
+                    ))}
+                  </Fragment>
                 ))}
               </tbody>
             </table>
