@@ -27,22 +27,25 @@ router.post("/add-juz", authorize("tahfiz"), async (req, res) => {
 
 router.post("/add-surah-to-juz", authorize("tahfiz"), async (req, res) => {
   try {
-    const { id, juzId, surahId, fromAyat, toAyat } = req.body;
+    const { id, juzId, surahId, fromAyat, toAyat, fromLine, toLine } = req.body;
+
+    console.log(req.body);
 
     if (id) {
       await client.query(
         `UPDATE t_juzitems 
           SET juz_id = $1, surah_id = $2, 
-          from_ayat = $3, to_ayat = $4 
-          WHERE id = $5`,
-        [juzId, surahId, fromAyat, toAyat, id]
+          from_ayat = $3, to_ayat = $4,
+          from_line = $5, to_line = $6 
+          WHERE id = $7`,
+        [juzId, surahId, fromAyat, toAyat, fromLine, toLine, id]
       );
     } else {
       await client.query(
         `INSERT INTO 
-          t_juzitems(juz_id, surah_id, from_ayat, to_ayat)
-          VALUES($1, $2, $3, $4) RETURNING *`,
-        [juzId, surahId, fromAyat, toAyat]
+          t_juzitems(juz_id, surah_id, from_ayat, to_ayat, from_line, to_line)
+          VALUES($1, $2, $3, $4, $5, $6) RETURNING *`,
+        [juzId, surahId, fromAyat, toAyat, fromLine, toLine]
       );
     }
 
@@ -71,7 +74,27 @@ router.get("/get-juz", authorize("tahfiz", "student"), async (req, res) => {
     let values = [];
 
     if (!page || !limit) {
-      query = `SELECT *, COALESCE((SELECT SUM(to_ayat) FROM t_juzitems WHERE t_juzitems.juz_id = t_juz.id), 0) AS total_ayat FROM t_juz ORDER BY id ASC`;
+      query = `SELECT t_juz.*, 
+          COALESCE(
+            json_agg(
+              DISTINCT jsonb_build_object(
+                'id', t_juzitems.id,
+                'surah_id', t_alquran.id,
+                'surah', t_alquran.name,
+                'from_ayat', t_juzitems.from_ayat,
+                'to_ayat', t_juzitems.to_ayat,
+                'from_line', t_juzitems.from_line,
+                'to_line', t_juzitems.to_line
+              )
+            ) FILTER (WHERE t_juzitems.id IS NOT NULL), '[]'
+          ) AS surah,
+          COALESCE((SELECT SUM(to_ayat) FROM t_juzitems WHERE t_juzitems.juz_id = t_juz.id), 0) AS total_ayat,
+          COALESCE((SELECT SUM(to_line) FROM t_juzitems WHERE t_juzitems.juz_id = t_juz.id), 0) AS total_line
+        FROM t_juz
+        LEFT JOIN t_juzitems ON t_juz.id = t_juzitems.juz_id
+        LEFT JOIN t_alquran ON t_juzitems.surah_id = t_alquran.id
+        GROUP BY t_juz.id
+        ORDER BY t_juz.id ASC`;
       const data = await client.query(query);
       return res.json(data.rows);
     } else {
@@ -93,11 +116,14 @@ router.get("/get-juz", authorize("tahfiz", "student"), async (req, res) => {
                 'surah_id', t_alquran.id,
                 'surah', t_alquran.name,
                 'from_ayat', t_juzitems.from_ayat,
-                'to_ayat', t_juzitems.to_ayat
+                'to_ayat', t_juzitems.to_ayat,
+                'from_line', t_juzitems.from_line,
+                'to_line', t_juzitems.to_line
               )
             ) FILTER (WHERE t_juzitems.id IS NOT NULL), '[]'
           ) AS surah,
-          COALESCE((SELECT SUM(to_ayat) FROM t_juzitems WHERE t_juzitems.juz_id = t_juz.id), 0) AS total_ayat
+          COALESCE((SELECT SUM(to_ayat) FROM t_juzitems WHERE t_juzitems.juz_id = t_juz.id), 0) AS total_ayat,
+          COALESCE((SELECT SUM(to_line) FROM t_juzitems WHERE t_juzitems.juz_id = t_juz.id), 0) AS total_line
         FROM t_juz
         LEFT JOIN t_juzitems ON t_juz.id = t_juzitems.juz_id
         LEFT JOIN t_alquran ON t_juzitems.surah_id = t_alquran.id

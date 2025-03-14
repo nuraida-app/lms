@@ -4,9 +4,37 @@ import { client } from "../../connection/connection.js";
 
 const router = express.Router();
 
+router.get("/get-grades", authorize("tahfiz"), async (req, res) => {
+  try {
+    const data = await client.query(
+      `SELECT * FROM grades ORDER BY CAST(grades.grade AS INTEGER) ASC`
+    );
+
+    res.status(200).json(data.rows);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+router.get("/get-class/:grade", authorize("tahfiz"), async (req, res) => {
+  try {
+    const { grade } = req.params;
+
+    const data = await client.query(
+      `SELECT * FROM classes WHERE grade_id = ${grade}`
+    );
+
+    res.status(200).json(data.rows);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
 router.get("/get-students", authorize("tahfiz"), async (req, res) => {
   try {
-    const { page = 1, limit = 10, search = "" } = req.query;
+    const { page = 1, limit = 10, search = "", code } = req.query;
     const offset = (page - 1) * limit;
 
     // Query to get total count of unique NIS
@@ -18,9 +46,9 @@ router.get("/get-students", authorize("tahfiz"), async (req, res) => {
       INNER JOIN homebase ON homebase.id = students_class.homebase_id
       INNER JOIN grades ON grades.id = students_class.grade_id
       INNER JOIN classes ON classes.code = students_class.class_code
-      WHERE user_student.name ILIKE $1;
+      WHERE user_student.name ILIKE $1 AND students_class.class_code = $2;
       `,
-      [`%${search}%`]
+      [`%${search}%`, code]
     );
 
     const totalData = parseInt(countData.rows[0].total, 10);
@@ -37,11 +65,11 @@ router.get("/get-students", authorize("tahfiz"), async (req, res) => {
       INNER JOIN homebase ON homebase.id = students_class.homebase_id
       INNER JOIN grades ON grades.id = students_class.grade_id
       INNER JOIN classes ON classes.code = students_class.class_code
-      WHERE user_student.name ILIKE $1
-      ORDER BY students_class.nis DESC
-      LIMIT $2 OFFSET $3;
+      WHERE user_student.name ILIKE $1 AND students_class.class_code = $2
+       ORDER BY students_class.nis, user_student.name ASC
+      LIMIT $3 OFFSET $4;
       `,
-      [`%${search}%`, limit, offset]
+      [`%${search}%`, code, limit, offset]
     );
 
     const students = data.rows;
@@ -60,7 +88,7 @@ router.get("/get-students", authorize("tahfiz"), async (req, res) => {
 router.post("/add-score", authorize("tahfiz"), async (req, res) => {
   // Asumsikan client database berasal dari app.locals
   try {
-    const { nis, poin, examiner, surahs } = req.body;
+    const { nis, poin, examiner, surahs, juzId } = req.body;
 
     // Validasi input
     if (
@@ -75,14 +103,24 @@ router.post("/add-score", authorize("tahfiz"), async (req, res) => {
 
     // Masukkan data ke tabel t_process
     for (const surah of surahs) {
-      const { fromSurah, fromAyat, toAyat } = surah;
+      const { fromSurah, fromAyat, toAyat, fromLine, toLine } = surah;
       if (!fromSurah || !fromAyat || !toAyat) {
         throw new Error("Surah data is incomplete.");
       }
       await client.query(
-        `INSERT INTO t_process (nis, from_id, from_count,  to_count, type_id, createdat )
-         VALUES ($1, $2, $3, $4, $5, NOW())`,
-        [nis, fromSurah, fromAyat, toAyat, poin.type_id]
+        `INSERT INTO t_process 
+        (nis, from_id, from_count,  to_count, type_id, createdat, juz_id, from_line, to_line )
+         VALUES ($1, $2, $3, $4, $5, NOW(), $6, $7, $8)`,
+        [
+          nis,
+          fromSurah,
+          fromAyat,
+          toAyat,
+          poin.type_id,
+          juzId,
+          fromLine,
+          toLine,
+        ]
       );
     }
 
