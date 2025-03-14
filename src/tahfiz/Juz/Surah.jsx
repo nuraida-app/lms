@@ -16,6 +16,8 @@ const Surah = ({ detail, close }) => {
   const [surahId, setSurahId] = useState("");
   const [fromAyat, setFromAyat] = useState("");
   const [toAyat, setToAyat] = useState("");
+  const [fromLine, setFromLine] = useState("");
+  const [toLine, setToLine] = useState("");
 
   const { data: juz } = useGetJuzQuery({ page, limit, search });
   const { data: surah } = useGetQuranQuery({ page, limit, search });
@@ -29,8 +31,15 @@ const Surah = ({ detail, close }) => {
       : [];
   };
 
+  const getLineOptions = (id) => {
+    const selectedSurah = surah?.find((surah) => surah.id === parseInt(id));
+    return selectedSurah
+      ? Array.from({ length: selectedSurah.lines }, (_, i) => i + 1)
+      : [];
+  };
+
   const addHanlder = () => {
-    const data = { id, juzId, surahId, fromAyat, toAyat };
+    const data = { id, juzId, surahId, fromAyat, toAyat, fromLine, toLine };
 
     addSurahToJuz(data);
   };
@@ -60,6 +69,8 @@ const Surah = ({ detail, close }) => {
       setSurahId(detail.surah_id);
       setFromAyat(detail.from_ayat);
       setToAyat(detail.to_ayat);
+      setFromLine(detail.from_line || "");
+      setToLine(detail.to_line || "");
     }
   }, [detail]);
 
@@ -132,6 +143,38 @@ const Surah = ({ detail, close }) => {
         {getAyatOptions(surahId).map((ayat) => (
           <option key={ayat} value={ayat}>
             {ayat}
+          </option>
+        ))}
+      </select>
+
+      <select
+        className="form-select"
+        value={fromLine}
+        onChange={(e) => setFromLine(e.target.value)}
+        disabled={!surahId}
+      >
+        <option value="" hidden>
+          Dari Baris
+        </option>
+        {getLineOptions(surahId).map((line) => (
+          <option key={line} value={line}>
+            {line}
+          </option>
+        ))}
+      </select>
+
+      <select
+        className="form-select"
+        value={toLine}
+        onChange={(e) => setToLine(e.target.value)}
+        disabled={!surahId}
+      >
+        <option value="" hidden>
+          Sampai Baris
+        </option>
+        {getLineOptions(surahId).map((line) => (
+          <option key={line} value={line}>
+            {line}
           </option>
         ))}
       </select>

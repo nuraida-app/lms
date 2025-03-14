@@ -10,7 +10,6 @@ import { useLoadMutation } from "./control/api/authApi";
 import MetaData from "./components/meta/MetaData";
 import { setLogin } from "./control/slice/authSlice";
 import Loader from "./components/loader/Loader";
-import TahfizAssess from "./tahfiz/penilaian/TahfizAssess";
 
 const CbtBankList = lazy(() => import("./cbt/Bank/CbtBankList"));
 const ListQuestions = lazy(() => import("./cbt/Bank/forms/ListQuestions"));
@@ -35,11 +34,13 @@ const TahfizDash = lazy(() => import("./tahfiz/dahboard/TahfizDash"));
 const TahfizAlquran = lazy(() => import("./tahfiz/index/TahfizAlquran"));
 const TahfizJuz = lazy(() => import("./tahfiz/Juz/TahfizJuz"));
 const TahfizMetriks = lazy(() => import("./tahfiz/metriks/TahfizMetriks"));
-const TahfizAssessment = lazy(() => import("./tahfiz/penilaian/TahfizAssess"));
+const TahfizAssess = lazy(() => import("./tahfiz/penilaian/TahfizAssess"));
+const TahfizAddMemo = lazy(() => import("./tahfiz/hafalan/TahfizAddMemo"));
 const TahfizExaminer = lazy(() => import("./tahfiz/penguji/TahfizExaminer"));
 const TahfizReport = lazy(() => import("./tahfiz/laporan/TahfizReport"));
 const ReportDetail = lazy(() => import("./tahfiz/laporan/ReportDetail"));
 const TahfizStudent = lazy(() => import("./tahfiz/santri/TahfizStudent"));
+const TahfizScoring = lazy(() => import("./tahfiz/hafalan/TahfizScoring"));
 
 const AdminDash = lazy(() => import("./admin/dashboard/AdminDash"));
 const AdminGrade = lazy(() => import("./admin/tingkat/AdminGrade"));
@@ -83,7 +84,7 @@ function App() {
 
   return (
     <BrowserRouter>
-      <ToastContainer position="bottom-right" autoClose={4000} />
+      <ToastContainer position="bottom-right" autoClose={3000} />
       <MetaData
         title={"Nuraida"}
         desc={
@@ -145,6 +146,13 @@ function App() {
           <Route path="/tahfiz-penguji" element={<TahfizExaminer />} />
 
           <Route path="/tahfiz-laporan" element={<TahfizReport />} />
+
+          <Route path="/tahfiz-hafalan" element={<TahfizAddMemo />} />
+
+          <Route
+            path="/tahfiz-hafalan-siswa/:nis/:name"
+            element={<TahfizScoring />}
+          />
 
           <Route path="/tahfiz-laporan/:nis/:name" element={<ReportDetail />} />
 

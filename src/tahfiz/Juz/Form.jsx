@@ -5,7 +5,6 @@ import { toast } from "react-toastify";
 const Form = ({ detail, close }) => {
   const [juz, setJuz] = useState("");
   const [id, setId] = useState("");
-  const [lines, setLines] = useState("");
 
   const [addJuz, { data, isSuccess, isLoading, error, reset }] =
     useAddJuzMutation();

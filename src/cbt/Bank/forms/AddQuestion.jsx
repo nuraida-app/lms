@@ -124,7 +124,7 @@ const AddQuestion = () => {
     }
   }, [detail]);
 
-  console.log(detail);
+  console.log(value);
 
   return (
     <Layout title={"Buat Pertanyaan"}>

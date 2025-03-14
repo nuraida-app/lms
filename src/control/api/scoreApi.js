@@ -6,13 +6,29 @@ export const scoreApi = createApi({
     baseUrl: `${import.meta.env.VITE_BASE}/scoring`,
     credentials: "include",
   }),
+  tagTypes: ["Grades", "Classes", "Students", "Scores"],
   endpoints: (builder) => ({
+    getGrades: builder.query({
+      query: () => ({
+        url: "/get-grades",
+        method: "GET",
+      }),
+      providesTags: ["Grades"],
+    }),
+    getClassess: builder.query({
+      query: (id) => ({
+        url: `/get-class/${id}`,
+        method: "GET",
+      }),
+      providesTags: (result, error, id) => [{ type: "Classes", id }],
+    }),
     getStudents: builder.query({
-      query: ({ page, limit, search }) => ({
+      query: ({ page, limit, search, code }) => ({
         url: "/get-students",
         method: "GET",
-        params: { page, limit, search },
+        params: { page, limit, search, code },
       }),
+      providesTags: ["Students"],
     }),
     addscore: builder.mutation({
       query: (body) => ({
@@ -20,8 +36,14 @@ export const scoreApi = createApi({
         method: "POST",
         body,
       }),
+      invalidatesTags: ["Scores"],
     }),
   }),
 });
 
-export const { useGetStudentsQuery, useAddscoreMutation } = scoreApi;
+export const {
+  useGetGradesQuery,
+  useGetClassessQuery,
+  useGetStudentsQuery,
+  useAddscoreMutation,
+} = scoreApi;
