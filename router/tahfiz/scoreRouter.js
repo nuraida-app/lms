@@ -88,7 +88,7 @@ router.get("/get-students", authorize("tahfiz"), async (req, res) => {
 router.post("/add-score", authorize("tahfiz"), async (req, res) => {
   // Asumsikan client database berasal dari app.locals
   try {
-    const { nis, poin, examiner, surahs, juzId } = req.body;
+    const { nis, poin, examiner, surahs } = req.body;
 
     // Validasi input
     if (
@@ -103,7 +103,7 @@ router.post("/add-score", authorize("tahfiz"), async (req, res) => {
 
     // Masukkan data ke tabel t_process
     for (const surah of surahs) {
-      const { fromSurah, fromAyat, toAyat, fromLine, toLine } = surah;
+      const { fromSurah, fromAyat, toAyat, fromLine, toLine, juzId } = surah;
       if (!fromSurah || !fromAyat || !toAyat) {
         throw new Error("Surah data is incomplete.");
       }
