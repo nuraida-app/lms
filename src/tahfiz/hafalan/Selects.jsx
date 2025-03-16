@@ -23,6 +23,7 @@ const Selects = ({
   toLine,
   setToLine,
   addToTable,
+  setTableData,
 }) => {
   const page = "";
   const limit = "";
@@ -44,6 +45,30 @@ const Selects = ({
     } else {
       setSelectedJuz(juz);
       setSurahList(juz.surah);
+    }
+  };
+
+  const handleSurahBulk = (e) => {
+    const selectedId = parseInt(e.target.value);
+    const juz = data.find((item) => item.id === selectedId);
+
+    if (juz.surah.length === 0) {
+      toast.error("Data tidak tersedia");
+      setTableData([]);
+    } else {
+      setSelectedJuz(juz);
+      setTableData((prevData) => [
+        ...prevData,
+        ...juz.surah.map((item) => ({
+          juzId: juz.id,
+          fromSurah: item.surah_id,
+          fromSurahName: item.surah,
+          fromAyat: item.from_ayat,
+          toAyat: item.to_ayat,
+          fromLine: item.from_line,
+          toLine: item.to_line,
+        })),
+      ]);
     }
   };
 
@@ -98,6 +123,27 @@ const Selects = ({
             </option>
           ))}
         </select>
+      </div>
+
+      <div className="col-12">
+        <p className="m-0">Berdasarkan Juz</p>
+      </div>
+
+      <div className="col-lg-2 col-12">
+        <select className="form-select" onChange={handleSurahBulk}>
+          <option value="" hidden>
+            Pilih Juz
+          </option>
+          {data?.map((juz) => (
+            <option key={juz.id} value={juz.id}>
+              {juz.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="col-12">
+        <p className="m-0">Berdasarkan Surah</p>
       </div>
 
       <div className="col-lg-2 col-6">
