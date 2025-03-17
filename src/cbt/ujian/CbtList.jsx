@@ -43,17 +43,20 @@ const CbtList = () => {
   );
 
   const goToLink = () => {
+    console.log(log);
+    console.log(detail);
+
     if (token === detail.token) {
       if (log?.isActive && log.quiz_id === detail.quiz_id) {
         setToken("");
         return toast.warning(`Anda sedang mengerjakan ujian ${detail.name}`);
       }
 
-      if (log?.isDone && log.quiz_id === detail.quiz_id) {
-        setToken("");
+      // if (log?.isDone && log.quiz_id === detail.quiz_id) {
+      //   setToken("");
 
-        return toast.warning(`Anda sudah mengerjakan ujian ${detail.name}`);
-      }
+      //   return toast.warning(`Anda sudah mengerjakan ujian ${detail.name}`);
+      // }
 
       const data = { quizId: detail.quiz_id, nis: user?.nis };
 

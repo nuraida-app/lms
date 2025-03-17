@@ -12,7 +12,7 @@ const Protected = ({ roles }) => {
       if (!user || !roles.includes(user?.role) || !signIn) {
         navigate("/"); // Redirect ke halaman beranda jika tidak memenuhi syarat
       }
-    }, 200);
+    }, 2000);
 
     return () => clearTimeout(timeout);
   }, [user, signIn, roles, navigate]);
