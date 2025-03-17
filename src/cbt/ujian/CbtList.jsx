@@ -57,10 +57,10 @@ const CbtList = () => {
 
       //   return toast.warning(`Anda sudah mengerjakan ujian ${detail.name}`);
       // }
+      const isActive = true;
+      const isDone = false;
 
-      const data = { quizId: detail.quiz_id, nis: user?.nis };
-
-      createLog(data);
+      const data = { quizId: detail.quiz_id, nis: user?.nis, isActive, isDone };
     } else {
       setToken("");
       toast.warning("Token yang anda masukan salah");
@@ -77,7 +77,7 @@ const CbtList = () => {
       toast.success(data.message);
 
       const formatted = detail.name.replace(/\s+/g, "-");
-      window.location.href = `/cbt-halaman/${formatted}/${detail.quiz_id}/${detail.time}`;
+      navigate(`/cbt-halaman/${formatted}/${detail.quiz_id}/${detail.time}`);
 
       reset();
 

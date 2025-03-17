@@ -1,0 +1,1 @@
+import{e as a,u as n,r as u}from"./index-BxzlNqZe.js";const i=({roles:o})=>{const s=a(),{user:t,signIn:r}=n(e=>e.auth);return u.useEffect(()=>{const e=setTimeout(()=>{(!t||!o.includes(t==null?void 0:t.role)||!r)&&s("/")},2e3);return()=>clearTimeout(e)},[t,r,o,s]),null};export{i as P};
