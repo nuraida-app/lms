@@ -8,26 +8,28 @@ const router = express.Router();
 router.post("/create", authorize("student"), async (req, res) => {
   try {
     const { nis, quizId } = req.body;
+    if (!nis || !quizId) {
+      return res.status(400).json({ message: "NIS dan Quiz ID wajib diisi" });
+    }
+
     const date = new Date().toISOString();
     let ipAddress = req.socket.remoteAddress;
     const browser = req.useragent.browser + " " + req.useragent.version;
-
     const isActive = true;
     const isDone = false;
 
-    // Jika alamat IP adalah IPv6, potong bagian IPv6 dan simpan hanya IPv4
+    // Jika alamat IP adalah IPv6, ambil IPv4 yang ada di dalamnya
     if (ipAddress.includes("::ffff:")) {
       ipAddress = ipAddress.split("::ffff:")[1];
     }
 
-    // Periksa apakah ada nis dan bank_id yang sama dalam log
-    const existingLog = await client.query(
-      "SELECT * FROM log WHERE nis = $1 AND quiz_id = $2",
+    // Periksa apakah sudah ada log untuk nis dan quizId yang sama
+    const { rowCount } = await client.query(
+      "SELECT 1 FROM log WHERE nis = $1 AND quiz_id = $2",
       [nis, quizId]
     );
 
-    if (existingLog.rowCount > 0) {
-      // Jika ada nis yang sama, hapus entri log yang terkait
+    if (rowCount > 0) {
       await client.query("DELETE FROM log WHERE nis = $1 AND quiz_id = $2", [
         nis,
         quizId,
@@ -35,14 +37,25 @@ router.post("/create", authorize("student"), async (req, res) => {
     }
 
     // Simpan data log baru
-    await client.query(
-      "INSERT INTO log (log_in, ip, browser, nis, quiz_id, 'isActive', 'isDone') VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
-      [date, ipAddress, browser, nis, quizId, isActive, isDone]
-    );
+    const insertQuery = `
+      INSERT INTO log (log_in, ip, browser, nis, quiz_id, "isActive", "isDone")
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      RETURNING *`;
+
+    await client.query(insertQuery, [
+      date,
+      ipAddress,
+      browser,
+      nis,
+      quizId,
+      isActive,
+      isDone,
+    ]);
 
     res.status(200).json({ message: "Joining Exam" });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    console.error("Error saat menyimpan log:", error);
+    res.status(500).json({ message: "Terjadi kesalahan server" });
   }
 });
 
