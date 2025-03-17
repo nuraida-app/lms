@@ -7,7 +7,7 @@ const router = express.Router();
 // Membuat log siswa
 router.post("/create", authorize("student"), async (req, res) => {
   try {
-    const { nis, quizId } = req.body;
+    const { nis, quizId, isActive, isDone } = req.body;
     if (!nis || !quizId) {
       return res.status(400).json({ message: "NIS dan Quiz ID wajib diisi" });
     }
@@ -15,8 +15,6 @@ router.post("/create", authorize("student"), async (req, res) => {
     const date = new Date().toISOString();
     let ipAddress = req.socket.remoteAddress;
     const browser = req.useragent.browser + " " + req.useragent.version;
-    const isActive = true;
-    const isDone = false;
 
     // Jika alamat IP adalah IPv6, ambil IPv4 yang ada di dalamnya
     if (ipAddress.includes("::ffff:")) {
