@@ -10,6 +10,7 @@ const CbtTimer = ({ refresh, isLoading, number, log, bankid }) => {
   const [countdown, setCountdown] = useState("");
 
   console.log("log_in", log?.log_in);
+  console.log("time", Number(time));
 
   const [timeoutQuiz, { isSuccess, error }] = useTimeoutQuizMutation();
 
@@ -36,11 +37,16 @@ const CbtTimer = ({ refresh, isLoading, number, log, bankid }) => {
     const duration = Number(time) * 60 * 1000;
     const endTime = logInTime + duration;
 
+    console.log("End time:", endTime);
+
     const updateCountdown = () => {
       const now = new Date().getTime();
       const timeLeft = endTime - now;
 
-      if (timeLeft <= 0 && log.log_in) {
+      console.log("Current time (now):", now);
+      console.log("Time left:", timeLeft);
+
+      if (timeLeft <= 0) {
         setCountdown("00:00:00");
         timeoutQuiz(bankid);
         return;
