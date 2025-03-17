@@ -38,11 +38,11 @@ router.post("/create", authorize("student"), async (req, res) => {
 
     // Simpan data log baru
     const insertQuery = `
-      INSERT INTO log (log_in, ip, browser, nis, quiz_id, "isActive", "isDone")
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
-      RETURNING *`;
+  INSERT INTO log (log_in, ip, browser, nis, quiz_id, "isActive", "isDone")
+  VALUES ($1, $2, $3, $4, $5, $6::boolean, $7::boolean)
+  RETURNING *`;
 
-    const data = await client.query(insertQuery, [
+    await client.query(insertQuery, [
       date,
       ipAddress,
       browser,
