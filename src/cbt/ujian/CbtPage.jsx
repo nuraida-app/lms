@@ -16,6 +16,7 @@ import { toast } from "react-toastify";
 const CbtPage = () => {
   const params = useParams();
   const { name, bankId, time } = params;
+  const formattedTime = parseInt(time, 10);
 
   const [questions, setQuestions] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -103,7 +104,7 @@ const CbtPage = () => {
               refresh={refreshQuestions}
               isLoading={isLoading}
               number={currentPage}
-              time={time}
+              time={formattedTime}
               log={log}
               bankid={bankId}
             />

@@ -1,1 +1,0 @@
-import{j as s}from"./index-Q78RQ5ai.js";const t=()=>s.jsxs("button",{className:"btn btn-light",type:"button",disabled:!0,children:[s.jsx("span",{className:"spinner-border spinner-border-sm","aria-hidden":"true"}),s.jsx("span",{role:"status",children:"Loading..."})]});export{t as B};
