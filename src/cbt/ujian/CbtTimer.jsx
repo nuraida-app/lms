@@ -9,6 +9,8 @@ const CbtTimer = ({ refresh, isLoading, number, log, bankid }) => {
   const navigate = useNavigate();
   const [countdown, setCountdown] = useState("");
 
+  console.log("log_in", log?.log_in);
+
   const [timeoutQuiz, { isSuccess, error }] = useTimeoutQuizMutation();
 
   const handleSync = () => {
@@ -38,7 +40,7 @@ const CbtTimer = ({ refresh, isLoading, number, log, bankid }) => {
       const now = new Date().getTime();
       const timeLeft = endTime - now;
 
-      if (timeLeft <= 0) {
+      if (timeLeft <= 0 && log.log_in) {
         setCountdown("00:00:00");
         timeoutQuiz(bankid);
         return;
