@@ -7,10 +7,9 @@ const CbtTimer = ({ refresh, isLoading, number, log, bankid }) => {
   const params = useParams();
   const { time } = params;
   const navigate = useNavigate();
-  const [countdown, setCountdown] = useState("");
-
-  console.log("log_in", log?.log_in);
-  console.log("time", Number(time));
+  const [countdown, setCountdown] = useState("--:--:--");
+  const [startCountdown, setStartCountdown] = useState(false);
+  const [endTime, setEndTime] = useState(null);
 
   const [timeoutQuiz, { isSuccess, error }] = useTimeoutQuizMutation();
 
@@ -24,7 +23,6 @@ const CbtTimer = ({ refresh, isLoading, number, log, bankid }) => {
       navigate(`/cbt-jawdal-ujian`);
       localStorage.removeItem("questions");
     }
-
     if (error) {
       toast.error(error.data.message);
     }
@@ -33,11 +31,23 @@ const CbtTimer = ({ refresh, isLoading, number, log, bankid }) => {
   useEffect(() => {
     if (!log?.log_in) return;
 
+    console.log("log_in", log.log_in);
+    console.log("time", Number(time));
+
     const logInTime = new Date(log.log_in).getTime();
     const duration = Number(time) * 60 * 1000;
-    const endTime = logInTime + duration;
+    const calculatedEndTime = logInTime + duration;
+    setEndTime(calculatedEndTime);
 
-    console.log("End time:", endTime);
+    console.log("End time:", calculatedEndTime);
+
+    setTimeout(() => {
+      setStartCountdown(true);
+    }, 5000);
+  }, [log?.log_in, time]);
+
+  useEffect(() => {
+    if (!startCountdown || !endTime) return;
 
     const updateCountdown = () => {
       const now = new Date().getTime();
@@ -66,11 +76,11 @@ const CbtTimer = ({ refresh, isLoading, number, log, bankid }) => {
       setCountdown(`${hours}:${minutes}:${seconds}`);
     };
 
-    updateCountdown(); // Initialize countdown immediately
+    updateCountdown();
     const interval = setInterval(updateCountdown, 1000);
 
     return () => clearInterval(interval);
-  }, [log?.log_in, time]);
+  }, [startCountdown, endTime]);
 
   return (
     <div className="d-flex align-items-center justify-content-between bg-white p-1 rounded shadow border border-2">
@@ -78,7 +88,6 @@ const CbtTimer = ({ refresh, isLoading, number, log, bankid }) => {
         <button style={{ width: 50 }} className="btn btn-info">
           {number}
         </button>
-
         <button
           style={{ width: 50 }}
           className="btn btn-warning"
@@ -88,7 +97,6 @@ const CbtTimer = ({ refresh, isLoading, number, log, bankid }) => {
           <i className="bi bi-arrow-repeat"></i>
         </button>
       </div>
-
       <button className="btn btn-danger">{countdown}</button>
     </div>
   );
