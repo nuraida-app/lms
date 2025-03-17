@@ -197,8 +197,6 @@ router.get(
         const result = await client.query(query, [id]);
         const tahfiz = result.rows[0];
 
-        console.log(tahfiz);
-
         return res.status(200).json(tahfiz);
       }
 
@@ -210,7 +208,6 @@ router.get(
         `;
         const result = await client.query(query, [id]);
         const superAdmin = result.rows[0];
-        console.log(superAdmin);
 
         return res.status(200).json(superAdmin);
       }
@@ -224,7 +221,6 @@ router.get(
         `;
         const result = await client.query(query, [id]);
         const adminData = result.rows[0];
-        console.log(adminData);
 
         return res.status(200).json(adminData);
       }
@@ -267,8 +263,6 @@ router.get(
           role: studentData.role,
         };
 
-        console.log(student);
-
         return res.status(200).json(student);
       }
 
@@ -304,7 +298,6 @@ router.get(
             .json({ message: "Data guru tidak ditemukan." });
         }
 
-        console.log(teacherData);
         return res.status(200).json(teacherData);
       }
 
@@ -345,7 +338,7 @@ router.get(
         const detailResult = await client.query(detailQuery, [studentData.nis]);
         const detailData = detailResult.rows[0];
 
-        const parent = {
+        const student = {
           name: parentData.username,
           email: parentData.email,
           phone: parentData.phone,
@@ -359,9 +352,7 @@ router.get(
           role: parentData.role,
         };
 
-        console.log(parent);
-
-        return res.status(200).json(parent);
+        return res.status(200).json(student);
       }
 
       // Default response for unsupported roles
