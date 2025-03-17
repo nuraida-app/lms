@@ -61,6 +61,8 @@ const CbtList = () => {
       const isDone = false;
 
       const data = { quizId: detail.quiz_id, nis: user?.nis, isActive, isDone };
+
+      createLog(data);
     } else {
       setToken("");
       toast.warning("Token yang anda masukan salah");
