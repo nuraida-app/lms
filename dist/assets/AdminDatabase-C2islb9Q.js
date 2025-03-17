@@ -1,1 +1,0 @@
-import{i as s,j as t}from"./index-DMKaAo0C.js";import{L as m}from"./Layout-CARJ-zNB.js";import{F as e}from"./FormPage-CM8nzxJa.js";import"./Menus-C_0QUNbK.js";import"./Protected-BlpkKOHf.js";import"./BtnLoader-B8YUclYM.js";const x=()=>{const a=s(),{name:r}=a,o=r.replace(/\-/g," ");return t.jsx(m,{title:`Database ${o}`,children:t.jsx(e,{})})};export{x as default};
