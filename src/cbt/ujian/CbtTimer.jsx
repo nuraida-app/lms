@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useTimeoutQuizMutation } from "../../control/api/logApi";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const CbtTimer = ({ refresh, isLoading, number, time, log, bankid }) => {
-  const [countdown, setCountdown] = useState("00:00:00");
+  const navigate = useNavigate();
+  const [countdown, setCountdown] = useState("");
+
+  console.log(time);
 
   const [timeoutQuiz, { isSuccess, error }] = useTimeoutQuizMutation();
 
@@ -14,7 +18,7 @@ const CbtTimer = ({ refresh, isLoading, number, time, log, bankid }) => {
 
   useEffect(() => {
     if (isSuccess) {
-      window.location.href = `/cbt-jawdal-ujian`;
+      navigate(`/cbt-jawdal-ujian`);
       localStorage.removeItem("questions");
     }
 
@@ -35,7 +39,7 @@ const CbtTimer = ({ refresh, isLoading, number, time, log, bankid }) => {
 
       if (timeLeft <= 0) {
         setCountdown("00:00:00");
-        // timeoutQuiz(bankid);
+        timeoutQuiz(bankid);
         return;
       }
 
