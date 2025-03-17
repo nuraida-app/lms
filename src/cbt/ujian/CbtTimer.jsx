@@ -31,18 +31,10 @@ const CbtTimer = ({ refresh, isLoading, number, log, bankid }) => {
   useEffect(() => {
     if (!log?.log_in) return;
 
-    console.log("log_in", log.log_in);
-    console.log("time (in minutes):", Number(time));
-
     const logInTime = new Date(log.log_in).getTime();
     const duration = Number(time) * 60 * 1000; // Convert time to milliseconds
     const calculatedEndTime = logInTime + duration;
     setEndTime(calculatedEndTime);
-
-    console.log(
-      "End time (should be 120 mins after log_in):",
-      new Date(calculatedEndTime)
-    );
 
     setTimeout(() => {
       setStartCountdown(true);
@@ -55,9 +47,6 @@ const CbtTimer = ({ refresh, isLoading, number, log, bankid }) => {
     const updateCountdown = () => {
       const now = new Date().getTime();
       const timeLeft = endTime - now;
-
-      console.log("Current time (now):", new Date(now));
-      console.log("Time left:", timeLeft);
 
       if (timeLeft <= 0) {
         setCountdown("00:00:00");

@@ -11,10 +11,12 @@ const Top = ({ name, quizName, bankid, nis }) => {
   );
 
   useEffect(() => {
-    if (log?.isDone) {
+    if (log && (log.isDone || !log.isActive)) {
       navigate(`/cbt-jawdal-ujian`);
     }
-  }, [log]);
+  }, [log, navigate]);
+
+  console.log(log);
 
   return (
     <div className="bg-primary text-white row d-flex align-items-center p-2">
@@ -23,7 +25,7 @@ const Top = ({ name, quizName, bankid, nis }) => {
       </div>
       <div className="col-lg-6 col-12">
         <p className="m-0 text-lg-end text-center">
-          {quizName.replace("-", " ")}
+          {quizName.replace(/-/g, " ")}
         </p>
       </div>
     </div>
