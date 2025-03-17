@@ -1,1 +1,0 @@
-import{j as r}from"./index-B3i7-Od_.js";import{L as t}from"./Layout-BvwMQNLL.js";import"./Menus-CeiNyHsH.js";import"./Protected-CKVcvXRo.js";import"./BtnLoader-DeRy67lV.js";const m=()=>r.jsx(t,{title:"Dashboard Guru",children:"TeacherDash"});export{m as default};

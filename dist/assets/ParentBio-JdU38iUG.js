@@ -1,0 +1,1 @@
+import{i as o,j as r}from"./index-DeaHuNJ0.js";import{L as s}from"./Layout-ClQOXX2b.js";import{F as m}from"./FormPage-eJ5w7jKr.js";import"./Menus--Y3j7fu2.js";import"./BtnLoader-DbV900Jb.js";const u=()=>{const t=o(),{name:a}=t;return r.jsx(s,{title:`Biodata ${a.replace(/\-/g," ")}`,children:r.jsx(m,{})})};export{u as default};

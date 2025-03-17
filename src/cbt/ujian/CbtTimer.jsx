@@ -9,8 +9,6 @@ const CbtTimer = ({ refresh, isLoading, number, log, bankid }) => {
   const navigate = useNavigate();
   const [countdown, setCountdown] = useState("");
 
-  console.log(time);
-
   const [timeoutQuiz, { isSuccess, error }] = useTimeoutQuizMutation();
 
   const handleSync = () => {
@@ -33,7 +31,8 @@ const CbtTimer = ({ refresh, isLoading, number, log, bankid }) => {
     if (!log?.log_in) return;
 
     const logInTime = new Date(log.log_in).getTime();
-    const endTime = logInTime + time * 60 * 1000; // 60 menit dalam milidetik
+    const duration = Number(time) * 60 * 1000;
+    const endTime = logInTime + duration;
 
     const updateCountdown = () => {
       const now = new Date().getTime();
@@ -41,7 +40,7 @@ const CbtTimer = ({ refresh, isLoading, number, log, bankid }) => {
 
       if (timeLeft <= 0) {
         setCountdown("00:00:00");
-        // timeoutQuiz(bankid);
+        timeoutQuiz(bankid);
         return;
       }
 
