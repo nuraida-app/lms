@@ -42,7 +42,7 @@ router.post("/create", authorize("student"), async (req, res) => {
       VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING *`;
 
-    await client.query(insertQuery, [
+    const data = await client.query(insertQuery, [
       date,
       ipAddress,
       browser,
@@ -51,6 +51,8 @@ router.post("/create", authorize("student"), async (req, res) => {
       isActive,
       isDone,
     ]);
+
+    console.log(data.rows);
 
     res.status(200).json({ message: "Joining Exam" });
   } catch (error) {
