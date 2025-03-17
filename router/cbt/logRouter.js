@@ -12,6 +12,9 @@ router.post("/create", authorize("student"), async (req, res) => {
     let ipAddress = req.socket.remoteAddress;
     const browser = req.useragent.browser + " " + req.useragent.version;
 
+    const isActive = true;
+    const isDone = false;
+
     // Jika alamat IP adalah IPv6, potong bagian IPv6 dan simpan hanya IPv4
     if (ipAddress.includes("::ffff:")) {
       ipAddress = ipAddress.split("::ffff:")[1];
@@ -33,8 +36,8 @@ router.post("/create", authorize("student"), async (req, res) => {
 
     // Simpan data log baru
     await client.query(
-      "INSERT INTO log (log_in, ip, browser, nis, quiz_id) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-      [date, ipAddress, browser, nis, quizId]
+      "INSERT INTO log (log_in, ip, browser, nis, quiz_id, isActive, isDone) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
+      [date, ipAddress, browser, nis, quizId, isActive, isDone]
     );
 
     res.status(200).json({ message: "Joining Exam" });
