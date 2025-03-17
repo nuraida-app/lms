@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useTimeoutQuizMutation } from "../../control/api/logApi";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
-const CbtTimer = ({ refresh, isLoading, number, time, log, bankid }) => {
+const CbtTimer = ({ refresh, isLoading, number, log, bankid }) => {
+  const params = useParams();
+  const { time } = params;
   const navigate = useNavigate();
   const [countdown, setCountdown] = useState("");
 

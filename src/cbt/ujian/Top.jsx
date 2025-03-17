@@ -16,7 +16,6 @@ const Top = ({ name, quizName, bankid, nis }) => {
     }
   }, [log]);
 
-  console.log(log);
   return (
     <div className="bg-primary text-white row d-flex align-items-center p-2">
       <div className="col-lg-6 col-12">

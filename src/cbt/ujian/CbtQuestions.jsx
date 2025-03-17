@@ -19,8 +19,6 @@ const CbtQuestions = ({ question, note, answers }) => {
     useDoubtAnswerMutation();
   const answer = answers?.find((a) => a.question_id === question?.id);
 
-  console.log(answer);
-
   const pg = question?.type === 1;
   const essay = question?.type === 2;
 
