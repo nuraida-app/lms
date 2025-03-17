@@ -52,8 +52,6 @@ router.post("/create", authorize("student"), async (req, res) => {
       isDone,
     ]);
 
-    console.log(data.rows);
-
     res.status(200).json({ message: "Joining Exam" });
   } catch (error) {
     console.error("Error saat menyimpan log:", error);
