@@ -35,7 +35,7 @@ const CbtTimer = ({ refresh, isLoading, number, time, log, bankid }) => {
 
       if (timeLeft <= 0) {
         setCountdown("00:00:00");
-        timeoutQuiz(bankid);
+        // timeoutQuiz(bankid);
         return;
       }
 

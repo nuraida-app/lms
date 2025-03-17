@@ -77,13 +77,12 @@ const CbtList = () => {
   useEffect(() => {
     if (isSuccess) {
       toast.success(data.message);
+      localStorage.removeItem("questions");
 
       const formatted = detail.name.replace(/\s+/g, "-");
-      navigate(`/cbt-halaman/${formatted}/${detail.quiz_id}/${detail.time}`);
+      window.location.href = `/cbt-halaman/${formatted}/${detail.quiz_id}/${detail.time}`;
 
       reset();
-
-      localStorage.removeItem("questions");
     }
 
     if (error) {
