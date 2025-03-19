@@ -177,4 +177,119 @@ router.post("/add-score", authorize("tahfiz"), async (req, res) => {
   }
 });
 
+router.post("/add-target", authorize("tahfiz"), async (req, res) => {
+  try {
+    const { gradeid, juzid } = req.body;
+
+    await client.query(
+      `INSERT INTO t_target (grade_id, juz_id) VALUES ($1, $2)`,
+      [gradeid, juzid]
+    );
+
+    res.status(200).json({ message: "Berhasil disimpan" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+router.get("/get-targets", authorize("tahfiz"), async (req, res) => {
+  try {
+    // Fetch all target data sorted by grade and juz name
+    const targetData = await client.query(
+      `SELECT t_target.*, t_juz.name AS juz_name, grades.grade AS grade_name
+      FROM t_target 
+      LEFT JOIN t_juz ON t_juz.id = t_target.juz_id
+      LEFT JOIN grades ON grades.id = t_target.grade_id
+      ORDER BY grades.grade::INTEGER ASC, t_juz.name DESC`
+    );
+
+    // Fetch total ayat and total lines for each juz
+    const responseData = await Promise.all(
+      targetData.rows.map(async (target) => {
+        const ayatData = await client.query(
+          `SELECT 
+          COALESCE(SUM(to_ayat), 0) AS total_ayat,
+          COALESCE(SUM(to_line), 0) AS total_line
+        FROM t_juzitems
+        WHERE juz_id = $1`,
+          [target.juz_id]
+        );
+
+        return {
+          grade: target.grade_name,
+          juz: target.juz_name,
+          total_ayat: parseInt(ayatData.rows[0].total_ayat, 10),
+          total_line: parseInt(ayatData.rows[0].total_line, 10),
+        };
+      })
+    );
+
+    // Group data by grade and calculate total_ayat & total_line per grade
+    const groupedData = responseData.reduce((acc, target) => {
+      let gradeEntry = acc.find((entry) => entry.grade === target.grade);
+      if (!gradeEntry) {
+        gradeEntry = {
+          grade: target.grade,
+          target: [],
+          total_ayat: 0,
+          total_line: 0,
+        };
+        acc.push(gradeEntry);
+      }
+
+      // Add juz data
+      gradeEntry.target.push({
+        juz: target.juz,
+        total_ayat: target.total_ayat,
+        total_line: target.total_line,
+      });
+
+      // Sum total ayat and total line for the grade
+      gradeEntry.total_ayat += target.total_ayat;
+      gradeEntry.total_line += target.total_line;
+
+      return acc;
+    }, []);
+
+    res.status(200).json(groupedData);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+router.delete("/delete-target/:id", authorize("tahfiz"), async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await client.query(`DELETE FROM t_target WHERE id = $1`, [id]);
+
+    res.status(200).json({ message: "Berhasil dihapus" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
 export default router;
+
+const data = [
+  {
+    garde: "7",
+    target: [
+      {
+        juz: "Juz 30",
+        total_ayat: "564",
+        total_line: "271",
+      },
+      {
+        juz: "Juz 29",
+        total_ayat: "431",
+        total_line: "278",
+      },
+    ],
+    total_ayat: "jumlah total_ayat",
+    total_line: "jumlah total_line",
+  },
+];

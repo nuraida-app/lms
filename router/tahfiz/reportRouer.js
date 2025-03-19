@@ -104,6 +104,8 @@ const buildStudentData = async (rows) => {
             name: surah.name,
             from_ayat: surah.from_count,
             to_ayat: surah.to_count,
+            from_line: surah.from_line,
+            to_line: surah.to_line,
           })),
           type_id: row.type_id,
           type: row.type_name,
@@ -367,6 +369,83 @@ router.delete("/delete-report", authorize("tahfiz"), async (req, res) => {
     }
 
     res.status(200).json({ message: "Data successfully deleted." });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+router.get("/get-progress", async (req, res) => {
+  try {
+    const { page = 1, limit = 10, search, juzId = 30 } = req.query;
+    const offset = (page - 1) * limit;
+
+    const typeData = await client.query(
+      `SELECT * FROM t_type WHERE name = 'Harian'`
+    );
+    const type = typeData.rows[0].id;
+
+    const juzData = await client.query(
+      `SELECT t_juz.id, t_juz.name,
+          COALESCE((SELECT SUM(to_line) FROM t_juzitems WHERE t_juzitems.juz_id = t_juz.id), 0) AS total_line
+        FROM t_juz
+        WHERE t_juz.id = $1`,
+      [juzId]
+    );
+
+    if (juzData.rows.length === 0) {
+      return res.status(404).json({ message: "Juz not found" });
+    }
+
+    const juz = juzData.rows[0];
+
+    const studentsData = await client.query(
+      `WITH RankedProcess AS (
+        SELECT t_process.nis, user_student.name, 
+               MAX(grades.grade) AS grade, 
+               MAX(classes.name) AS class_name,
+               t_process.from_id, 
+               MAX(t_process.to_line) AS to_line, 
+               MAX(t_process.createdat) AS createdat
+        FROM t_process
+        LEFT JOIN user_student ON t_process.nis = user_student.nis
+        LEFT JOIN students_class ON t_process.nis = students_class.nis
+        LEFT JOIN grades ON students_class.grade_id = grades.id
+        LEFT JOIN classes ON students_class.class_code = classes.code
+        WHERE t_process.juz_id = $1 AND t_process.type_id = $2 AND user_student.isactive = true
+        GROUP BY t_process.nis, user_student.name, t_process.from_id
+      )
+      SELECT nis, name, grade, class_name, SUM(to_line) AS total_line
+      FROM RankedProcess
+      GROUP BY nis, name, grade, class_name
+      ORDER BY CAST(grade AS INTEGER) ASC, class_name ASC, name ASC
+      LIMIT $3 OFFSET $4;`,
+      [juzId, type, limit, offset]
+    );
+
+    const totalStudents = await client.query(
+      `SELECT COUNT(DISTINCT nis) AS total FROM t_process WHERE juz_id = $1 AND type_id = $2`,
+      [juzId, type]
+    );
+
+    const totalData = totalStudents.rows[0].total;
+    const totalPages = Math.ceil(totalData / limit);
+
+    const result = studentsData.rows.map((student) => ({
+      nis: student.nis,
+      name: student.name,
+      grade: student.grade,
+      class: student.class_name,
+      juz: juz.name,
+      total_line: student.total_line,
+      percentage: ((student.total_line / juz.total_line) * 100).toFixed(2),
+    }));
+
+    res.status(200).json({
+      totalData,
+      totalPages,
+      result,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: error.message });
