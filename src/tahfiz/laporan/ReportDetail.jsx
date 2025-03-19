@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import { useParams } from "react-router-dom";
 import { useGetCategoriesQuery } from "../../control/api/metricApi";
+import SurahTable from "./SurahTable";
 
 const ReportDetail = () => {
   const params = useParams();
@@ -28,27 +29,27 @@ const ReportDetail = () => {
 
   return (
     <Layout title={`laporan ${params.name.replace("-", " ")}`}>
-      <div className="d-flex flex-column gap-2">
-        <div className="row g-2">
-          <div className="col-lg-4 col-12">
-            <p className="m-0 h5 bg-white p-2 border shadow rounded">
+      <div className='d-flex flex-column gap-2'>
+        <div className='row g-2'>
+          <div className='col-lg-4 col-12'>
+            <p className='m-0 h5 bg-white p-2 border shadow rounded'>
               {student}
             </p>
           </div>
-          <div className="col-lg-4 col-12">
-            <p className="m-0 h5 bg-white p-2 border shadow rounded">{type}</p>
+          <div className='col-lg-4 col-12'>
+            <p className='m-0 h5 bg-white p-2 border shadow rounded'>{type}</p>
           </div>
-          <div className="col-lg-4 col-12">
-            <p className="m-0 h5 bg-white p-2 border shadow rounded">
+          <div className='col-lg-4 col-12'>
+            <p className='m-0 h5 bg-white p-2 border shadow rounded'>
               {examiner}
             </p>
           </div>
         </div>
 
-        <div className="row g-2">
-          <div className="col-md-6 col-12">
-            <div className="table-responsive border border-2 p-1 rounded bg-white shadow">
-              <table className="table table-striped table-hover">
+        <div className='row g-2'>
+          <div className='col-md-6 col-12'>
+            <div className='table-responsive border border-2 p-1 rounded bg-white shadow'>
+              <table className='table table-striped table-hover'>
                 <thead>
                   <tr>
                     <th>Kategori</th>
@@ -60,11 +61,11 @@ const ReportDetail = () => {
                   {categories?.map((category, i) => (
                     <tr key={i}>
                       {/* Nama Kategori */}
-                      <td className="align-middle">{category.category}</td>
+                      <td className='align-middle'>{category.category}</td>
 
                       {/* Indikator */}
-                      <td className="align-middle">
-                        <div className="d-flex flex-column gap-2">
+                      <td className='align-middle'>
+                        <div className='d-flex flex-column gap-2'>
                           {Array.isArray(category.indicators) &&
                           category.indicators.filter((indi) => indi !== null)
                             .length > 0 ? (
@@ -89,14 +90,14 @@ const ReportDetail = () => {
                                 return (
                                   <div
                                     key={j}
-                                    className="d-flex align-items-center justify-content-between p-2 rounded border border-2 bg-white"
+                                    className='d-flex align-items-center justify-content-between p-2 rounded border border-2 bg-white'
                                   >
-                                    <p className="m-0">{indi.name}</p>
+                                    <p className='m-0'>{indi.name}</p>
                                     <input
                                       style={{ width: 200 }}
-                                      type="text"
-                                      className="form-control"
-                                      placeholder="Penilaian"
+                                      type='text'
+                                      className='form-control'
+                                      placeholder='Penilaian'
                                       value={indicatorPoint || ""}
                                       readOnly
                                       data-indicator-id={indi.id}
@@ -106,7 +107,7 @@ const ReportDetail = () => {
                                 );
                               })
                           ) : (
-                            <p className="m-0 text-muted">
+                            <p className='m-0 text-muted'>
                               Tidak ada indikator untuk kategori ini
                             </p>
                           )}
@@ -114,13 +115,13 @@ const ReportDetail = () => {
                       </td>
 
                       {/* Poin Kategori */}
-                      <td className="align-middle">
-                        <div className="d-flex justify-content-center">
+                      <td className='align-middle'>
+                        <div className='d-flex justify-content-center'>
                           <input
-                            type="text"
-                            name="category-score"
-                            className="form-control"
-                            placeholder="Nilai"
+                            type='text'
+                            name='category-score'
+                            className='form-control'
+                            placeholder='Nilai'
                             style={{ width: 80 }}
                             value={
                               report?.scores?.find(
@@ -139,27 +140,8 @@ const ReportDetail = () => {
             </div>
           </div>
 
-          <div className="col-md-6 col-12">
-            <div className="table-responsive border border-2 rounded p-1 bg-white shadow">
-              <table className="table table-striped table-hover">
-                <thead>
-                  <tr>
-                    <th>Surah</th>
-                    <th>Dari Ayat</th>
-                    <th>Sampai Ayat</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {tableData.map((row, index) => (
-                    <tr key={index}>
-                      <td>{row.name}</td>
-                      <td>{row.from_ayat}</td>
-                      <td>{row.to_ayat}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+          <div className='col-md-6 col-12'>
+            <SurahTable data={tableData} />
           </div>
         </div>
       </div>

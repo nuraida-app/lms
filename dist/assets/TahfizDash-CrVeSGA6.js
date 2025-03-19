@@ -1,0 +1,1 @@
+import{j as t}from"./index-CTzcuBoK.js";import{L as r}from"./Layout-Cu2rnSMr.js";import"./BtnLoader-3yQoFKHU.js";import"./Protected-C3pLNaBW.js";import"./Menus-2OI2gVT_.js";import"./Menus--Y3j7fu2.js";const e=()=>t.jsx(r,{title:"Administrator Tahfiz"});export{e as default};

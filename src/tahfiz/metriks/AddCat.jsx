@@ -46,34 +46,33 @@ const AddCat = ({ category, clear }) => {
     }
   }, [category]);
 
-  console.log(category);
   return (
     <form
-      className="p-2 rounded border border-2 d-flex flex-column gap-2 bg-white"
+      className='p-2 rounded border border-2 d-flex flex-column gap-2 bg-white'
       onSubmit={categoryHandler}
     >
-      <p className="m-0 h6">Tambah Kategori</p>
+      <p className='m-0 h6'>Tambah Kategori</p>
 
       <input
-        type="text"
-        name="category"
-        id="i"
-        className="form-control"
+        type='text'
+        name='category'
+        id='i'
+        className='form-control'
         required
         value={name || ""}
         onChange={(e) => setName(e.target.value)}
-        placeholder="Kategori Penilaian"
+        placeholder='Kategori Penilaian'
       />
 
-      <div className="text-end">
+      <div className='text-end'>
         <button
-          type="button"
-          className="btn btn-warning me-2"
+          type='button'
+          className='btn btn-warning me-2'
           onClick={cancelHandler}
         >
           Batal
         </button>
-        <button type="submit" className="btn btn-success">
+        <button type='submit' className='btn btn-success'>
           {isLoading ? `Loading...` : `+ Tambahkan`}
         </button>
       </div>

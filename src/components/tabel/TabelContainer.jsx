@@ -31,73 +31,80 @@ const TableContainer = ({
     setPage(1);
   };
 
+  // Calculate the pages to display
+  const getPaginationButtons = () => {
+    const buttons = [];
+    const startPage = Math.max(1, page - 1);
+    const endPage = Math.min(totalPages, page + 1);
+
+    for (let i = startPage; i <= endPage; i++) {
+      buttons.push(
+        <li key={i} className={`page-item ${page === i ? "active" : ""}`}>
+          <button className='page-link' onClick={() => handlePageChange(i)}>
+            {i}
+          </button>
+        </li>
+      );
+    }
+
+    return buttons;
+  };
+
   return (
-    <div className="container-fluid p-2 shadow rounded mt-2 bg-white border border-2">
+    <div className='container-fluid p-2 shadow rounded mt-2 bg-white border border-2'>
       <div
-        className="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3 d-flex justify-content-between"
-        role="search"
+        className='col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3 d-flex justify-content-between'
+        role='search'
       >
-        <div className="d-flex align-items-center">
+        <div className='d-flex align-items-center'>
           <input
-            type="text"
-            className="form-control"
-            placeholder="Cari ..."
+            type='text'
+            className='form-control'
+            placeholder='Cari ...'
             value={value || ""}
             onChange={handleChange}
           />
         </div>
 
-        <div className="d-flex align-items-center">
+        <div className='d-flex align-items-center'>
           <select
-            className="form-select form-select-sm"
+            className='form-select form-select-sm'
             value={limitValue}
             onChange={handleRowsPerPageChange}
           >
-            <option value="10">10</option>
-            <option value="20">20</option>
-            <option value="30">30</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
-            <option value="200">200</option>
-            <option value="300">300</option>
-            <option value="400">400</option>
-            <option value="500">500</option>
+            <option value='10'>10</option>
+            <option value='20'>20</option>
+            <option value='30'>30</option>
+            <option value='50'>50</option>
+            <option value='100'>100</option>
+            <option value='200'>200</option>
+            <option value='300'>300</option>
+            <option value='400'>400</option>
+            <option value='500'>500</option>
           </select>
         </div>
       </div>
 
-      <div className="table-responsive my-2">
+      <div className='table-responsive my-2'>
         {children}
 
-        <nav className="d-flex flex-wrap justify-content-between align-items-center">
-          <ul className="pagination pagination-sm justify-content-center m-0 d-flex flex-wrap">
+        <nav className='d-flex flex-wrap justify-content-between align-items-center'>
+          <ul className='pagination pagination-sm justify-content-center m-0 d-flex flex-wrap'>
             <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
               <button
-                className="page-link"
+                className='page-link'
                 onClick={() => handlePageChange(page - 1)}
                 disabled={page === 1}
               >
                 <Md.MdKeyboardDoubleArrowLeft />
               </button>
             </li>
-            {[...Array(totalPages).keys()].map((_, index) => (
-              <li
-                key={index + 1}
-                className={`page-item ${page === index + 1 ? "active" : ""}`}
-              >
-                <button
-                  className="page-link"
-                  onClick={() => handlePageChange(index + 1)}
-                >
-                  {index + 1}
-                </button>
-              </li>
-            ))}
+            {getPaginationButtons()}
             <li
               className={`page-item ${page === totalPages ? "disabled" : ""}`}
             >
               <button
-                className="page-link"
+                className='page-link'
                 onClick={() => handlePageChange(page + 1)}
                 disabled={page >= totalPages}
               >

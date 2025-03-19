@@ -12,13 +12,7 @@ const columns = [
 ];
 
 const TahfizDash = () => {
-  return (
-    <Layout title={"Administrator Tahfiz"}>
-      <div style={{ height: "calc(100vh - 70px)", overflow: "auto" }}>
-        <Juz />
-      </div>
-    </Layout>
-  );
+  return <Layout title={"Administrator Tahfiz"}></Layout>;
 };
 
 export default TahfizDash;

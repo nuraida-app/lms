@@ -6,7 +6,7 @@ export const scoreApi = createApi({
     baseUrl: `${import.meta.env.VITE_BASE}/scoring`,
     credentials: "include",
   }),
-  tagTypes: ["Grades", "Classes", "Students", "Scores"],
+  tagTypes: ["Grades", "Classes", "Students", "Scores", "Targets"],
   endpoints: (builder) => ({
     getGrades: builder.query({
       query: () => ({
@@ -38,6 +38,28 @@ export const scoreApi = createApi({
       }),
       invalidatesTags: ["Scores"],
     }),
+    getTargets: builder.query({
+      query: () => ({
+        url: "/get-targets",
+        method: "GET",
+      }),
+      providesTags: ["Targets"],
+    }),
+    addTarget: builder.mutation({
+      query: (body) => ({
+        url: "/add-target",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Targets"],
+    }),
+    deleteTarget: builder.mutation({
+      query: (id) => ({
+        url: `/delete-target/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Targets"],
+    }),
   }),
 });
 
@@ -46,4 +68,7 @@ export const {
   useGetClassessQuery,
   useGetStudentsQuery,
   useAddscoreMutation,
+  useGetTargetsQuery,
+  useAddTargetMutation,
+  useDeleteTargetMutation,
 } = scoreApi;

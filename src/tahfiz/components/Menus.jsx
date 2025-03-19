@@ -2,6 +2,8 @@ export const AdminMenus = [
   { label: "Hafalan", link: "/tahfiz-hafalan" },
   { label: "Surat Al Quran", link: "/tahfiz-alquran" },
   { label: "Juz Al Quran", link: "/tahfiz-juz-alquran" },
+  { label: "Target", link: "/tahfiz-target" },
+  { label: "Capaian", link: "/tahfiz-capaian" },
   { label: "Penguji", link: "/tahfiz-penguji" },
   { label: "Penilaian", link: "/tahfiz-penilaian" },
   { label: "Metriks", link: "/tahfiz-metriks" },

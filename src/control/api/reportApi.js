@@ -31,6 +31,14 @@ export const reportApi = createApi({
       }),
       providesTags: ["reports"],
     }),
+    getProgress: builder.query({
+      query: ({ page, limit, search, juzId }) => ({
+        url: "/get-progress",
+        method: "GET",
+        params: { page, limit, search, juzId },
+      }),
+      providesTags: ["reports"],
+    }),
   }),
 });
 
@@ -38,4 +46,5 @@ export const {
   useGetReportQuery,
   useDeleteReportMutation,
   useStudentReportQuery,
+  useGetProgressQuery,
 } = reportApi;

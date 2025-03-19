@@ -48,8 +48,6 @@ const TahfizScoring = () => {
     setToLine("");
   };
 
-  console.log(tableData);
-
   const deleteSurah = (name) => {
     const filteredTableData = tableData.filter(
       (surah) => surah.fromSurahName !== name
@@ -129,9 +127,9 @@ const TahfizScoring = () => {
     <Layout title={`hafalan Siswa ${formatted}`}>
       <div
         style={{ overflow: "auto" }}
-        className="h-100 p-2 d-flex flex-column gap-2 rounded bg-white border shadow"
+        className='h-100 p-2 d-flex flex-column gap-2 rounded bg-white border shadow'
       >
-        <p className="m-0 h5">{formatted}</p>
+        <p className='m-0 h5'>{formatted}</p>
 
         <Selects
           typeId={typeId}
@@ -155,17 +153,17 @@ const TahfizScoring = () => {
           setTableData={setTableData}
         />
 
-        <div className="row g-2">
-          <div className="col-lg-6 col-12">
+        <div className='row g-2'>
+          <div className='col-lg-6 col-12'>
             <Scoring />
           </div>
-          <div className="col-lg-6 col-12">
+          <div className='col-lg-6 col-12'>
             <TableData data={tableData} deleteSurah={deleteSurah} />
 
-            <div className="text-end">
+            <div className='text-end'>
               {tableData?.length > 0 && (
                 <button
-                  className="btn btn-success"
+                  className='btn btn-success'
                   disabled={isLoading}
                   onClick={handleSave}
                 >

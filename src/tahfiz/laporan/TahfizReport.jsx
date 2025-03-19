@@ -57,19 +57,20 @@ const TahfizReport = () => {
 
   return (
     <Layout title={"Laporan"}>
-      <div className="d-flex justify-content-end gap-2 p-2 rounded border shadow">
-        <button className="btn btn-secondary" onClick={() => setType("")}>
+      <div className='d-flex justify-content-end flex-wrap gap-2 p-2 rounded border shadow bg-white'>
+        <button className='btn btn-secondary' onClick={() => setType("")}>
           Reset
         </button>
         {types?.map((item) => (
           <button
             key={item.id}
-            className="btn btn-secondary"
+            className='btn btn-secondary'
             onClick={() => setType(item.id)}
           >
             {item.name}
           </button>
         ))}
+        <button className='btn btn-primary'>Data Siswa</button>
       </div>
       <TableContainer
         page={page}
@@ -78,20 +79,17 @@ const TahfizReport = () => {
         onValue={(e) => setSearch(e)}
         totalPages={totalPages}
       >
-        <table className="table table-striped table-hover table-bordered">
+        <table className='table table-striped table-hover table-bordered'>
           <thead>
             <tr>
-              <th className="align-middle text-center">No</th>
-              <th className="align-middle text-center">Tanggal</th>
-              <th className="align-middle text-center">NIS</th>
-              <th className="align-middle text-center">Nama Siswa</th>
-              <th className="align-middle text-center">Tingkat</th>
-              <th className="align-middle text-center">Kelas</th>
-              <th className="align-middle text-center">Jenis Penilaian</th>
-              <th className="align-middle text-center">Surah</th>
-              <th className="align-middle text-center">Nilai</th>
-              <th className="align-middle text-center">Penguji</th>
-              <th className="align-middle text-center">Aksi</th>
+              <th className='align-middle text-center'>No</th>
+              <th className='align-middle text-center'>Tanggal</th>
+              <th className='align-middle text-center'>NIS</th>
+              <th className='align-middle text-center'>Nama Siswa</th>
+              <th className='align-middle text-center'>Tingkat</th>
+              <th className='align-middle text-center'>Kelas</th>
+              <th className='align-middle text-center'>Penilaian</th>
+              <th className='align-middle text-center'>Aksi</th>
             </tr>
           </thead>
           {report?.length === 0 ? (
@@ -110,39 +108,26 @@ const TahfizReport = () => {
             <tbody>
               {report?.map((data, index) => (
                 <tr key={index}>
-                  <td className="text-center align-middle">{index + 1}</td>
-                  <td className="text-center align-middle">
+                  <td className='text-center align-middle'>{index + 1}</td>
+                  <td className='text-center align-middle'>
                     {new Date(data.date).toLocaleDateString()}
                   </td>
-                  <td className="text-center align-middle">{data.nis}</td>
-                  <td className="text-start align-middle">{data.name}</td>
-                  <td className="text-center align-middle">{data.grade}</td>
-                  <td className="text-center align-middle">{data.class}</td>
-                  <td className="text-center align-middle">{data.type}</td>
-                  <td className="text-center align-middle">
-                    {data.surahs?.map((item, i) => (
-                      <p key={i} className="m-0">
-                        {item.name}{" "}
-                        <span>{`(${item.from_ayat} - ${item.to_ayat})`}</span>
-                      </p>
-                    ))}
-                  </td>
-
-                  <td className="text-center align-middle">
-                    {data.totalPoints}
-                  </td>
-                  <td className="text-center align-middle">{data.examiner}</td>
-                  <td className="align-middle">
-                    <div className="d-flex justify-content-center gap-2">
+                  <td className='text-center align-middle'>{data.nis}</td>
+                  <td className='text-start align-middle'>{data.name}</td>
+                  <td className='text-center align-middle'>{data.grade}</td>
+                  <td className='text-center align-middle'>{data.class}</td>
+                  <td className='text-center align-middle'>{data.type}</td>
+                  <td className='align-middle'>
+                    <div className='d-flex justify-content-center gap-2'>
                       <button
-                        className="btn btn-primary"
+                        className='btn btn-primary'
                         onClick={() => goToLink(data)}
                       >
                         Detail
                       </button>
 
                       <button
-                        className="btn btn-danger"
+                        className='btn btn-danger'
                         onClick={() =>
                           deleteHandler(
                             data.nis,

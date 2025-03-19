@@ -41,6 +41,10 @@ const TahfizReport = lazy(() => import("./tahfiz/laporan/TahfizReport"));
 const ReportDetail = lazy(() => import("./tahfiz/laporan/ReportDetail"));
 const TahfizStudent = lazy(() => import("./tahfiz/santri/TahfizStudent"));
 const TahfizScoring = lazy(() => import("./tahfiz/hafalan/TahfizScoring"));
+const TahfizAchievement = lazy(() =>
+  import("./tahfiz/capaian/TahfizAchievement")
+);
+const TahfizTarget = lazy(() => import("./tahfiz/target/TahfizTarget"));
 
 const AdminDash = lazy(() => import("./admin/dashboard/AdminDash"));
 const AdminGrade = lazy(() => import("./admin/tingkat/AdminGrade"));
@@ -84,7 +88,7 @@ function App() {
 
   return (
     <BrowserRouter>
-      <ToastContainer position="bottom-right" autoClose={3000} />
+      <ToastContainer position='bottom-right' autoClose={3000} />
       <MetaData
         title={"Nuraida"}
         desc={
@@ -93,145 +97,151 @@ function App() {
       />
       <Suspense fallback={<Loader />}>
         <Routes>
-          <Route path="/" element={<SignIn />} />
+          <Route path='/' element={<SignIn />} />
 
-          <Route path="/signup" element={<SignUp />} />
+          <Route path='*' element={<SignIn />} />
+
+          <Route path='/signup' element={<SignUp />} />
 
           {/* CBT */}
-          <Route path="/cbt-bank-soal" element={<CbtBankList />} />
+          <Route path='/cbt-bank-soal' element={<CbtBankList />} />
 
           <Route
-            path="/cbt-bank-soal/:name/:bankid"
+            path='/cbt-bank-soal/:name/:bankid'
             element={<ListQuestions />}
           />
 
           <Route
-            path="/cbt-bank-soal/:name/tambah-soal/:bankid"
+            path='/cbt-bank-soal/:name/tambah-soal/:bankid'
             element={<AddQuestion />}
           />
 
           <Route
-            path="/cbt-bank-soal/:name/tambah-soal/:bankid/:questionid"
+            path='/cbt-bank-soal/:name/tambah-soal/:bankid/:questionid'
             element={<AddQuestion />}
           />
 
-          <Route path="/cbt-ujian" element={<CbtSchedules />} />
+          <Route path='/cbt-ujian' element={<CbtSchedules />} />
 
           <Route
-            path="/cbt-laporan/:name/:bankid/:gradeid"
+            path='/cbt-laporan/:name/:bankid/:gradeid'
             element={<CbtReport />}
           />
 
           {/* LMS */}
-          <Route path="/lms-mapel" element={<LmsMapel />} />
+          <Route path='/lms-mapel' element={<LmsMapel />} />
 
-          <Route path="/lms-mapel-siswa" element={<LmsStudent />} />
+          <Route path='/lms-mapel-siswa' element={<LmsStudent />} />
 
           <Route
-            path="/lms-mapel/:id/:name/:code"
+            path='/lms-mapel/:id/:name/:code'
             element={<LmsMapelDetail />}
           />
 
           {/* Tahfiz */}
-          <Route path="/tahfiz-dashboard" element={<TahfizDash />} />
+          <Route path='/tahfiz-dashboard' element={<TahfizDash />} />
 
-          <Route path="/tahfiz-alquran" element={<TahfizAlquran />} />
+          <Route path='/tahfiz-alquran' element={<TahfizAlquran />} />
 
-          <Route path="/tahfiz-juz-alquran" element={<TahfizJuz />} />
+          <Route path='/tahfiz-juz-alquran' element={<TahfizJuz />} />
 
-          <Route path="/tahfiz-metriks" element={<TahfizMetriks />} />
+          <Route path='/tahfiz-metriks' element={<TahfizMetriks />} />
 
-          <Route path="/tahfiz-penilaian" element={<TahfizAssess />} />
+          <Route path='/tahfiz-penilaian' element={<TahfizAssess />} />
 
-          <Route path="/tahfiz-penguji" element={<TahfizExaminer />} />
+          <Route path='/tahfiz-penguji' element={<TahfizExaminer />} />
 
-          <Route path="/tahfiz-laporan" element={<TahfizReport />} />
+          <Route path='/tahfiz-laporan' element={<TahfizReport />} />
 
-          <Route path="/tahfiz-hafalan" element={<TahfizAddMemo />} />
+          <Route path='/tahfiz-hafalan' element={<TahfizAddMemo />} />
 
           <Route
-            path="/tahfiz-hafalan-siswa/:nis/:name"
+            path='/tahfiz-hafalan-siswa/:nis/:name'
             element={<TahfizScoring />}
           />
 
-          <Route path="/tahfiz-laporan/:nis/:name" element={<ReportDetail />} />
+          <Route path='/tahfiz-laporan/:nis/:name' element={<ReportDetail />} />
 
           <Route
-            path="/tahfiz-laporan-siswa/:nis/:name"
+            path='/tahfiz-laporan-siswa/:nis/:name'
             element={<TahfizStudent />}
           />
 
+          <Route path='/tahfiz-capaian' element={<TahfizAchievement />} />
+
+          <Route path='/tahfiz-target' element={<TahfizTarget />} />
+
           {/* Center */}
-          <Route path="/center-dashboard" element={<CenterDash />} />
+          <Route path='/center-dashboard' element={<CenterDash />} />
 
-          <Route path="/center-admin" element={<CenterAdmin />} />
+          <Route path='/center-admin' element={<CenterAdmin />} />
 
-          <Route path="/center-tapel" element={<CenterYears />} />
+          <Route path='/center-tapel' element={<CenterYears />} />
 
-          <Route path="/center-sekolah" element={<CenterSch />} />
+          <Route path='/center-sekolah' element={<CenterSch />} />
 
-          <Route path="/center-jenjang" element={<CenterGrade />} />
+          <Route path='/center-jenjang' element={<CenterGrade />} />
 
-          <Route path="/center-guru" element={<CenterTeacher />} />
+          <Route path='/center-guru' element={<CenterTeacher />} />
 
-          <Route path="/center-siswa" element={<CenterStudent />} />
+          <Route path='/center-siswa' element={<CenterStudent />} />
 
-          <Route path="/center-database" element={<CenterDb />} />
+          <Route path='/center-database' element={<CenterDb />} />
 
           {/* Admin */}
-          <Route path="/admin-dashboard" element={<AdminDash />} />
+          <Route path='/admin-dashboard' element={<AdminDash />} />
 
-          <Route path="/admin-tingkat" element={<AdminGrade />} />
+          <Route path='/admin-tingkat' element={<AdminGrade />} />
 
-          <Route path="/admin-kelas" element={<AdminClass />} />
+          <Route path='/admin-kelas' element={<AdminClass />} />
 
           <Route
-            path="/admin-kelas-daftar-siswa/:gradeId/:name/:code"
+            path='/admin-kelas-daftar-siswa/:gradeId/:name/:code'
             element={<AdminStudentList />}
           />
 
-          <Route path="/admin-mapel" element={<AdminSubjects />} />
+          <Route path='/admin-mapel' element={<AdminSubjects />} />
 
-          <Route path="/admin-guru" element={<AdminTeacher />} />
+          <Route path='/admin-guru' element={<AdminTeacher />} />
 
-          <Route path="/admin-siswa" element={<AdminStudents />} />
+          <Route path='/admin-siswa' element={<AdminStudents />} />
 
           <Route
-            path="/admin-database/:name/:nis"
+            path='/admin-database/:name/:nis'
             element={<AdminDatabase />}
           />
 
           {/* Guru */}
-          <Route path="/guru-dashboard" element={<TeacherDash />} />
+          <Route path='/guru-dashboard' element={<TeacherDash />} />
 
-          <Route path="/guru-profil" element={<TeacherProfile />} />
+          <Route path='/guru-profil' element={<TeacherProfile />} />
 
-          <Route path="/guru-mapel" element={<TeacherSubjects />} />
+          <Route path='/guru-mapel' element={<TeacherSubjects />} />
 
-          <Route path="/guru-database" element={<TeacherDatabase />} />
+          <Route path='/guru-database' element={<TeacherDatabase />} />
 
           <Route
-            path="/guru-database/:name/:nis"
+            path='/guru-database/:name/:nis'
             element={<TeacherStudent />}
           />
 
           {/* Siswa */}
-          <Route path="/siswa-dashboard" element={<StudentDash />} />
+          <Route path='/siswa-dashboard' element={<StudentDash />} />
 
-          <Route path="/cbt-jawdal-ujian" element={<StudentExam />} />
+          <Route path='/cbt-jawdal-ujian' element={<StudentExam />} />
 
           <Route
-            path="/cbt-halaman/:name/:bankId/:time"
+            path='/cbt-halaman/:name/:bankId/:time'
             element={<StudentExamPage />}
           />
 
-          <Route path="/siswa-biodata/:name/:nis" element={<StudentData />} />
+          <Route path='/siswa-biodata/:name/:nis' element={<StudentData />} />
 
           {/* Orang Tua */}
-          <Route path="/wali-dashboard" element={<ParentDash />} />
+          <Route path='/wali-dashboard' element={<ParentDash />} />
 
           <Route
-            path="/wali-biodata-siswa/:name/:nis"
+            path='/wali-biodata-siswa/:name/:nis'
             element={<ParentBio />}
           />
         </Routes>

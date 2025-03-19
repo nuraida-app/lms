@@ -1,0 +1,1 @@
+import{i as o,j as t}from"./index-CTzcuBoK.js";import{L as s}from"./Layout-ClkshND7.js";import{F as m}from"./FormPage-Dxh47zxg.js";import"./Menus-2OI2gVT_.js";import"./Protected-C3pLNaBW.js";import"./BtnLoader-3yQoFKHU.js";const x=()=>{const a=o(),{name:r}=a;return t.jsx(s,{title:`Data ${r.replace(/\-/g," ")}`,children:t.jsx(m,{})})};export{x as default};
