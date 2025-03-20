@@ -45,6 +45,7 @@ const TahfizAchievement = lazy(() =>
   import("./tahfiz/capaian/TahfizAchievement")
 );
 const TahfizTarget = lazy(() => import("./tahfiz/target/TahfizTarget"));
+const ReportStudent = lazy(() => import("./tahfiz/laporan/ReportStudent"));
 
 const AdminDash = lazy(() => import("./admin/dashboard/AdminDash"));
 const AdminGrade = lazy(() => import("./admin/tingkat/AdminGrade"));
@@ -151,8 +152,6 @@ function App() {
 
           <Route path='/tahfiz-penguji' element={<TahfizExaminer />} />
 
-          <Route path='/tahfiz-laporan' element={<TahfizReport />} />
-
           <Route path='/tahfiz-hafalan' element={<TahfizAddMemo />} />
 
           <Route
@@ -160,7 +159,11 @@ function App() {
             element={<TahfizScoring />}
           />
 
+          <Route path='/tahfiz-laporan' element={<TahfizReport />} />
+
           <Route path='/tahfiz-laporan/:nis/:name' element={<ReportDetail />} />
+
+          <Route path='/tahfiz-laporan-siswa' element={<ReportStudent />} />
 
           <Route
             path='/tahfiz-laporan-siswa/:nis/:name'

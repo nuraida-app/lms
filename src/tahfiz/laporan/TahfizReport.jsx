@@ -70,7 +70,12 @@ const TahfizReport = () => {
             {item.name}
           </button>
         ))}
-        <button className='btn btn-primary'>Data Siswa</button>
+        <button
+          className='btn btn-primary'
+          onClick={() => navigate("/tahfiz-laporan-siswa")}
+        >
+          Data Siswa
+        </button>
       </div>
       <TableContainer
         page={page}

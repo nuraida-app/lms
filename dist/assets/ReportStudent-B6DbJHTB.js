@@ -1,0 +1,1 @@
+import{j as t}from"./index-BrJWcZb6.js";import{L as r}from"./Layout-DrvebmSn.js";import"./BtnLoader-Di2qQ-OL.js";import"./Protected-ByH0_coX.js";import"./Menus-2OI2gVT_.js";import"./Menus--Y3j7fu2.js";const e=()=>t.jsx(r,{title:"Laporan Siswa",children:"sdasd"});export{e as default};
